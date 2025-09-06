@@ -1,0 +1,183 @@
+// 品牌色彩系统
+$primary-color: #FF7A00;        // 主色调橙色 (寿司橙)
+$secondary-color: #1E88E5;      // 辅助色蓝色（LINE FRIENDS联名色）
+$success-color: #4CAF50;
+$warning-color: #FF9800;
+$error-color: #F44336;
+$info-color: #2196F3;
+
+// ConveyorBeltDisplay 专用颜色 (合并自 display/_variables.scss)
+$color-accent: #FF9533;
+$color-wood-light: #DDC8B1;
+$color-wood-medium: #C8B299;
+$color-wood-dark: #B59B79;
+$color-wood-border: #8B4513;
+$color-wood-button-light: #D4B996;
+
+// 中性色系
+$white: #FFFFFF;
+$light-gray: #F5F5F5;
+$medium-gray: #CCCCCC;
+$dark-gray: #333333;
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-disabled: #999999;
+
+// 背景色
+$bg-primary: #FFFFFF;
+$bg-secondary: #F5F5F5;
+$bg-accent: #FFF8F0;
+
+// 圆角规范
+$border-radius-card: 16px;      // 大圆角（卡片）
+$border-radius-button: 8px;     // 小圆角（按钮）
+$border-radius-small: 4px;
+
+// 字体系统
+$font-family-title: 'FZLanTingHei-R-GBK', 'Microsoft YaHei', sans-serif;  // 方正兰亭黑简体
+$font-family-body: 'Source Han Sans CN', 'Microsoft YaHei', sans-serif;   // 思源黑体
+
+// 字体大小（基于1rem=10px）
+$font-size-xs: 1.2rem;    // 12px
+$font-size-sm: 1.4rem;    // 14px
+$font-size-base: 1.6rem;  // 16px
+$font-size-lg: 1.8rem;    // 18px
+$font-size-xl: 2.0rem;    // 20px
+$font-size-2xl: 2.4rem;   // 24px
+$font-size-3xl: 3.2rem;   // 32px
+
+// 响应式断点
+$breakpoint-xs: 375px;    // 手机端
+$breakpoint-sm: 768px;    // 平板端
+$breakpoint-md: 1024px;   // iPad端
+$breakpoint-lg: 1200px;
+$breakpoint-xl: 1920px;
+
+// 间距系统
+$spacing-xs: 0.4rem;   // 4px
+$spacing-sm: 0.8rem;   // 8px
+$spacing-md: 1.6rem;   // 16px
+$spacing-lg: 2.4rem;   // 24px
+$spacing-xl: 3.2rem;   // 32px
+$spacing-2xl: 4.8rem;  // 48px
+
+// ConveyorBeltDisplay 专用尺寸 (合并自 display/_variables.scss)
+$height-top-section: 120px;
+$height-bottom-section: 140px;
+$height-center-layout: 124px;
+$height-function-btn: 60px;
+$width-menu-btn: 100px;
+$width-function-btn: 160px;
+$padding-section: 20px;
+$padding-bottom-lr: 10px;
+$padding-bottom-center: 5px;
+$gap-bottom-section: 50px;
+$gap-center-layout: 8px;
+$gap-function-row: 10px;
+$gap-function-column: 4px;
+
+// 阴影系统
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+// 动画时长
+$transition-fast: 0.2s;
+$transition-base: 0.3s;
+$transition-slow: 0.5s;
+
+// Z-index层级
+$z-index-dropdown: 1000;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// 头部高度
+$header-height: 60px;
+$sidebar-width: 240px;
+$sidebar-collapsed-width: 64px;
+
+// 卡片样式
+$card-padding: 20px;
+$card-margin: 16px;
+
+// 表格样式
+$table-header-bg: #fafafa;
+$table-border-color: #ebeef5;
+$table-hover-bg: #f5f7fa;
+
+// 登录页面专用变量
+$login-bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$login-card-bg: rgba(255, 255, 255, 0.95);
+$login-input-bg: rgba(255, 255, 255, 0.9);
+$floating-animation-duration: 6s;
+
+// ConveyorBeltDisplay 专用渐变 (合并自 display/_variables.scss)
+$gradient-wood-panel: linear-gradient(135deg, $color-wood-light 0%, $color-wood-medium 50%, $color-wood-dark 100%);
+$gradient-wood-button: linear-gradient(135deg, $color-wood-button-light 0%, $color-wood-medium 100%);
+$gradient-wood-button-hover: linear-gradient(135deg, $color-wood-medium 0%, $color-wood-dark 100%);
+
+// ConveyorBeltDisplay 专用阴影 (合并自 display/_variables.scss)
+$shadow-light: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-medium: 0 6px 16px rgba(0, 0, 0, 0.2);
+$shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+$shadow-combined: $shadow-inset, 0 4px 12px rgba(0, 0, 0, 0.3);
+
+// 背景图片
+$bg-theme: url('/assets/design-resources/日料/3840x1080/theme.png') center/cover;
+
+// 按钮动画关键帧变量 (合并自 button-animations.scss)
+$btn-animation-duration-fast: 0.2s;
+$btn-animation-duration-normal: 0.3s;
+$btn-animation-duration-slow: 0.5s;
+$btn-hover-lift-distance: -3px;
+$btn-hover-scale-factor: 1.05;
+$btn-active-scale-factor: 0.98;
+
+// 背景颜色补充
+$bg-color: #f5f5f5;
+$bg-color-light: #f8f9fa;
+$bg-color-dark: #343a40;
+
+// 边框颜色
+$border-color-light: #e4e7ed;
+$border-color-base: #dcdfe6;
+$border-color-dark: #d4d7de;
+
+// 文本颜色别名（兼容旧版本）
+$text-color-primary: $text-primary;
+$text-color-secondary: $text-secondary;
+
+// 圆角别名（兼容旧版本）
+$border-radius: $border-radius-button;
+$border-radius-lg: $border-radius-card;
+
+// 阴影别名（兼容旧版本）
+$box-shadow-sm: $shadow-sm;
+$box-shadow: $shadow-md;
+$box-shadow-lg: $shadow-lg;
+
+// 颜色别名（兼容旧版本）
+$color-primary: $primary-color;
+$color-warning: $warning-color;
+$color-success: $success-color;
+$color-danger: $error-color;
+
+// 字体大小别名（兼容旧版本）
+$font-size-md: $font-size-base;
+$font-size-xxl: $font-size-3xl;
+
+// 文本颜色别名（兼容旧版本）
+$text-color-regular: $text-secondary;
+
+// 寿司主题色（用于菜单组件）
+$sushi-primary: $primary-color;
+$sushi-secondary: $secondary-color;
+
+
+
+
+
+
+

@@ -1,0 +1,312 @@
+// 导入变量文件
+@use './variables.scss' as *;
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-center-x {
+  display: flex;
+  justify-content: center;
+}
+
+@mixin flex-center-y {
+  display: flex;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-around {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// 响应式断点 mixins
+@mixin mobile {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-sm}) and (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: #{$breakpoint-xs - 1px}) { @content; }
+  }
+  @if $breakpoint == sm {
+    @media (min-width: #{$breakpoint-sm}) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (min-width: #{$breakpoint-md}) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (min-width: #{$breakpoint-lg}) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (min-width: #{$breakpoint-xl}) { @content; }
+  }
+}
+
+// 文本省略
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-ellipsis-multi($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// 清除浮动
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+// 按钮样式
+@mixin button-variant($color, $background, $border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+
+  &:hover {
+    color: $color;
+    background-color: rgba($background, 0.925);
+    border-color: rgba($border, 0.9);
+  }
+
+  &:active {
+    color: $color;
+    background-color: rgba($background, 0.9);
+    border-color: rgba($border, 0.875);
+  }
+}
+
+// ConveyorBeltDisplay 专用 Mixins (合并自 display/_mixins.scss)
+// 悬停抬升效果
+@mixin hover-raise($shadow: $shadow-light) {
+  transition: $transition-base;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-medium;
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 木质面板样式
+@mixin wood-panel {
+  background: $gradient-wood-panel;
+  border: 3px solid $color-wood-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-combined;
+}
+
+// 木质按钮样式
+@mixin wood-button {
+  background: $gradient-wood-button;
+  border: 2px solid $color-wood-dark;
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-weight: 600;
+  color: $color-wood-border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: $shadow-light;
+  @include hover-raise;
+
+  &:hover {
+    background: $gradient-wood-button-hover;
+  }
+}
+
+// 响应式断点 Mixins (ConveyorBeltDisplay专用)
+@mixin desktop-down {
+  @media (max-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin laptop-down {
+  @media (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin mobile-down {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+// 按钮动画 Mixins (合并自 button-animations.scss)
+@mixin btn-hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover:not(.btn-disabled):not(.btn-loading) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active:not(.btn-disabled):not(.btn-loading) {
+    transform: translateY(-1px);
+    transition: all 0.1s ease;
+  }
+}
+
+@mixin btn-hover-scale {
+  transition: transform 0.2s ease;
+  
+  &:hover:not(.btn-disabled):not(.btn-loading) {
+    transform: scale(1.05);
+  }
+  
+  &:active:not(.btn-disabled):not(.btn-loading) {
+    transform: scale(0.98);
+  }
+}
+
+@mixin btn-click-ripple {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  &:active:not(.btn-disabled):not(.btn-loading)::after {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+// 卡片样式
+@mixin card-style {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow-sm;
+  padding: $card-padding;
+  
+  &:hover {
+    box-shadow: $box-shadow;
+  }
+}
+
+// 渐变背景
+@mixin gradient-bg($start, $end, $direction: 135deg) {
+  background: linear-gradient($direction, $start 0%, $end 100%);
+}
+
+// 动画
+@mixin animation($name, $duration: 1s, $timing: ease, $delay: 0s, $iteration: 1, $direction: normal, $fill: both) {
+  animation: $name $duration $timing $delay $iteration $direction $fill;
+}
+
+// 过渡效果
+@mixin transition($property: all, $duration: $transition-base, $timing: ease) {
+  transition: $property $duration $timing;
+}
+
+// 绝对居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// 全屏覆盖
+@mixin full-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// 隐藏滚动条
+@mixin hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// 自定义滚动条
+@mixin custom-scrollbar($width: 6px, $track-color: #f1f1f1, $thumb-color: #c1c1c1) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $width / 2;
+    
+    &:hover {
+      background: rgba($thumb-color, 0.9);
+    }
+  }
+}
+
+

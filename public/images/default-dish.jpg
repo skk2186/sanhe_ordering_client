@@ -1,0 +1,6 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="300" height="200" fill="#F5F5F5"/>
+<circle cx="150" cy="100" r="60" fill="#FF7A00" opacity="0.3"/>
+<text x="150" y="105" font-family="Arial" font-size="16" fill="#666" text-anchor="middle">美味寿司</text>
+<text x="150" y="125" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Delicious Sushi</text>
+</svg>
