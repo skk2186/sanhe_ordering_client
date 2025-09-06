@@ -48,7 +48,6 @@ const props = defineProps({
   height: 180px;
   background: linear-gradient(to bottom, #8B4513 0%, #A0522D 50%, #8B4513 100%);
   border-radius: 90px;
-  overflow: hidden;
   position: relative;
   cursor: grab;
 }
@@ -65,7 +64,6 @@ const props = defineProps({
   height: 150px;
   background: linear-gradient(to bottom, #2C2C2C 0%, #1A1A1A 50%, #2C2C2C 100%);
   border-radius: 75px;
-  overflow: hidden;
 }
 
 .belt-items {
@@ -75,7 +73,7 @@ const props = defineProps({
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 30px;
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;

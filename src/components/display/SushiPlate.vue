@@ -24,7 +24,7 @@
           @load="handleImageLoad"
         />
       </div>
-      <div class="price-tag">¥{{ item.price }}</div>
+<!--      <div class="price-tag">¥{{ item.price }}</div>-->
 
       <!-- 停顿状态指示器 -->
       <div v-if="isPaused" class="pause-indicator">
@@ -356,46 +356,78 @@ onUnmounted(() => {
 
 .sushi-circle {
   position: relative;
-  width: 70px;
-  height: 70px;
-  background: radial-gradient(circle, #FFFFFF 0%, #F0F0F0 70%, #E0E0E0 100%);
-  border-radius: 50%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  height: 200px;
+  //background: radial-gradient(circle, #FFFFFF 0%, #F0F0F0 70%, #E0E0E0 100%);
+  //border-radius: 50%;
+  //box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   display: flex;
-  align-items: center;
+  //align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 2;
   overflow: hidden;
 }
 
+.sushi-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    //border-radius: 50%;
+  }
+}
+
 .sushi-info {
-  width: 86px;
-  height: 50px;
+  width: 100%;
+  padding: 10px 0;
   margin-top: -8px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1;
+  background:#fff;
   position: relative;
 }
 
 .sushi-name-area {
   height: 60%;
-  background: linear-gradient(135deg, #FF7A00 0%, #FFB366 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2px 4px;
 }
+.sushi-name {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
 
 .sushi-price-area {
   height: 40%;
-  background: linear-gradient(135deg, #FFF3D6 0%, #FFE082 100%);
+  margin-top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6px;
+
+}
+.sushi-price {
+  font-size: 16px;
+
+  font-weight: bold;
+  color: #553C20;
+  text-align: center;
 }
 
 // 停顿脉冲动画
@@ -426,39 +458,7 @@ onUnmounted(() => {
   }
 }
 
-.sushi-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-}
 
-.sushi-name {
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.sushi-price {
-  font-size: 12px;
-  font-weight: bold;
-  color: #553C20;
-  text-align: center;
-}
 
 .price-tag {
   position: absolute;

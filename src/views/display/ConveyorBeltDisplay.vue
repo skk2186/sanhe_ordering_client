@@ -72,8 +72,8 @@
     <!-- 详细菜单弹窗 -->
     <el-dialog v-model="showMenuModal" title="🍣 详细菜单" width="600px">
       <div class="menu-grid">
-        <div 
-          v-for="item in displaySushiData" 
+        <div
+          v-for="item in displaySushiData"
           :key="item.id"
           class="menu-item"
           @click="addSpecificItem(item)"
@@ -88,8 +88,8 @@
     </el-dialog>
 
     <!-- 寿司导航组件 -->
-    <SushiNavigation 
-      :visible="showSushiNavigation" 
+    <SushiNavigation
+      :visible="showSushiNavigation"
       :left-cart="leftCart"
       :right-cart="rightCart"
       @close="showSushiNavigation = false"
@@ -104,11 +104,11 @@
       :items="orderHistoryItems"
       title="点餐记录"
     />
-    
+
     <!-- 呼叫店员确认弹窗 -->
-    <el-dialog 
-      v-model="callWaiterConfirmVisible" 
-      title="呼叫店员" 
+    <el-dialog
+      v-model="callWaiterConfirmVisible"
+      title="呼叫店员"
       width="400px"
       :show-close="false"
       center
@@ -120,7 +120,7 @@
           <p>店员将会立即前来为您服务</p>
         </div>
       </div>
-      
+
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="cancelCallWaiter" size="large">取消</el-button>
@@ -190,7 +190,7 @@ const { virtualScrollState, displayItems } = useVirtualPlates({
   data: displaySushiData,
   displayOffset,
   itemWidth: 200,
-  gap: 10,
+  gap: 60,
   buffer: 5
 })
 
@@ -341,7 +341,7 @@ const placeOrder = (side) => {
     ElMessage.warning('购物车为空，无法下单')
     return
   }
-  
+
   // 将下单的商品添加到订单历史中，并添加下单时间
   const orderTime = new Date().toLocaleString('zh-CN')
   const newOrderItems = cartItems.map(item => ({
@@ -349,10 +349,10 @@ const placeOrder = (side) => {
     orderTime,
     orderId: Date.now() + Math.random() // 简单的订单ID生成
   }))
-  
+
   // 添加到订单历史
   orderHistory.value.push(...newOrderItems)
-  
+
   const { delta, reachedReward } = applyOrder(cartItems)
   ElMessage.success(`下单成功！进度增加${delta}%`)
   clear(side)
@@ -463,13 +463,13 @@ onUnmounted(() => {
 .call-waiter-confirm {
   text-align: center;
   padding: 20px 0;
-  
+
   .confirm-icon {
     font-size: 48px;
     margin-bottom: 20px;
     animation: ring 1s ease-in-out infinite;
   }
-  
+
   .confirm-message {
     h3 {
       margin: 0 0 10px 0;
@@ -477,7 +477,7 @@ onUnmounted(() => {
       font-size: 18px;
       font-weight: 600;
     }
-    
+
     p {
       margin: 0;
       color: #666;
@@ -491,7 +491,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   gap: 20px;
-  
+
   .el-button {
     min-width: 100px;
     font-weight: 500;
@@ -509,22 +509,22 @@ onUnmounted(() => {
 :deep(.el-dialog) {
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  
+
   .el-dialog__header {
     padding: 20px 20px 10px;
     border-bottom: 1px solid #f0f0f0;
-    
+
     .el-dialog__title {
       font-size: 16px;
       font-weight: 600;
       color: #333;
     }
   }
-  
+
   .el-dialog__body {
     padding: 10px 20px;
   }
-  
+
   .el-dialog__footer {
     padding: 10px 20px 20px;
     border-top: 1px solid #f0f0f0;
