@@ -353,7 +353,6 @@ onUnmounted(() => {
     }
   }
 }
-
 .sushi-circle {
   position: relative;
   width: 200px;
