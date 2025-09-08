@@ -393,6 +393,8 @@ onUnmounted(() => {
   z-index: 1;
   background:#fff;
   position: relative;
+  color: black;
+  border: 2px solid black;
 }
 
 .sushi-name-area {
