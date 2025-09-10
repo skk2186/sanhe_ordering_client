@@ -38,7 +38,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px; 
+  gap: 30px;
 
   @include desktop-down {
     height: 120px;
@@ -63,7 +63,7 @@
   align-items: center;
   background: linear-gradient(135deg, #DDC8B1 0%, #C8B299 50%, #B59B79 100%);
   height: 100%;
-  padding: 10%; /* 最小内边距 */
+  padding: 20px; /* 最小内边距 */
   border: 3px solid #8B4513;
   border-radius: 15px;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -153,49 +153,49 @@
   margin: 0;
 }
 
-.progress-bar { 
-  width: 100%; 
-  max-width: 400px; 
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
 }
 
-.progress-track { 
-  width: 100%; 
-  height: 40px; 
-  background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%); 
-  border: 2px solid #D0D0D0; 
-  border-radius: 20px; 
-  position: relative; 
-  overflow: hidden; 
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); 
+.progress-track {
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(135deg, #F5F5F5 0%, #E8E8E8 100%);
+  border: 2px solid #D0D0D0;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.progress-fill { 
-  height: 100%; 
-  background: linear-gradient(135deg, $primary-color 0%, $color-accent 50%, #FFB366 100%); 
-  border-radius: 18px; 
-  transition: $transition-slow cubic-bezier(0.4, 0, 0.2, 1); 
-  position: relative; 
-  box-shadow: 0 2px 8px rgba(255, 122, 0, 0.3); 
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, $primary-color 0%, $color-accent 50%, #FFB366 100%);
+  border-radius: 18px;
+  transition: $transition-slow cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(255, 122, 0, 0.3);
 }
 
-.progress-fill::before { 
-  content: ''; 
-  position: absolute; 
-  inset: 0; 
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); 
-  border-radius: 18px; 
-  animation: shimmer 2s infinite; 
+.progress-fill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 18px;
+  animation: shimmer 2s infinite;
 }
 
-.progress-fill::after { 
-  content: ''; 
-  position: absolute; 
-  top: 2px; 
-  left: 2px; 
-  right: 2px; 
-  height: 8px; 
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%); 
-  border-radius: 16px; 
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 16px;
 }
 
 .progress-text {
@@ -217,44 +217,44 @@
 
 // ==================== 中间功能按钮区样式 ====================
 
-.center-layout { 
-  display: flex; 
-  align-items: flex-start; 
-  gap: $gap-center-layout; 
-  height: $height-center-layout; 
-  padding: 0 10px; 
+.center-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: $gap-center-layout;
+  height: $height-center-layout;
+  padding: 0 10px;
 }
 
 .menu-btn {
-  width: $width-menu-btn; 
-  height: $height-center-layout; 
+  width: $width-menu-btn;
+  height: $height-center-layout;
   @include wood-button;
-  writing-mode: vertical-rl; 
+  writing-mode: vertical-rl;
   text-orientation: upright;
   font-size: $font-size-base;
 }
 
-.center-functions { 
-  display: flex; 
-  flex-direction: column; 
-  gap: $gap-function-column; 
-  height: $height-center-layout; 
-  justify-content: flex-start; 
+.center-functions {
+  display: flex;
+  flex-direction: column;
+  gap: $gap-function-column;
+  height: $height-center-layout;
+  justify-content: flex-start;
 }
 
-.function-row { 
-  display: flex; 
-  gap: $gap-function-row; 
+.function-row {
+  display: flex;
+  gap: $gap-function-row;
 }
 
-.first-row .function-btn { 
-  width: $width-function-btn; 
-  height: $height-function-btn; 
+.first-row .function-btn {
+  width: $width-function-btn;
+  height: $height-function-btn;
 }
 
-.second-row .function-btn { 
-  width: $width-function-btn; 
-  height: $height-function-btn; 
+.second-row .function-btn {
+  width: $width-function-btn;
+  height: $height-function-btn;
 }
 
 .function-btn {
@@ -380,21 +380,21 @@
       font-weight: bold;
     }
   }
-  
+
   .item-image {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     img {
       width: 80%;
       height: 80%;
       object-fit: contain;
     }
   }
-  
+
   .circle-close-btn {
     position: absolute;
     top: -8px;
@@ -508,7 +508,7 @@
     opacity: 0.5;
     cursor: not-allowed;
     background: linear-gradient(135deg, #CCCCCC 0%, #999999 100%);
-    
+
     &:hover {
       background: linear-gradient(135deg, #CCCCCC 0%, #999999 100%);
       transform: none;
@@ -555,13 +555,13 @@
   &:active {
     transform: translateY(0);
   }
-  
+
   .order-text {
     font-size: 16px;
     font-weight: bold;
     line-height: 1;
   }
-  
+
   .order-progress {
     background: rgba(255, 255, 255, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -611,7 +611,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     width: 100%;
     height: 100%;
