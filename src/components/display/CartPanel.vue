@@ -1,12 +1,12 @@
 <template>
   <div class="item-group">
     <!-- 右侧场景：先渲染下单按钮 -->
-    <button v-if="orderFirst" class="order-btn" type="button"
+    <div v-if="orderFirst" class="order-btn" type="button"
             :aria-label="`下单-${side}`" :title="`下单`"
             @click="$emit('place-order', side)">
-      <div class="order-text">下单</div>
+<!--      <div class="order-text">下单</div>-->
       <div class="order-progress">{{ count }}/4</div>
-    </button>
+    </div>
 
     <!-- 购物车圆形显示 -->
     <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" class="cart-item">
@@ -36,12 +36,12 @@
     </div>
 
     <!-- 左侧场景：最后渲染下单按钮 -->
-    <button v-if="!orderFirst" class="order-btn" type="button"
+    <div v-if="!orderFirst" class="order-btn" type="button"
             :aria-label="`下单-${side}`" :title="`下单`"
             @click="$emit('place-order', side)">
-      <div class="order-text">下单</div>
+<!--      <div class="order-text">下单</div>-->
       <div class="order-progress">{{ count }}/4</div>
-    </button>
+    </div>
   </div>
 </template>
 

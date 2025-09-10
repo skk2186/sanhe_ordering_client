@@ -33,7 +33,7 @@
 
 // 底部功能区
 .bottom-section {
-  height: 140px;
+  height: 213px;
   padding: 0;
   display: flex;
   justify-content: center;
@@ -61,11 +61,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #DDC8B1 0%, #C8B299 50%, #B59B79 100%);
+  background: #fffce7;
   height: 100%;
   padding: 20px; /* 最小内边距 */
   border: 3px solid #8B4513;
-  border-radius: 15px;
+  border-bottom: none;
+  border-radius: 15px 15px 0 0;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
   margin: 10px 10px; /* 只保留上下边距，移除左右边距 */
   min-width: fit-content; /* 最小宽度适应内容 */
@@ -96,12 +97,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #DDC8B1 0%, #C8B299 50%, #B59B79 100%);
+  background: #fffce7;
   height: 100%;
   padding: 5px; /* 减少内边距 */
   margin: 10px 0; /* 只保留上下边距，移除左右边距 */
   border: 3px solid #8B4513;
-  border-radius: 15px;
+  border-bottom: none;
+  border-radius: 15px 15px 0 0;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
 
   @include desktop-down {
@@ -221,23 +223,22 @@
   display: flex;
   align-items: flex-start;
   gap: $gap-center-layout;
-  height: $height-center-layout;
   padding: 0 10px;
 }
 
 .menu-btn {
-  width: $width-menu-btn;
-  height: $height-center-layout;
+  //width: $width-menu-btn;
+  //height: $height-center-layout;
   @include wood-button;
   writing-mode: vertical-rl;
   text-orientation: upright;
   font-size: $font-size-base;
+
 }
 
 .center-functions {
   display: flex;
   flex-direction: column;
-  gap: $gap-function-column;
   height: $height-center-layout;
   justify-content: flex-start;
 }
@@ -258,21 +259,8 @@
 }
 
 .function-btn {
-  background: linear-gradient(135deg, #D4B996 0%, #C8B299 100%);
-  border: 2px solid #B59B79;
-  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 600;
-  color: #553C20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  position: relative;
-
   &:hover {
     background: linear-gradient(135deg, #C8B299 0%, #B59B79 100%);
     transform: translateY(-2px);
@@ -284,27 +272,28 @@
   }
 
   &.navigation-btn {
-    .search-icon {
-      font-size: 16px;
-      margin-right: 8px;
-    }
-
-    .btn-text {
-      line-height: 1.2;
-    }
+    background-image: url("/images/ui/a/daohang.png");
+    width: 218px;
+    height: 105px;
   }
 
   &.checkout-btn {
-    .btn-text {
-      line-height: 1.2;
-    }
+    background-image: url("/images/ui/a/jilu.png");
+    width: 218px;
+    height: 105px;
   }
 
-  &.settings-btn, &.waiter-btn {
-    font-size: 13px;
+  &.settings-btn {
+    background-image: url("/images/ui/a/shezhi.png");
+    width: 218px;
+    height: 79px;
+  }
+  &.waiter-btn {
+    background-image: url("/images/ui/a/fujiao.png");
+    width: 218px;
+    height: 79px;
   }
 }
-
 
 
 // 响应式设计
@@ -529,25 +518,21 @@
 }
 
 .order-btn {
-  background: linear-gradient(135deg, #D4B996 0%, #C8B299 100%);
-  border: 2px solid #B59B79;
-  border-radius: 8px;
-  padding: 15px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #553C20;
+  background-image: url("/images/ui/a/xiadan.png");
+  width: 118px;
+  height: 185px;
+  //font-size: 16px;
+  //font-weight: bold;
+  //color: #553C20;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  height: 120px; /* 恢复原始高度以容纳两行内容 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  //flex-direction: column;
+  //align-items: center;
+  //justify-content: center;
 
   &:hover {
-    background: linear-gradient(135deg, #C8B299 0%, #B59B79 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
@@ -563,16 +548,23 @@
   }
 
   .order-progress {
-    background: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: absolute;
+    width: 100%;
+    top: 120px;
+    //background: rgba(255, 255, 255, 0.3);
+    //border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 12px;
     padding: 3px 8px;
-    font-size: 11px;
+    font-size: 26px;
     font-weight: bold;
-    color: #553C20;
+    color: #9b451c;
     min-width: 30px;
     text-align: center;
-    backdrop-filter: blur(5px);
+    /* 正片叠底混合模式，模拟图层混合效果 */
+    //mix-blend-mode: multiply;
+    /* 投影效果，对应角度、距离、阻塞、大小等参数 */
+    //box-shadow: 0 5px 5px rgba(0, 0, 0, 0.5);
+    //backdrop-filter: blur(5px);
   }
 }
 

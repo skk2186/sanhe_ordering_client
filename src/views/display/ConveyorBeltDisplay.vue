@@ -169,7 +169,7 @@ const beltItems = ref(null)
 
 // 传送带配置
 const beltConfig = {
-  itemWidth: 200,
+  itemWidth: 300,
   autoSpeed: 1, // 恢复正常滚动速度
   maxVelocity: 15,
   decay: 0.95,
@@ -189,8 +189,8 @@ const { displayOffset, isDragging, isMomentum, dragState, startDrag } = belt
 const { virtualScrollState, displayItems } = useVirtualPlates({
   data: displaySushiData,
   displayOffset,
-  itemWidth: 200,
-  gap: 60,
+  itemWidth: 300,
+  gap: 130,
   buffer: 5
 })
 

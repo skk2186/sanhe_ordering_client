@@ -148,22 +148,15 @@
 
 // 木质按钮样式
 @mixin wood-button {
-  background: $gradient-wood-button;
-  border: 2px solid $color-wood-dark;
-  border-radius: $border-radius;
+  width: 138px;
+  height: 184px;
+  background-image: url("/images/ui/a/caidan.png");
   cursor: pointer;
-  font-weight: 600;
-  color: $color-wood-border;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  box-shadow: $shadow-light;
+
+
   @include hover-raise;
 
-  &:hover {
-    background: $gradient-wood-button-hover;
-  }
+
 }
 
 // 响应式断点 Mixins (ConveyorBeltDisplay专用)
@@ -188,12 +181,12 @@
 // 按钮动画 Mixins (合并自 button-animations.scss)
 @mixin btn-hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover:not(.btn-disabled):not(.btn-loading) {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active:not(.btn-disabled):not(.btn-loading) {
     transform: translateY(-1px);
     transition: all 0.1s ease;
@@ -202,11 +195,11 @@
 
 @mixin btn-hover-scale {
   transition: transform 0.2s ease;
-  
+
   &:hover:not(.btn-disabled):not(.btn-loading) {
     transform: scale(1.05);
   }
-  
+
   &:active:not(.btn-disabled):not(.btn-loading) {
     transform: scale(0.98);
   }
@@ -215,7 +208,7 @@
 @mixin btn-click-ripple {
   position: relative;
   overflow: hidden;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -228,7 +221,7 @@
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
-  
+
   &:active:not(.btn-disabled):not(.btn-loading)::after {
     width: 300px;
     height: 300px;
@@ -241,7 +234,7 @@
   border-radius: $border-radius;
   box-shadow: $box-shadow-sm;
   padding: $card-padding;
-  
+
   &:hover {
     box-shadow: $box-shadow;
   }
@@ -283,7 +276,7 @@
 @mixin hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -294,15 +287,15 @@
   &::-webkit-scrollbar {
     width: $width;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: $track-color;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: $thumb-color;
     border-radius: $width / 2;
-    
+
     &:hover {
       background: rgba($thumb-color, 0.9);
     }

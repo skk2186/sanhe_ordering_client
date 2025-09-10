@@ -322,7 +322,6 @@ onUnmounted(() => {
 
   &:hover:not(.paused):not(.dragging) {
     .sushi-circle {
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
       transform: translateY(-2px);
     }
   }
@@ -339,7 +338,6 @@ onUnmounted(() => {
   // 拖动状态
   &.dragging {
     .sushi-circle {
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
       transform: rotate(5deg);
       opacity: 0.8;
       z-index: 1000;
@@ -355,8 +353,8 @@ onUnmounted(() => {
 }
 .sushi-circle {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   //background: radial-gradient(circle, #FFFFFF 0%, #F0F0F0 70%, #E0E0E0 100%);
   //border-radius: 50%;
   //box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
