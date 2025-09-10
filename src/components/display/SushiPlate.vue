@@ -328,13 +328,13 @@ onUnmounted(() => {
   }
 
   // 停顿状态
-  &.paused {
-    .sushi-circle {
-      box-shadow: 0 8px 25px rgba(255, 122, 0, 0.4);
-      border: 2px solid rgba(255, 122, 0, 0.6);
-      animation: pausePulse 1s ease-in-out;
-    }
-  }
+  //&.paused {
+  //  .sushi-circle {
+  //    box-shadow: 0 8px 25px rgba(255, 122, 0, 0.4);
+  //    border: 2px solid rgba(255, 122, 0, 0.6);
+  //    animation: pausePulse 1s ease-in-out;
+  //  }
+  //}
 
   // 拖动状态
   &.dragging {
@@ -347,11 +347,11 @@ onUnmounted(() => {
     cursor: grabbing;
   }
 
-  &.clicked:not(.paused):not(.dragging) {
-    .sushi-circle {
-      box-shadow: 0 8px 25px rgba(255, 122, 0, 0.3);
-    }
-  }
+  //&.clicked:not(.paused):not(.dragging) {
+  //  .sushi-circle {
+  //    box-shadow: 0 8px 25px rgba(255, 122, 0, 0.3);
+  //  }
+  //}
 }
 .sushi-circle {
   position: relative;
