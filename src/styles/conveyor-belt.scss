@@ -327,8 +327,8 @@
 // 菜品选择组
 .item-group {
   display: flex;
-  align-items: flex-end; /* 改为底部对齐，让下单按钮与购物车组合体保持水平 */
-  gap: 15px;
+  align-items: center; /* 改为底部对齐，让下单按钮与购物车组合体保持水平 */
+  gap: 30px;
 }
 
 .cart-item {
@@ -339,8 +339,8 @@
 }
 
 .item-circle {
-  width: 70px;
-  height: 70px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: linear-gradient(135deg, #FFE178 0%, #FFD54F 100%);
   border: 2px solid #FFC107;

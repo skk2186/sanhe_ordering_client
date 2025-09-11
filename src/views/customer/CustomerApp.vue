@@ -38,9 +38,9 @@
           <div class="cart-text">查看购物车</div>
         </div>
       </div>
-      <el-button 
-        type="primary" 
-        size="large" 
+      <el-button
+        type="primary"
+        size="large"
         class="checkout-btn"
         @click="checkout"
         :disabled="totalItems === 0"
@@ -52,8 +52,8 @@
     <!-- 投盘进度条 -->
     <div class="plate-progress" v-if="plateCount > 0">
       <div class="progress-bar">
-        <div 
-          class="progress-fill" 
+        <div
+          class="progress-fill"
           :style="{ width: `${(plateCount % 5) * 20}%` }"
         ></div>
       </div>
@@ -63,13 +63,13 @@
     </div>
 
     <!-- 扭蛋机弹窗 -->
-    <GachaMachine 
-      v-model:visible="showGacha" 
+    <GachaMachine
+      v-model:visible="showGacha"
       @reward="handleGachaReward"
     />
 
     <!-- 购物车抽屉 -->
-    <CartDrawer 
+    <CartDrawer
       v-model:visible="showCartDrawer"
       :items="cartItems"
       @update-quantity="updateCartQuantity"
@@ -173,7 +173,7 @@ const handlePlateAdded = () => {
 onMounted(() => {
   updateTime()
   timeInterval = setInterval(updateTime, 1000)
-  
+
   // 监听投盘事件
   window.addEventListener('plateAdded', handlePlateAdded)
 })
@@ -205,12 +205,12 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  
+
   .status-left {
     display: flex;
     align-items: center;
     gap: $spacing-md;
-    
+
     .table-info {
       display: flex;
       align-items: center;
@@ -219,18 +219,18 @@ onUnmounted(() => {
       color: $primary-color;
       font-size: $font-size-lg;
     }
-    
+
     .time {
       color: $text-secondary;
       font-size: $font-size-sm;
     }
   }
-  
+
   .status-right {
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    
+
     .member-info {
       display: flex;
       align-items: center;
@@ -240,7 +240,7 @@ onUnmounted(() => {
       border-radius: $border-radius-button;
       color: $white;
       font-size: $font-size-sm;
-      
+
       .member-level {
         font-weight: 600;
       }
@@ -266,18 +266,18 @@ onUnmounted(() => {
   padding: 0 $spacing-md;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  
+
   .cart-summary {
     flex: 1;
     display: flex;
     align-items: center;
     gap: $spacing-sm;
     cursor: pointer;
-    
+
     .cart-icon {
       position: relative;
       color: $primary-color;
-      
+
       .cart-count {
         position: absolute;
         top: -0.8rem;
@@ -294,21 +294,21 @@ onUnmounted(() => {
         font-weight: 600;
       }
     }
-    
+
     .cart-info {
       .cart-total {
         font-size: $font-size-lg;
         font-weight: 600;
         color: $primary-color;
       }
-      
+
       .cart-text {
         font-size: $font-size-sm;
         color: $text-secondary;
       }
     }
   }
-  
+
   .checkout-btn {
     min-width: 12rem;
     height: 4.4rem;
@@ -327,14 +327,14 @@ onUnmounted(() => {
   color: $white;
   padding: $spacing-sm $spacing-md;
   z-index: 99;
-  
+
   .progress-bar {
     height: 0.4rem;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 0.2rem;
     overflow: hidden;
     margin-bottom: $spacing-xs;
-    
+
     .progress-fill {
       height: 100%;
       background: $white;
@@ -342,7 +342,7 @@ onUnmounted(() => {
       transition: width $transition-base;
     }
   }
-  
+
   .progress-text {
     font-size: $font-size-sm;
     text-align: center;
@@ -354,26 +354,26 @@ onUnmounted(() => {
   .status-bar {
     height: 5rem;
     padding: 0 $spacing-sm;
-    
+
     .status-left {
       gap: $spacing-sm;
-      
+
       .table-info {
         font-size: $font-size-base;
       }
     }
-    
+
     .member-info {
       .member-points {
         display: none;
       }
     }
   }
-  
+
   .cart-bar {
     height: 6rem;
     padding: 0 $spacing-sm;
-    
+
     .checkout-btn {
       min-width: 10rem;
       height: 4rem;

@@ -16,7 +16,10 @@
             @select="handleSelectSlot"
           />
         </div>
-
+        <!-- 返回按钮 -->
+        <div class="return-btn" @click="closeNavigation">
+          返回传送带
+        </div>
         <!-- 右侧购物车 -->
         <div class="bottom-right">
           <CartPanel
@@ -31,7 +34,7 @@
           />
         </div>
       </div>
-      
+
       <!-- 加载动画 -->
       <div v-if="isLoading" class="loading-overlay">
         <div class="loading-content">
@@ -62,7 +65,7 @@
       </div>
 
       <!-- 无界大菜单容器 -->
-      <div 
+      <div
         v-show="!isLoading"
         ref="menuContainer"
         class="infinite-menu-container"
@@ -72,10 +75,10 @@
       >
         <!-- 右侧拖动区域 -->
         <div class="right-drag-area"></div>
-        <div 
+        <div
           ref="menuContent"
           class="menu-content"
-          :style="{ 
+          :style="{
             transform: `translate3d(${offsetX}px, ${offsetY}px, 0)`,
             transition: 'none'
           }"
@@ -84,7 +87,7 @@
           <div class="menu-items-grid">
             <template v-for="(item, index) in mixedItems" :key="item.type === 'filter' ? `filter-${item.id}` : item.id">
               <!-- 筛选格子 -->
-              <div 
+              <div
                 v-if="item.type === 'filter'"
                 class="menu-item filter-item"
                 :class="{ 'active-filter': activeFilter === item.id }"
@@ -101,15 +104,15 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="item-info">
                   <h3 class="item-name">{{ item.name }}</h3>
                   <div class="item-price">{{ item.keyword }}</div>
                 </div>
               </div>
-              
+
               <!-- 菜品 -->
-              <div 
+              <div
                 v-else
                 class="menu-item"
                 :class="{ 'sold-out': item.soldOut }"
@@ -122,11 +125,11 @@
                   </div>
                   <div v-if="item.isNew" class="new-badge">新品</div>
                 </div>
-                
+
                 <div class="item-info">
                   <h3 class="item-name">{{ item.name }}</h3>
                 </div>
-                
+
                 <!-- 添加按钮 -->
                 <div class="add-overlay" v-if="!item.soldOut">
                   <el-icon class="add-icon"><Plus /></el-icon>
@@ -136,13 +139,8 @@
           </div>
         </div>
       </div>
-      
-      <!-- 返回按钮 -->
-      <div class="return-button">
-        <button class="return-btn" @click="closeNavigation">
-          返回传送带
-        </button>
-      </div>
+
+
     </div>
   </div>
 </template>
@@ -202,7 +200,7 @@ const filteredItems = computed(() => {
   if (activeFilter.value === 'all') {
     return sushiData
   }
-  
+
   return sushiData.filter(item => {
     if (activeFilter.value === 'popular') return item.isPopular
     if (activeFilter.value === 'new') return item.isNew
@@ -215,17 +213,17 @@ const filteredItems = computed(() => {
 // 混合筛选格子和菜品 - 根据筛选状态显示不同内容
 const mixedItems = computed(() => {
   const items = [...filteredItems.value]
-  
+
   // 如果选择了特定筛选，只显示筛选后的商品，不显示筛选格子
   if (activeFilter.value !== 'all') {
     return items
   }
-  
+
   // 如果是显示全部，则混合显示筛选格子和商品
   const filters = filterCategories.map(filter => ({ ...filter, type: 'filter' }))
   const mixed = []
   const filterInterval = Math.max(1, Math.floor(items.length / filters.length))
-  
+
   let filterIndex = 0
   for (let i = 0; i < items.length; i++) {
     // 每隔一定数量的菜品插入一个筛选格子
@@ -235,13 +233,13 @@ const mixedItems = computed(() => {
     }
     mixed.push(items[i])
   }
-  
+
   // 确保所有筛选格子都被添加
   while (filterIndex < filters.length) {
     mixed.push(filters[filterIndex])
     filterIndex++
   }
-  
+
   return mixed
 })
 
@@ -266,17 +264,17 @@ const applyFilter = (filterId) => {
 const startDrag = (event) => {
   event.preventDefault()
   isDragging.value = true
-  
+
   const clientX = event.touches ? event.touches[0].clientX : event.clientX
   const clientY = event.touches ? event.touches[0].clientY : event.clientY
-  
+
   dragState.startX = clientX - offsetX.value
   dragState.startY = clientY - offsetY.value
   dragState.lastX = clientX
   dragState.lastY = clientY
   dragState.lastTime = Date.now()
   dragState.hasMoved = false // 重置移动标记
-  
+
   document.addEventListener('mousemove', handleDrag)
   document.addEventListener('mouseup', endDrag)
   document.addEventListener('touchmove', handleDrag, { passive: false })
@@ -286,19 +284,19 @@ const startDrag = (event) => {
 // 处理拖拽 - 优化性能，减少计算
 const handleDrag = (event) => {
   if (!isDragging.value) return
-  
+
   event.preventDefault()
-  
+
   const clientX = event.touches ? event.touches[0].clientX : event.clientX
   const clientY = event.touches ? event.touches[0].clientY : event.clientY
-  
+
   // 检查是否发生了实际移动
   const deltaX = Math.abs(clientX - dragState.lastX)
   const deltaY = Math.abs(clientY - dragState.lastY)
   if (deltaX > 3 || deltaY > 3) {
     dragState.hasMoved = true
   }
-  
+
   // 简化速度计算，只在需要时计算
   const currentTime = Date.now()
   const deltaTime = currentTime - dragState.lastTime
@@ -309,7 +307,7 @@ const handleDrag = (event) => {
     dragState.lastY = clientY
     dragState.lastTime = currentTime
   }
-  
+
   // 直接更新位置，减少边界检查频率
   offsetX.value = clientX - dragState.startX
   offsetY.value = clientY - dragState.startY
@@ -318,18 +316,18 @@ const handleDrag = (event) => {
 // 结束拖拽 - 移除惯性滚动减少卡顿
 const endDrag = () => {
   if (!isDragging.value) return
-  
+
   // 立即重置拖拽状态
   isDragging.value = false
-  
+
   // 延迟重置移动标记，防止点击事件立即触发
   setTimeout(() => {
     dragState.hasMoved = false
   }, 150)
-  
+
   // 应用边界约束
   applyBoundaryConstraints()
-  
+
   document.removeEventListener('mousemove', handleDrag)
   document.removeEventListener('mouseup', endDrag)
   document.removeEventListener('touchmove', handleDrag)
@@ -339,25 +337,25 @@ const endDrag = () => {
 // 处理滚轮事件
 const handleWheel = (event) => {
   event.preventDefault()
-  
+
   const deltaX = event.deltaX
   const deltaY = event.deltaY
-  
+
   offsetX.value -= deltaX * 0.5
-  
+
   offsetY.value -= deltaY * 0.5
-  
+
   applyBoundaryConstraints()
 }
 
 // 边界约束 - 简化计算
 const applyBoundaryConstraints = () => {
   if (!menuContainer.value || !menuContent.value) return
-  
+
   // 简化边界计算，使用固定值减少DOM查询
   const maxOffsetX = 2500 // 固定最大拖拽范围
   const maxOffsetY = 1500
-  
+
   // 应用约束
   offsetX.value = Math.max(-maxOffsetX, Math.min(400, offsetX.value))
   offsetY.value = Math.max(-maxOffsetY, Math.min(200, offsetY.value))
@@ -367,23 +365,23 @@ const applyBoundaryConstraints = () => {
 const applyMomentumScroll = () => {
   const friction = 0.95
   const threshold = 0.1
-  
+
   const animate = () => {
     if (Math.abs(dragState.velocityX) < threshold && Math.abs(dragState.velocityY) < threshold) {
       return
     }
-    
+
     offsetX.value += dragState.velocityX * 16
     offsetY.value += dragState.velocityY * 16
-    
+
     applyBoundaryConstraints()
-    
+
     dragState.velocityX *= friction
     dragState.velocityY *= friction
-    
+
     requestAnimationFrame(animate)
   }
-  
+
   if (Math.abs(dragState.velocityX) > threshold || Math.abs(dragState.velocityY) > threshold) {
     requestAnimationFrame(animate)
   }
@@ -391,6 +389,7 @@ const applyMomentumScroll = () => {
 
 // 关闭导航
 const closeNavigation = () => {
+  console.log(3213213321)
   emit('close')
 }
 
@@ -435,11 +434,11 @@ const preloadImages = async () => {
   isLoading.value = true
   loadingProgress.value = 0
   const startTime = Date.now()
-  
+
   // 设置总图片数量
   totalImages.value = sushiData.length
   let loadedCount = 0
-  
+
   const imagePromises = sushiData.map(item => {
     return new Promise((resolve) => {
       if (loadedImages.value.has(item.image)) {
@@ -448,36 +447,34 @@ const preloadImages = async () => {
         resolve()
         return
       }
-      
+
       const img = new Image()
       img.onload = () => {
         loadedImages.value.add(item.image)
         loadedCount++
         loadingProgress.value = (loadedCount / totalImages.value) * 100
-        console.log(`图片加载完成: ${item.name} (${loadedCount}/${totalImages.value})`)
         resolve()
       }
       img.onerror = () => {
         loadedCount++
         loadingProgress.value = (loadedCount / totalImages.value) * 100
-        console.warn(`图片加载失败: ${item.name} - ${item.image}`)
         resolve() // 即使加载失败也继续
       }
       img.src = item.image
     })
   })
-  
+
   // 等待所有图片加载完成
   await Promise.all(imagePromises)
-  
+
   // 确保至少显示2秒加载动画，让用户能看清楚
   const elapsedTime = Date.now() - startTime
   const minLoadingTime = 2000 // 最少2秒
-  
+
   if (elapsedTime < minLoadingTime) {
     await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime))
   }
-  
+
   console.log(`所有图片加载完成，总耗时: ${Date.now() - startTime}ms`)
   isLoading.value = false
 }
@@ -536,10 +533,10 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 140px;
+  height: 213px;
   padding: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   z-index: 10;
   pointer-events: none; // 让容器本身不阻挡点击
@@ -551,11 +548,12 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #DDC8B1 0%, #C8B299 50%, #B59B79 100%);
+  background: #fffce7;
   height: 100%;
   padding: 10px;
   border: 3px solid #8B4513;
-  border-radius: 15px;
+  border-bottom: none;
+  border-radius: 15px 15px 0 0;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
   margin: 10px;
   min-width: fit-content;
@@ -717,58 +715,58 @@ onUnmounted(() => {
 }
 
 @keyframes sushiMagicDance {
-  0% { 
+  0% {
     transform: rotate(0deg) translateX(25px) rotate(0deg) scale(0.7);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   }
-  10% { 
+  10% {
     transform: rotate(36deg) translateX(35px) rotate(-36deg) scale(0.85);
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
   }
-  20% { 
+  20% {
     transform: rotate(72deg) translateX(45px) rotate(-72deg) scale(1.0);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
   }
-  30% { 
+  30% {
     transform: rotate(108deg) translateX(55px) rotate(-108deg) scale(1.15);
     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
   }
-  40% { 
+  40% {
     transform: rotate(144deg) translateX(60px) rotate(-144deg) scale(1.25);
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
   }
-  50% { 
+  50% {
     transform: rotate(180deg) translateX(65px) rotate(-180deg) scale(1.3);
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
   }
-  60% { 
+  60% {
     transform: rotate(216deg) translateX(60px) rotate(-216deg) scale(1.25);
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
   }
-  70% { 
+  70% {
     transform: rotate(252deg) translateX(50px) rotate(-252deg) scale(1.1);
     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
   }
-  80% { 
+  80% {
     transform: rotate(288deg) translateX(40px) rotate(-288deg) scale(0.95);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
   }
-  90% { 
+  90% {
     transform: rotate(324deg) translateX(30px) rotate(-324deg) scale(0.8);
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
   }
-  100% { 
+  100% {
     transform: rotate(360deg) translateX(25px) rotate(-360deg) scale(0.7);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
   }
 }
 
 @keyframes waveAnimation {
-  0%, 100% { 
+  0%, 100% {
     transform: scale(1);
     opacity: 0.7;
   }
-  50% { 
+  50% {
     transform: scale(1.5);
     opacity: 1;
   }
@@ -781,7 +779,7 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   cursor: grab;
-  
+
   &:active {
     cursor: grabbing;
   }
@@ -789,7 +787,7 @@ onUnmounted(() => {
   // 优化触摸性能
   touch-action: none;
   -webkit-overflow-scrolling: touch;
-  
+
   // 启用硬件加速，减少卡顿
   transform: translateZ(0);
   will-change: transform;
@@ -814,12 +812,12 @@ onUnmounted(() => {
   min-width: 100%;
   min-height: 100%;
   padding: 20px;
-  
+
   // 启用硬件加速，优化平板性能
   transform: translateZ(0);
   will-change: transform;
   backface-visibility: hidden;
-  
+
   // 减少重绘，提升性能
   contain: layout style paint;
 }
@@ -853,7 +851,7 @@ onUnmounted(() => {
   &.sold-out {
     opacity: 0.6;
     cursor: not-allowed;
-    
+
     &:hover {
       transform: none;
     }
@@ -862,17 +860,17 @@ onUnmounted(() => {
   // 筛选格子样式 - 与物品样式一致
   &.filter-item {
     opacity: 1;
-    
+
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
-    
+
     &.active-filter {
       border: 3px solid #007bff;
       box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
     }
-    
+
     .filter-image {
       height: 150px;
       background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
@@ -882,27 +880,27 @@ onUnmounted(() => {
       justify-content: center;
       position: relative;
       color: white;
-      
+
       .filter-content {
         text-align: center;
-        
+
         .filter-name {
           font-size: 18px;
           font-weight: bold;
           margin-bottom: 8px;
         }
-        
+
         .filter-keyword {
           font-size: 12px;
           opacity: 0.9;
         }
       }
-      
+
       .filter-arrow {
         position: absolute;
         bottom: 10px;
         right: 10px;
-        
+
         .arrow-circle {
           width: 28px;
           height: 28px;
@@ -1000,7 +998,7 @@ onUnmounted(() => {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
+
   .add-icon {
     font-size: 48px;
     color: white;
@@ -1016,7 +1014,7 @@ onUnmounted(() => {
   color: white;
   padding: 10px 20px;
   border-radius: 25px;
-  
+
   .drag-hint {
     display: flex;
     align-items: center;
@@ -1025,16 +1023,9 @@ onUnmounted(() => {
   }
 }
 
-.return-button {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
 
 .return-btn {
-  background: white;
+  margin: 0 300px;
   color: black;
   border: 2px solid black;
   padding: 15px 30px;
@@ -1043,7 +1034,8 @@ onUnmounted(() => {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+  background: #fff;
+  pointer-events: auto;
   &:hover {
     background: #f0f0f0;
     transform: translateY(-2px);
@@ -1068,7 +1060,7 @@ onUnmounted(() => {
   .menu-items-grid {
     grid-template-columns: repeat(3, 180px);
   }
-  
+
   .menu-item {
     width: 180px;
   }

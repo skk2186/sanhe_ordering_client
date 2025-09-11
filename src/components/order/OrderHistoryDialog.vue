@@ -31,10 +31,10 @@
         ⬇️⬇️
       </button>
     </div>
-        
+
     <!-- 表格容器 -->
     <div class="ordering-modal">
-      <div class="table-container" ref="tableContainer">
+      <div>
         <table class="order-table">
           <thead>
             <tr>
@@ -47,7 +47,7 @@
               <th>金额</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody  class="table-container" ref="tableContainer">
             <tr v-for="(item, index) in orderItems" :key="index">
               <td>{{ index + 1 }}</td>
               <td>{{ item.name }}</td>
@@ -64,7 +64,7 @@
           </tbody>
         </table>
       </div>
-      
+
       <div class="modal-footer">
         <div class="total-name">历史订单合计: </div>
         <div class="total-amount">
@@ -72,7 +72,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 底部操作栏 -->
     <div class="action-bar">
       <button class="close-btn" @click="closeModal">返回</button>
@@ -80,7 +80,7 @@
       <button class="deal-btn" @click="showDealImage">前往记账/确认记账</button>
     </div>
   </div>
-  
+
   <!-- 呼叫店员弹窗 -->
   <div v-if="callImageVisible" class="overlay">
     <div class="popup-content">
@@ -91,7 +91,7 @@
       <button class="close-popup" @click="hideCallImage">关闭</button>
     </div>
   </div>
-  
+
   <!-- 结账弹窗 -->
   <div v-if="dealImageVisible" class="overlay">
     <div class="popup-content deal-popup">
@@ -135,7 +135,7 @@ const orderItems = computed(() => {
     const statuses = ['已送达', '制作中', '待制作']
     const statusClasses = ['delivered', 'preparing', 'pending']
     const randomStatus = Math.floor(Math.random() * 3)
-    
+
     return {
       ...item,
       category: item.category || getCategoryByName(item.name),
@@ -235,7 +235,7 @@ const confirmDeal = () => {
 <style scoped>
 .overlay {
   position: fixed;
-  top: 50%; 
+  top: 50%;
   left: 50%;
   width: 100%;
   height: 100%;
@@ -295,7 +295,7 @@ const confirmDeal = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.action-bar { 
+.action-bar {
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -387,7 +387,7 @@ const confirmDeal = () => {
 .order-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 24px;
   border-spacing: 0;
   border: 1px solid black;
 }
@@ -405,7 +405,7 @@ const confirmDeal = () => {
   padding: 10px 8px;
   text-align: center;
   border-bottom: 1px solid #000000;
-  border-right: 1px solid black; 
+  border-right: 1px solid black;
 }
 
 .order-table tr:nth-child(even) {
