@@ -17,37 +17,38 @@
           <img src="/images/arrow1.png" style="transform: rotate(180deg)" alt="">
         </div>
       </div>
+
+
       <div class="ordering-modal">
-        <div>
-          <table class="order-table">
-            <thead>
-              <tr>
-                <th>序号</th>
-                <th>商品名称</th>
-                <th>商品分类</th>
-                <th>数量</th>
-                <th>下单时间</th>
-                <th>送餐状态</th>
-                <th>金额</th>
-              </tr>
-            </thead>
-            <tbody class="table-container" ref="tableContainer">
-            <tr v-for="(item, index) in orderItems" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.category || '寿司类' }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>{{ item.orderTime || '未知时间' }}</td>
-              <td>
-                <span :class="['status', item.statusClass || 'delivered']">
-                  {{ item.status || '已送达' }}
-                </span>
-              </td>
-              <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="order-table">
+          <thead>
+          <tr>
+            <th>序号</th>
+            <th>商品名称</th>
+            <th>商品分类</th>
+            <th>数量</th>
+            <th>下单时间</th>
+            <th>送餐状态</th>
+            <th>金额</th>
+          </tr>
+          </thead>
+          <tbody class="table-container" ref="tableContainer">
+          <tr v-for="(item, index) in orderItems" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category || '寿司类' }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.orderTime || '未知时间' }}</td>
+            <td>
+            <span :class="['status', item.statusClass || 'delivered']">
+              {{ item.status || '已送达' }}
+            </span>
+            </td>
+            <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
+          </tr>
+          </tbody>
+        </table>
+
 
         <div class="modal-footer">
           <div class="total-name">历史订单合计: </div>
@@ -55,7 +56,15 @@
             ¥{{ totalAmount.toFixed(2) }}
           </div>
         </div>
+
+        <div class="action-bar">
+          <button class="close-btn" @click="closeModal">返回</button>
+          <button class="call-btn" @click="$emit('call-waiter')">呼叫店员</button>
+          <button class="deal-btn" @click="showDealImage">前往记账/确认记账</button>
+        </div>
+
       </div>
+
       <div class="btn-container">
         <div class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
           <img src="/images/arrow1.png" alt="">
@@ -71,16 +80,10 @@
         </div>
       </div>
 
+      </div>
     </div>
-
     <!-- 底部操作栏 -->
-    <div class="action-bar">
-      <button class="close-btn" @click="closeModal">返回</button>
-      <button class="call-btn" @click="$emit('call-waiter')">呼叫店员</button>
-      <button class="call-btn" @click="$emit('call-waiter')">呼叫店员</button>
-      <button class="deal-btn" @click="showDealImage">前往记账/确认记账</button>
-    </div>
-  </div>
+
 
   <!-- 呼叫店员弹窗 -->
 
@@ -241,8 +244,8 @@ const confirmDeal = () => {
 
 
 .scroll-btn {
-  width: 100px;
-  height: 70px;
+  width: 130px;
+  height: 130px;
   border: 2px solid #333;
   background: #fff;
   cursor: pointer;
@@ -270,25 +273,20 @@ const confirmDeal = () => {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 960px;
-  height: 80px;
-  overflow: hidden;
+  width: 1000px;
   display: flex;
-  position: relative;
+  justify-content: center;
+  gap: 90px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .close-btn {
-  position: absolute;
-  padding: 8px 16px;
+  padding: 16px 48px;
   background-color: #fcfcc2;
   color: rgb(0, 0, 0);
   border: 2px solid black;
   cursor: pointer;
-  width: 150px;
-  height: 50px;
-  font-size: 14px;
-  left: 20%;
+  font-size: 20px;
   border-radius: 4px;
   transition: all 0.3s ease;
 }
@@ -299,17 +297,13 @@ const confirmDeal = () => {
 }
 
 .call-btn {
-  position: absolute;
-  padding: 8px 16px;
+  padding: 16px 48px;
   background-color: #fcfcc2;
   color: rgb(0, 0, 0);
   border: 2px solid black;
   border-radius: 4px;
   cursor: pointer;
-  width: 150px;
-  height: 50px;
-  font-size: 14px;
-  left: 40%;
+  font-size: 20px;
   transition: all 0.3s ease;
 }
 
@@ -319,17 +313,13 @@ const confirmDeal = () => {
 }
 
 .deal-btn {
-  position: absolute;
-  padding: 8px 16px;
+  padding: 16px 48px;
   background-color: #ff0415;
   color: rgb(255, 255, 255);
   border: 2px solid black;
   border-radius: 4px;
   cursor: pointer;
-  width: 250px;
-  height: 50px;
-  font-size: 14px;
-  left: 60%;
+  font-size: 20px;
   transition: all 0.3s ease;
 }
 
@@ -339,12 +329,17 @@ const confirmDeal = () => {
 }
 
 .ordering-modal-frame{
+
+}
+
+.ordering-modal {
   display: flex;
   align-content: center;
   align-items: center;
 }
 
-.ordering-modal {
+.table-container {
+
   background: white;
   border-radius: 8px;
   width: 1000px;
@@ -353,9 +348,8 @@ const confirmDeal = () => {
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
 
-.table-container {
+
   overflow-y: auto;
   flex: 1;
   margin: 0;

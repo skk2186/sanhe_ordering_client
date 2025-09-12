@@ -39,7 +39,6 @@
     <div v-if="!orderFirst" class="order-btn" type="button"
             :aria-label="`下单-${side}`" :title="`下单`"
             @click="$emit('place-order', side)">
-<!--      <div class="order-text">下单</div>-->
       <div class="order-progress">{{ count }}/4</div>
     </div>
   </div>
