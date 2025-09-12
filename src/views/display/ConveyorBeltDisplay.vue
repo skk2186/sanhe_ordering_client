@@ -131,6 +131,30 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+        v-model="settingVisible"
+        title="设置"
+        width="400px"
+        :show-close="false"
+        center
+    >
+
+      <div class="call-waiter-confirm">
+        <div class="confirm-icon">🔔</div>
+        <div class="confirm-message">
+          <h3>确认呼叫店员？</h3>
+          <p>店员将会立即前来为您服务</p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="HandleCancelSetting" size="large">取消</el-button>
+        </div>
+      </template>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -162,6 +186,8 @@ const { plateProgress, applyOrder, resetLater } = useOrderProgress()
 // const selectedSushi = ref(null) // 暂未使用
 const showMenuModal = ref(false)
 const showSushiNavigation = ref(false)
+const settingVisible = ref(false)
+
 
 // 传送带相关
 const beltTrack = ref(null)
@@ -312,7 +338,7 @@ const addSpecificItem = (item) => {
 }
 
 const openSettings = () => {
-  ElMessage.info('⚙️ 设置功能开发中...')
+  settingVisible.value = true
 }
 
 const openNavigation = () => {
@@ -397,6 +423,10 @@ const confirmCallWaiter = () => {
 
 const cancelCallWaiter = () => {
   callWaiterConfirmVisible.value = false
+}
+
+const HandleCancelSetting = () => {
+  settingVisible.value = false
 }
 
 
