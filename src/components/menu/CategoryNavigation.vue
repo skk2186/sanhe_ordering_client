@@ -1,28 +1,11 @@
 <template>
   <div class="category-navigation" :class="{ 'mobile': mobile, 'collapsed': collapsed }">
-    <!-- 头部 -->
-    <div class="nav-header">
-      <div class="header-content">
-        <h3 class="title" v-if="!collapsed">菜品分类</h3>
-        <el-button 
-          v-if="!mobile"
-          type="text" 
-          @click="toggleCollapse"
-          class="collapse-btn"
-        >
-          <el-icon>
-            <component :is="collapsed ? 'Expand' : 'Fold'" />
-          </el-icon>
-        </el-button>
-      </div>
-    </div>
-    
     <!-- 分类列表 -->
-    <div class="category-list" v-loading="menuStore.categoriesLoading">
+    <div class="category-list" v-loading="loading">
       <!-- 全部分类 -->
-      <div 
+      <div
         class="category-item all-category"
-        :class="{ 'active': !menuStore.currentCategory }"
+        :class="{ 'active': !selectedCategory }"
         @click="selectCategory(null)"
       >
         <div class="category-icon">
@@ -30,13 +13,13 @@
         </div>
         <span class="category-name" v-if="!collapsed">全部</span>
         <div class="category-count" v-if="!collapsed">
-          {{ menuStore.availableMenuItems.length }}
+          {{ totalItems }}
         </div>
       </div>
       
       <!-- 分类项 -->
       <div
-        v-for="category in menuStore.enabledCategories"
+        v-for="category in categories"
         :key="category.id"
         class="category-item"
         :class="{ 'active': isActiveCategory(category) }"
@@ -58,60 +41,6 @@
       </div>
     </div>
     
-    <!-- 底部操作 -->
-    <div class="nav-footer" v-if="!collapsed">
-      <!-- 快速筛选 -->
-      <div class="quick-filters">
-        <h4 class="filter-title">快速筛选</h4>
-        <div class="filter-buttons">
-          <el-button 
-            size="small" 
-            type="primary" 
-            plain
-            @click="filterRecommended"
-          >
-            <el-icon><Star /></el-icon>
-            推荐
-          </el-button>
-          <el-button 
-            size="small" 
-            type="success" 
-            plain
-            @click="filterNew"
-          >
-            <el-icon><Plus /></el-icon>
-            新品
-          </el-button>
-          <el-button 
-            size="small" 
-            type="warning" 
-            plain
-            @click="filterPopular"
-          >
-            <el-icon><TrendCharts /></el-icon>
-            热门
-          </el-button>
-        </div>
-      </div>
-      
-      <!-- 价格范围 -->
-      <div class="price-range-filter">
-        <h4 class="filter-title">价格范围</h4>
-        <el-slider
-          v-model="priceRange"
-          range
-          :min="0"
-          :max="500"
-          :step="10"
-          :format-tooltip="formatPrice"
-          @change="handlePriceRangeChange"
-        />
-        <div class="price-labels">
-          <span>{{ formatPrice(priceRange[0]) }}</span>
-          <span>{{ formatPrice(priceRange[1]) }}</span>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -134,6 +63,14 @@ const props = defineProps({
   mobile: {
     type: Boolean,
     default: false
+  },
+  categories: {
+    type: Array,
+    default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -141,15 +78,21 @@ const props = defineProps({
 const emit = defineEmits(['category-change', 'toggle-sidebar'])
 
 // 状态管理
-const menuStore = useMenuStore()
+const menuStore = useMenuStore() // 仅用于可能的全局状态，但此组件主要依赖props
 
 // 响应式数据
 const collapsed = ref(false)
 const priceRange = ref([0, 500])
+const selectedCategory = ref(null)
+
+const totalItems = computed(() => {
+    return props.categories.reduce((sum, cat) => sum + (cat.itemCount || 0), 0);
+});
+
 
 // 计算属性
 const isActiveCategory = (category) => {
-  return menuStore.currentCategory?.id === category.id
+  return selectedCategory.value?.id === category.id
 }
 
 // 切换折叠状态
@@ -160,64 +103,23 @@ const toggleCollapse = () => {
 
 // 选择分类
 const selectCategory = (category) => {
-  menuStore.setCurrentCategory(category)
+  selectedCategory.value = category;
   emit('category-change', category)
 }
 
-// 筛选推荐菜品
-const filterRecommended = async () => {
-  try {
-    await menuStore.fetchRecommendedItems()
-    // 触发搜索以显示推荐菜品
-    await menuStore.searchMenuItems({
-      keyword: '',
-      tags: ['推荐']
-    })
-  } catch (error) {
-    console.error('获取推荐菜品失败:', error)
-  }
-}
+// 筛选推荐菜品 (此功能暂时移除，因为依赖于store的搜索)
+const filterRecommended = () => {}
 
-// 筛选新品菜品
-const filterNew = async () => {
-  try {
-    await menuStore.fetchNewItems()
-    await menuStore.searchMenuItems({
-      keyword: '',
-      tags: ['新品']
-    })
-  } catch (error) {
-    console.error('获取新品菜品失败:', error)
-  }
-}
+// 筛选新品菜品 (此功能暂时移除)
+const filterNew = () => {}
 
-// 筛选热门菜品
-const filterPopular = async () => {
-  try {
-    await menuStore.fetchPopularItems()
-    await menuStore.searchMenuItems({
-      keyword: '',
-      tags: ['热门']
-    })
-  } catch (error) {
-    console.error('获取热门菜品失败:', error)
-  }
-}
+// 筛选热门菜品 (此功能暂时移除)
+const filterPopular = () => {}
 
 // 处理价格范围变化
 const handlePriceRangeChange = (value) => {
-  menuStore.setPriceRange(value)
-  // 触发搜索
-  menuStore.searchMenuItems({
-    minPrice: value[0],
-    maxPrice: value[1]
-  })
+  // 价格范围筛选暂时移除
 }
-
-// 监听菜单store的价格范围变化
-watch(() => menuStore.priceRange, (newRange) => {
-  priceRange.value = [...newRange]
-}, { immediate: true })
 
 // 组件挂载
 onMounted(() => {
@@ -235,56 +137,6 @@ onMounted(() => {
   height: 100%;
   background: white;
   transition: all $transition-base;
-  
-  &.collapsed {
-    .nav-header .title {
-      display: none;
-    }
-    
-    .category-item {
-      justify-content: center;
-      padding: 12px 8px;
-      
-      .category-name,
-      .category-count {
-        display: none;
-      }
-    }
-    
-    .nav-footer {
-      display: none;
-    }
-  }
-  
-  &.mobile {
-    .nav-header .collapse-btn {
-      display: none;
-    }
-  }
-}
-
-.nav-header {
-  padding: 20px;
-  border-bottom: 1px solid $border-color-light;
-  
-  .header-content {
-    @include flex-between;
-    
-    .title {
-      font-size: $font-size-lg;
-      font-weight: 600;
-      color: $text-color-primary;
-      margin: 0;
-    }
-    
-    .collapse-btn {
-      padding: 4px;
-      
-      .el-icon {
-        font-size: 16px;
-      }
-    }
-  }
 }
 
 .category-list {

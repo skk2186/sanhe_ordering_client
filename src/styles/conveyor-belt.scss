@@ -59,7 +59,8 @@
 .bottom-left, .bottom-right {
   flex: 0 auto; /* 自动宽度，根据内容调整 */
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   background: #fffce7;
   height: 100%;

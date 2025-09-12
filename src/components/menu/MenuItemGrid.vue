@@ -213,7 +213,7 @@
               type="primary" 
               size="small"
               :disabled="item.status !== 'AVAILABLE'"
-              @click.stop="addToCart(item)"
+              @click.stop="emitAddToCart(item)"
             >
               <el-icon><Plus /></el-icon>
               加入购物车
@@ -380,8 +380,12 @@ const showAddToCartDialog = (item) => {
 // 添加到购物车
 const addToCart = (item, quantity = 1) => {
   cartStore.addItem(item, quantity)
-  emit('add-to-cart', item, quantity)
+  // emit('add-to-cart', item, quantity) // 旧的事件，暂时保留
 }
+
+const emitAddToCart = (item) => {
+  emit('add-to-cart', item);
+};
 
 // 确认添加到购物车
 const confirmAddToCart = () => {

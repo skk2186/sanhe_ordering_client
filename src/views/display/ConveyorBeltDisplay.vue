@@ -7,6 +7,16 @@
 
     <!-- 中间传送带区域 -->
     <div class="middle-section">
+      <!-- 左侧菜单 -->
+      <div class="menu-overlay left-menu" v-if="menuVisibility.left">
+        <MenuView side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
+      </div>
+      
+      <!-- 右侧菜单 -->
+      <div class="menu-overlay right-menu" v-if="menuVisibility.right">
+        <MenuView side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
+      </div>
+      
       <!-- 传送带（组件化） -->
       <ConveyorBeltContainer
         v-model:beltTrack="beltTrack"
@@ -33,16 +43,18 @@
     <div class="bottom-section">
       <!-- 左侧菜品选择区 -->
       <div class="bottom-left">
-        <CartPanel
-          side="left"
-          :items="leftCart"
-          :count="getCartCount('left')"
-          @place-order="placeOrder"
-          @remove="removeItem"
-          @increase="increaseQuantity"
-          @decrease="decreaseQuantity"
-          @select="selectCartSlot"
-        />
+        <div class="cart-section">
+          <CartPanel
+            side="left"
+            :items="leftCart"
+            :count="getCartCount('left')"
+            @place-order="placeOrder"
+            @remove="removeItem"
+            @increase="increaseQuantity"
+            @decrease="decreaseQuantity"
+            @select="selectCartSlot"
+          />
+        </div>
       </div>
 
       <!-- 中间功能按钮区 -->
@@ -56,36 +68,21 @@
 
       <!-- 右侧菜品选择区 -->
       <div class="bottom-right">
-        <CartPanel
-          side="right"
-          :items="rightCart"
-          :count="getCartCount('right')"
-          @place-order="placeOrder"
-          @remove="removeItem"
-          @increase="increaseQuantity"
-          @decrease="decreaseQuantity"
-          @select="selectCartSlot"
-        />
+        <div class="cart-section">
+          <CartPanel
+            side="right"
+            :items="rightCart"
+            :count="getCartCount('right')"
+            @place-order="placeOrder"
+            @remove="removeItem"
+            @increase="increaseQuantity"
+            @decrease="decreaseQuantity"
+            @select="selectCartSlot"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- 详细菜单弹窗 -->
-    <el-dialog v-model="showMenuModal" title="🍣 详细菜单" width="600px">
-      <div class="menu-grid">
-        <div
-          v-for="item in displaySushiData"
-          :key="item.id"
-          class="menu-item"
-          @click="addSpecificItem(item)"
-        >
-          <div class="menu-image">
-            <img :src="item.image" :alt="item.name" />
-          </div>
-          <div class="menu-name">{{ item.name }}</div>
-          <div class="menu-price">¥{{ item.price }}</div>
-        </div>
-      </div>
-    </el-dialog>
 
     <!-- 寿司导航组件 -->
     <SushiNavigation
@@ -139,8 +136,9 @@
 
 <script setup>
 import { ref, computed, onUnmounted, watch } from 'vue'
-import { ElMessage, ElDialog } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
+import MenuView from '@/views/customer/MenuView.vue'
 import SushiNavigation from '@/components/menu/SushiNavigation.vue'
 import OrderHistoryDialog from '@/components/order/OrderHistoryDialog.vue'
 import ConveyorBeltContainer from '@/components/display/ConveyorBeltContainer.vue'
@@ -164,7 +162,7 @@ const { leftCart, rightCart, cartOf, countOf, add, remove, increase, decrease, c
 const { plateProgress, applyOrder, resetLater } = useOrderProgress()
 // const currentPlates = ref(2) // 暂未使用
 // const selectedSushi = ref(null) // 暂未使用
-const showMenuModal = ref(false)
+const menuVisibility = ref({ left: false, right: false });
 const showSushiNavigation = ref(false)
 const settingVisible = ref(false)
 
@@ -308,13 +306,12 @@ const addToCart = (item, side) => {
 // }
 
 // 功能按钮
-const openDetailMenu = () => {
-  showMenuModal.value = true
+const openDetailMenu = (side) => {
+  menuVisibility.value[side] = !menuVisibility.value[side];
 }
 
-const addSpecificItem = (item) => {
-  addToCart(item)
-  showMenuModal.value = false
+const addSpecificItem = (item, side) => {
+  addToCart(item, side);
 }
 
 const openSettings = () => {
@@ -463,6 +460,57 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+
+.bottom-left, .bottom-right {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .menu-section {
+    width: 100%;
+    margin-bottom: 20px;
+    // 确保菜单不会覆盖购物车
+    z-index: 10;
+  }
+  
+  .cart-section {
+    width: 100%;
+    // 确保购物车在菜单下方显示
+    z-index: 5;
+  }
+  
+  :deep(.menu-view-container) {
+    width: 100%;
+    max-width: 1200px;
+  }
+}
+
+.menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  &.left-menu {
+    justify-content: flex-start;
+  }
+  
+  &.right-menu {
+    justify-content: flex-end;
+  }
+}
+
+:deep(.menu-view-container) {
+  width: auto;
+  max-width: 80%;
+  max-height: 80%;
+}
 
 // 呼叫店员确认弹窗样式
 .call-waiter-confirm {

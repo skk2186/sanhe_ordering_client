@@ -1,7 +1,7 @@
 <template>
   <div class="bottom-center">
     <div class="center-layout">
-      <div class="menu-btn left-menu" type="button" aria-label="菜单" @click="$emit('open-detail-menu')"></div>
+      <div class="menu-btn left-menu" type="button" aria-label="菜单" @click="$emit('open-detail-menu', 'left')"></div>
       <div class="center-functions">
         <div class="function-row first-row">
           <div class="function-btn navigation-btn" type="button"
@@ -18,7 +18,7 @@
               @click="$emit('call-waiter')"></div>
         </div>
       </div>
-      <div class="menu-btn right-menu" type="button" aria-label="菜单" @click="$emit('open-detail-menu')"></div>
+      <div class="menu-btn right-menu" type="button" aria-label="菜单" @click="$emit('open-detail-menu', 'right')"></div>
     </div>
   </div>
 </template>
