@@ -1,53 +1,40 @@
 <template>
   <div v-if="visible" class="overlay">
-    <!-- 左侧按钮组 -->
-    <div class="btn-container">
-      <button class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
-        ⬆️⬆️
-      </button>
-      <button class="scroll-btn up-btn" @click="scrollUp" title="向上">
-        ⬆️
-      </button>
-      <button class="scroll-btn down-btn" @click="scrollDown" title="向下">
-        ⬇️
-      </button>
-      <button class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
-        ⬇️⬇️
-      </button>
-    </div>
 
-    <!-- 右侧按钮组 -->
-    <div class="btn-containerr">
-      <button class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
-        ⬆️⬆️
-      </button>
-      <button class="scroll-btn up-btn" @click="scrollUp" title="向上">
-        ⬆️
-      </button>
-      <button class="scroll-btn down-btn" @click="scrollDown" title="向下">
-        ⬇️
-      </button>
-      <button class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
-        ⬇️⬇️
-      </button>
-    </div>
+
+
 
     <!-- 表格容器 -->
-    <div class="ordering-modal">
-      <div>
-        <table class="order-table">
-          <thead>
-            <tr>
-              <th>序号</th>
-              <th>商品名称</th>
-              <th>商品分类</th>
-              <th>数量</th>
-              <th>下单时间</th>
-              <th>送餐状态</th>
-              <th>金额</th>
-            </tr>
-          </thead>
-          <tbody  class="table-container" ref="tableContainer">
+    <div class="ordering-modal-frame">
+      <div class="btn-container">
+        <div class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
+          <img src="/images/arrow1.png" alt="">
+        </div>
+        <div class="scroll-btn up-btn" @click="scrollUp" title="向上">
+          <img src="/images/arrow2.png" alt="">
+        </div>
+        <div class="scroll-btn down-btn" @click="scrollDown" title="向下">
+          <img src="/images/arrow2.png" style="transform: rotate(180deg)" alt="">
+        </div>
+        <div class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
+          <img src="/images/arrow1.png" style="transform: rotate(180deg)" alt="">
+        </div>
+      </div>
+      <div class="ordering-modal">
+        <div>
+          <table class="order-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>商品名称</th>
+                <th>商品分类</th>
+                <th>数量</th>
+                <th>下单时间</th>
+                <th>送餐状态</th>
+                <th>金额</th>
+              </tr>
+            </thead>
+            <tbody class="table-container" ref="tableContainer">
             <tr v-for="(item, index) in orderItems" :key="index">
               <td>{{ index + 1 }}</td>
               <td>{{ item.name }}</td>
@@ -61,36 +48,44 @@
               </td>
               <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
             </tr>
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
 
-      <div class="modal-footer">
-        <div class="total-name">历史订单合计: </div>
-        <div class="total-amount">
-          ¥{{ totalAmount.toFixed(2) }}
+        <div class="modal-footer">
+          <div class="total-name">历史订单合计: </div>
+          <div class="total-amount">
+            ¥{{ totalAmount.toFixed(2) }}
+          </div>
         </div>
       </div>
+      <div class="btn-container">
+        <div class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
+          <img src="/images/arrow1.png" alt="">
+        </div>
+        <div class="scroll-btn up-btn" @click="scrollUp" title="向上">
+          <img src="/images/arrow2.png" alt="">
+        </div>
+        <div class="scroll-btn down-btn" @click="scrollDown" title="向下">
+          <img src="/images/arrow2.png" style="transform: rotate(180deg)" alt="">
+        </div>
+        <div class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
+          <img src="/images/arrow1.png" style="transform: rotate(180deg)" alt="">
+        </div>
+      </div>
+
     </div>
 
     <!-- 底部操作栏 -->
     <div class="action-bar">
       <button class="close-btn" @click="closeModal">返回</button>
-      <button class="call-btn" @click="showCallImage">呼叫店员</button>
+      <button class="call-btn" @click="$emit('call-waiter')">呼叫店员</button>
+      <button class="call-btn" @click="$emit('call-waiter')">呼叫店员</button>
       <button class="deal-btn" @click="showDealImage">前往记账/确认记账</button>
     </div>
   </div>
 
   <!-- 呼叫店员弹窗 -->
-  <div v-if="callImageVisible" class="overlay">
-    <div class="popup-content">
-      <div class="popup-message">
-        <h2>📞 正在呼叫店员</h2>
-        <p>店员将很快为您服务，请稍候...</p>
-      </div>
-      <button class="close-popup" @click="hideCallImage">关闭</button>
-    </div>
-  </div>
 
   <!-- 结账弹窗 -->
   <div v-if="dealImageVisible" class="overlay">
@@ -121,7 +116,6 @@ const emit = defineEmits(['update:modelValue'])
 
 // 响应式数据
 const tableContainer = ref(null)
-const callImageVisible = ref(false)
 const dealImageVisible = ref(false)
 
 const visible = computed({
@@ -209,13 +203,6 @@ const closeModal = () => {
   visible.value = false
 }
 
-const showCallImage = () => {
-  callImageVisible.value = true
-}
-
-const hideCallImage = () => {
-  callImageVisible.value = false
-}
 
 const showDealImage = () => {
   dealImageVisible.value = true
@@ -248,32 +235,19 @@ const confirmDeal = () => {
   flex-direction: column;
   gap: 20px;
 }
-
-.btn-container {
+.btn-container{
   display: flex;
-  position: fixed;
-  left: 7%;
-  top: 50%;
-  transform: translateY(-50%);
   flex-direction: column;
   gap: 20px;
+  margin: 0 60px;
 }
 
-.btn-containerr {
-  display: flex;
-  position: fixed;
-  right: 7%;
-  top: 50%;
-  transform: translateY(-50%);
-  flex-direction: column;
-  gap: 20px;
-}
 
 .scroll-btn {
   width: 100px;
   height: 70px;
   border: 2px solid #333;
-  background: linear-gradient(135deg, #fcfcc2 0%, #f0f0a8 100%);
+  background: #fff;
   cursor: pointer;
   border-radius: 8px;
   font-size: 24px;
@@ -367,11 +341,17 @@ const confirmDeal = () => {
   transform: translateY(-1px);
 }
 
+.ordering-modal-frame{
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
 .ordering-modal {
   background: white;
   border-radius: 8px;
   width: 1000px;
-  height: 70%;
+  height: 600px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -533,5 +513,6 @@ const confirmDeal = () => {
 .deal-popup .popup-content {
   min-width: 500px;
 }
+
 </style>
 

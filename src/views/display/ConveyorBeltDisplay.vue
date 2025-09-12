@@ -102,6 +102,7 @@
     <OrderHistoryDialog
       v-model="orderHistoryVisible"
       :items="orderHistoryItems"
+      @call-waiter="callWaiter"
       title="点餐记录"
     />
 
