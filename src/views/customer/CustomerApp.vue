@@ -10,7 +10,7 @@
         <div class="time">{{ currentTime }}</div>
       </div>
       <div class="status-right">
-        <div class="member-info" v-if="memberInfo">
+        <div v-if="memberInfo" class="member-info">
           <el-icon color="#FFD700"><User /></el-icon>
           <span class="member-level">{{ memberInfo.level }}</span>
           <span class="member-points">积分：{{ memberInfo.points }}</span>
@@ -27,7 +27,7 @@
     </div>
 
     <!-- 底部购物车栏 -->
-    <div class="cart-bar" v-if="cartItems.length > 0">
+    <div v-if="cartItems.length > 0" class="cart-bar">
       <div class="cart-summary" @click="showCart">
         <div class="cart-icon">
           <el-icon size="24"><ShoppingCart /></el-icon>
@@ -39,22 +39,22 @@
         </div>
       </div>
       <el-button
-        type="primary"
-        size="large"
-        class="checkout-btn"
-        @click="checkout"
         :disabled="totalItems === 0"
+        class="checkout-btn"
+        size="large"
+        type="primary"
+        @click="checkout"
       >
         去结算
       </el-button>
     </div>
 
     <!-- 投盘进度条 -->
-    <div class="plate-progress" v-if="plateCount > 0">
+    <div v-if="plateCount > 0" class="plate-progress">
       <div class="progress-bar">
         <div
-          class="progress-fill"
           :style="{ width: `${(plateCount % 5) * 20}%` }"
+          class="progress-fill"
         ></div>
       </div>
       <div class="progress-text">

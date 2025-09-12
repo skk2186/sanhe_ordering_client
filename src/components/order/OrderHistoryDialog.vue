@@ -4,17 +4,17 @@
     <!-- 表格容器 -->
     <div class="ordering-modal-frame">
       <div class="btn-container">
-        <div class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
-          <img src="/images/arrow1.png" alt="">
+        <div class="scroll-btn uptop-btn" title="回到顶部" @click="scrollToTop">
+          <img alt="" src="/images/arrow1.png">
         </div>
-        <div class="scroll-btn up-btn" @click="scrollUp" title="向上">
-          <img src="/images/arrow2.png" alt="">
+        <div class="scroll-btn up-btn" title="向上" @click="scrollUp">
+          <img alt="" src="/images/arrow2.png">
         </div>
-        <div class="scroll-btn down-btn" @click="scrollDown" title="向下">
-          <img src="/images/arrow2.png" style="transform: rotate(180deg)" alt="">
+        <div class="scroll-btn down-btn" title="向下" @click="scrollDown">
+          <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)">
         </div>
-        <div class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
-          <img src="/images/arrow1.png" style="transform: rotate(180deg)" alt="">
+        <div class="scroll-btn downtop-btn" title="到底部" @click="scrollToBottom">
+          <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)">
         </div>
       </div>
 
@@ -32,7 +32,7 @@
             <th>金额</th>
           </tr>
           </thead>
-          <tbody class="table-container" ref="tableContainer">
+          <tbody ref="tableContainer" class="table-container">
           <tr v-for="(item, index) in orderItems" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ item.name }}</td>
@@ -51,7 +51,7 @@
 
 
         <div class="modal-footer">
-          <div class="total-name">历史订单合计: </div>
+          <div class="total-name">历史订单合计:</div>
           <div class="total-amount">
             ¥{{ totalAmount.toFixed(2) }}
           </div>
@@ -66,23 +66,23 @@
       </div>
 
       <div class="btn-container">
-        <div class="scroll-btn uptop-btn" @click="scrollToTop" title="回到顶部">
-          <img src="/images/arrow1.png" alt="">
+        <div class="scroll-btn uptop-btn" title="回到顶部" @click="scrollToTop">
+          <img alt="" src="/images/arrow1.png">
         </div>
-        <div class="scroll-btn up-btn" @click="scrollUp" title="向上">
-          <img src="/images/arrow2.png" alt="">
+        <div class="scroll-btn up-btn" title="向上" @click="scrollUp">
+          <img alt="" src="/images/arrow2.png">
         </div>
-        <div class="scroll-btn down-btn" @click="scrollDown" title="向下">
-          <img src="/images/arrow2.png" style="transform: rotate(180deg)" alt="">
+        <div class="scroll-btn down-btn" title="向下" @click="scrollDown">
+          <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)">
         </div>
-        <div class="scroll-btn downtop-btn" @click="scrollToBottom" title="到底部">
-          <img src="/images/arrow1.png" style="transform: rotate(180deg)" alt="">
+        <div class="scroll-btn downtop-btn" title="到底部" @click="scrollToBottom">
+          <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)">
         </div>
       </div>
 
-      </div>
     </div>
-    <!-- 底部操作栏 -->
+  </div>
+  <!-- 底部操作栏 -->
 
 
   <!-- 呼叫店员弹窗 -->
@@ -104,13 +104,13 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
+import {computed, ref, nextTick} from 'vue'
+import {ElMessage} from 'element-plus'
 
 const props = defineProps({
-  modelValue: { type: Boolean, default: false },
-  items: { type: Array, default: () => [] },
-  title: { type: String, default: '' }
+  modelValue: {type: Boolean, default: false},
+  items: {type: Array, default: () => []},
+  title: {type: String, default: ''}
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -226,7 +226,7 @@ const confirmDeal = () => {
   left: 50%;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -235,7 +235,8 @@ const confirmDeal = () => {
   flex-direction: column;
   gap: 20px;
 }
-.btn-container{
+
+.btn-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -328,7 +329,7 @@ const confirmDeal = () => {
   transform: translateY(-1px);
 }
 
-.ordering-modal-frame{
+.ordering-modal-frame {
 
 }
 
