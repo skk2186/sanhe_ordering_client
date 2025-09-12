@@ -1,9 +1,6 @@
 <template>
   <div v-if="visible" class="overlay">
 
-
-
-
     <!-- 表格容器 -->
     <div class="ordering-modal-frame">
       <div class="btn-container">

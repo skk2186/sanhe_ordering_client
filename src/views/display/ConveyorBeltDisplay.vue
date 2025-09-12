@@ -132,29 +132,8 @@
       </template>
     </el-dialog>
 
-    <el-dialog
-        v-model="settingVisible"
-        title="设置"
-        width="400px"
-        :show-close="false"
-        center
-    >
 
-      <div class="call-waiter-confirm">
-        <div class="confirm-icon">🔔</div>
-        <div class="confirm-message">
-          <h3>确认呼叫店员？</h3>
-          <p>店员将会立即前来为您服务</p>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="HandleCancelSetting" size="large">取消</el-button>
-        </div>
-      </template>
-
-    </el-dialog>
+    <SettingDialog v-model="settingVisible"></SettingDialog>
   </div>
 </template>
 
@@ -175,6 +154,7 @@ import { useOrderProgress } from '@/composables/useOrderProgress'
 import { useConveyorBelt } from '@/composables/useConveyorBelt'
 import { useVirtualPlates } from '@/composables/useVirtualPlates'
 import { useConveyorLifecycle } from '@/composables/useConveyorLifecycle'
+import SettingDialog from "@components/display/SettingDialog.vue";
 
 // 使用前12个寿司作为传送带显示
 const displaySushiData = sushiData.slice(0, 12)
@@ -424,12 +404,6 @@ const confirmCallWaiter = () => {
 const cancelCallWaiter = () => {
   callWaiterConfirmVisible.value = false
 }
-
-const HandleCancelSetting = () => {
-  settingVisible.value = false
-}
-
-
 
 // 选择购物车位置（预留扩展）
 const selectCartSlot = () => {}
