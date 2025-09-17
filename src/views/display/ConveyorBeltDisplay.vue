@@ -7,16 +7,8 @@
 
     <!-- 中间传送带区域 -->
     <div class="middle-section">
-      <!-- 左侧菜单 -->
-      <div class="menu-overlay left-menu" v-if="menuVisibility.left">
-        <MenuView side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
-      </div>
-      
-      <!-- 右侧菜单 -->
-      <div class="menu-overlay right-menu" v-if="menuVisibility.right">
-        <MenuView side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
-      </div>
-      
+
+
       <!-- 传送带（组件化） -->
       <ConveyorBeltContainer
         v-model:beltTrack="beltTrack"
@@ -54,6 +46,8 @@
             @decrease="decreaseQuantity"
             @select="selectCartSlot"
           />
+
+          <MenuView  v-if="menuVisibility.left" side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
         </div>
       </div>
 
@@ -79,6 +73,8 @@
             @decrease="decreaseQuantity"
             @select="selectCartSlot"
           />
+
+          <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
         </div>
       </div>
     </div>
@@ -466,24 +462,21 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   .menu-section {
     width: 100%;
     margin-bottom: 20px;
     // 确保菜单不会覆盖购物车
     z-index: 10;
   }
-  
+
   .cart-section {
     width: 100%;
     // 确保购物车在菜单下方显示
     z-index: 5;
   }
-  
-  :deep(.menu-view-container) {
-    width: 100%;
-    max-width: 1200px;
-  }
+
+
 }
 
 .menu-overlay {
@@ -496,21 +489,17 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
   &.left-menu {
     justify-content: flex-start;
   }
-  
+
   &.right-menu {
     justify-content: flex-end;
   }
 }
 
-:deep(.menu-view-container) {
-  width: auto;
-  max-width: 80%;
-  max-height: 80%;
-}
+
 
 // 呼叫店员确认弹窗样式
 .call-waiter-confirm {

@@ -7,8 +7,8 @@
         争鲜寿司
       </div>
       <div class="category-list">
-        <div 
-          v-for="category in localCategories" 
+        <div
+          v-for="category in localCategories"
           :key="category.id"
           class="category-item"
           :class="{ active: currentCategory && currentCategory.id === category.id }"
@@ -42,9 +42,9 @@
     <!-- 右侧菜品网格 -->
     <div class="main-panel">
       <div class="grid-container">
-        <div 
-          v-for="item in paginatedItems" 
-          :key="item.id" 
+        <div
+          v-for="item in paginatedItems"
+          :key="item.id"
           class="dish-card"
           @click="onAddToCart(item)"
         >
@@ -118,8 +118,12 @@ function prevPage() {
 <style lang="scss" scoped>
 // 这是作为一个独立的、非弹窗组件的样式，定位由父组件通过props或CSS控制
 .menu-view-container {
-  width: 100%;
-  max-width: 1200px;
+  position: absolute;
+  //bottom: -30px;
+  top: -650px;
+  left: -180px;
+  width: 1100px;
+  height: 600px;
   background-color: #fcf6e9;
   border-radius: 20px;
   border: 10px solid #fff;
@@ -201,7 +205,7 @@ function prevPage() {
   justify-content: center;
   align-items: center;
   gap: 15px;
-  width: 110px;
+  width: 70px;
 
   .page-btn {
     width: 100%;
@@ -209,6 +213,7 @@ function prevPage() {
     background-color: #f3a633;
     color: white;
     border: none;
+    display: block;
     border-radius: 15px;
     font-size: 18px;
     font-weight: bold;
@@ -232,7 +237,7 @@ function prevPage() {
   flex: 1;
   border-left: 2px dashed #e0d7c1;
   padding-left: 20px;
-  
+
   .grid-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
