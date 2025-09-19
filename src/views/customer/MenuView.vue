@@ -1,7 +1,7 @@
 <template>
-  <div class="menu-view-container">
+  <div class="menu-view-container" >
     <!-- 左侧分类导航 -->
-    <div class="left-panel">
+    <div class="left-panel"  :style="'order: ' + (side === 'right' ? '1' : '0')">
       <div class="header">
         <img src="/images/line-friends-logo.svg" alt="Logo" class="logo" />
         争鲜寿司
@@ -20,44 +20,48 @@
       </div>
       <div class="footer">
         <el-button class="exit-btn" @click="$emit('close')">
-          <el-icon><SwitchButton /></el-icon>
+          <img src="/images/exit.png" alt="" style="margin-right: 10px">
           退出
         </el-button>
       </div>
     </div>
 
-    <!-- 中部分页控制 -->
-    <div class="pagination-panel">
-      <el-button class="page-btn" @click="prevPage" :disabled="currentPage === 1">
-        <el-icon><DArrowLeft /></el-icon>
-        上一页
-      </el-button>
-      <div class="page-info">{{ currentPage }} / {{ totalPages }}</div>
-      <el-button class="page-btn" @click="nextPage" :disabled="currentPage === totalPages">
-        <el-icon><DArrowRight /></el-icon>
-        下一页
-      </el-button>
-    </div>
+    <div class="right-panel" :style="'order: ' + (side === 'right' ? '0' : '1')">
+      <div class="pagination-panel">
+        <div class="page-btn" @click="prevPage" :disabled="currentPage === 1">
+          <div class="btn-icon"><img src="/images/next.png" alt=""  @dragstart.prevent @dragover.prevent></div>
+          <div class="btn-text">上一页</div>
+        </div>
+        <div class="page-info">{{ currentPage }} / {{ totalPages }}</div>
+        <div class="page-btn" @click="nextPage" :disabled="currentPage === totalPages">
+          <div class="btn-icon"><img src="/images/next.png" alt="" style="transform: rotate(180deg)"  @dragstart.prevent @dragover.prevent></div>
+          <div class="btn-text">下一页</div>
+        </div>
+      </div>
 
-    <!-- 右侧菜品网格 -->
-    <div class="main-panel">
-      <div class="grid-container">
-        <div
-          v-for="item in paginatedItems"
-          :key="item.id"
-          class="dish-card"
-          @click="onAddToCart(item)"
-        >
-          <div class="dish-image">
-            <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
-          </div>
-          <div class="dish-info">
-            <p class="dish-name">{{ item.name }}</p>
-            <p class="dish-price">¥{{ item.price }}</p>
+      <!-- 右侧菜品网格 -->
+      <div class="main-panel">
+        <div class="grid-container">
+          <div
+              v-for="item in paginatedItems"
+              :key="item.id"
+              class="dish-card"
+              @click="onAddToCart(item)"
+          >
+            <div class="dish-image">
+              <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
+            </div>
+            <div class="dish-info">
+              <p class="dish-name">{{ item.name }}</p>
+              <p class="dish-price">¥{{ item.price }}</p>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
+    <!-- 中部分页控制 -->
+
   </div>
 </template>
 
@@ -121,8 +125,8 @@ function prevPage() {
   position: absolute;
   //bottom: -30px;
   top: -650px;
-  left: -180px;
-  width: 1100px;
+  left: -260px;
+  width: 1300px;
   height: 600px;
   background-color: #fcf6e9;
   border-radius: 20px;
@@ -190,7 +194,8 @@ function prevPage() {
     .exit-btn {
       width: 100%;
       height: 60px;
-      font-size: 20px;
+      font-size: 24px;
+      font-weight: 600;
       background-color: #f3a633;
       color: #fff;
       border: none;
@@ -199,53 +204,61 @@ function prevPage() {
   }
 }
 
-.pagination-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  width: 70px;
 
-  .page-btn {
-    width: 100%;
-    height: 180px;
-    background-color: #f3a633;
-    color: white;
-    border: none;
-    display: block;
-    border-radius: 15px;
-    font-size: 18px;
-    font-weight: bold;
+.right-panel {
+  display: flex;
+  .pagination-panel {
+    display: flex;
     flex-direction: column;
-    .el-icon {
-      font-size: 30px;
-      margin-bottom: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 70px;
+
+    .page-btn {
+      width: 100%;
+      height: 180px;
+      background-color: #f3a633;
+      display: flex; /* 横向拆分图标和文字 */
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      flex-direction: column;
+      user-select: none;
+      .el-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+      }
+    }
+
+    .page-info {
+      font-weight: bold;
+      font-size: 16px;
+      background: #fff;
+      padding: 8px 15px;
+      border-radius: 20px;
     }
   }
 
-  .page-info {
-    font-weight: bold;
-    font-size: 16px;
-    background: #fff;
-    padding: 8px 15px;
-    border-radius: 20px;
-  }
-}
+  .main-panel {
+    flex: 1;
 
-.main-panel {
-  flex: 1;
-  border-left: 2px dashed #e0d7c1;
-  padding-left: 20px;
+    padding-left: 20px;
 
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr); // 确保是两行
-    gap: 20px;
-    height: 100%;
-    overflow-y: auto;
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr); // 确保是两行
+      gap: 20px;
+      height: 100%;
+      overflow-y: auto;
+    }
   }
+
 }
 
 .dish-card {
@@ -267,7 +280,7 @@ function prevPage() {
     img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
     }
   }
 
