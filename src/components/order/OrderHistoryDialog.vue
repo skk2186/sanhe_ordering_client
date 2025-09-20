@@ -18,7 +18,6 @@
         </div>
       </div>
 
-
       <div class="ordering-modal">
         <table class="order-table">
           <thead>
@@ -36,9 +35,9 @@
           <tr v-for="(item, index) in orderItems" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ item.name }}</td>
-            <td>{{ item.category || '寿司类' }}</td>
+            <td>{{ item.category }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.orderTime || '未知时间' }}</td>
+            <td>{{ item.orderTime }}</td>
             <td>
             <span :class="['status', item.statusClass || 'delivered']">
               {{ item.status || '已送达' }}
@@ -82,10 +81,7 @@
 
     </div>
   </div>
-  <!-- 底部操作栏 -->
 
-
-  <!-- 呼叫店员弹窗 -->
 
   <!-- 结账弹窗 -->
   <div v-if="dealImageVisible" class="overlay">
@@ -330,13 +326,13 @@ const confirmDeal = () => {
 }
 
 .ordering-modal-frame {
-
-}
-
-.ordering-modal {
   display: flex;
   align-content: center;
   align-items: center;
+}
+
+.ordering-modal {
+
 }
 
 .table-container {
