@@ -19,7 +19,7 @@
       </div>
 
       <div class="ordering-modal" style="order: 2">
-        <div class="table-container">
+        <div class="table-container"  ref="tableContainer">
           <table class="order-table">
             <thead>
             <tr>
@@ -141,7 +141,7 @@ const totalAmount = computed(() => {
 const scrollToTop = () => {
   nextTick(() => {
     if (tableContainer.value) {
-      tableContainer.value.scrollTo({
+      tableContainer.value.scrollBy({
         top: 0,
         behavior: 'smooth'
       })
@@ -218,6 +218,7 @@ const confirmDeal = () => {
   transform: translate(-50%, -50%);
   flex-direction: column;
   gap: 20px;
+  user-select: none;
 }
 
 .btn-container {
@@ -325,14 +326,14 @@ const confirmDeal = () => {
 }
 
 .table-container {
-  background: white;
+  background: #fff;
   border-radius: 8px;
   width: 1000px;
   height: 600px;
-  overflow: hidden;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
-  margin: 0;
+  overflow-x: hidden; /* 避免水平滚动干扰 */
+  position: relative; /* 确保定位上下文正确 */
 }
 
 .order-table {
