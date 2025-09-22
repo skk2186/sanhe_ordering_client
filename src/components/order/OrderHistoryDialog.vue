@@ -5,16 +5,16 @@
     <div class="ordering-modal-frame">
       <div class="btn-container" v-for="(item, index) in ['left', 'right']" :style="'order:'+ (item === 'right' ? 3: 1) + ';'">
         <div class="scroll-btn uptop-btn" title="回到顶部" @click="scrollToTop">
-          <img alt="" src="/images/arrow1.png">
+          <img alt="" src="/images/arrow1.png"  @dragstart.prevent @dragover.prevent>
         </div>
         <div class="scroll-btn up-btn" title="向上" @click="scrollUp">
-          <img alt="" src="/images/arrow2.png">
+          <img alt="" src="/images/arrow2.png"  @dragstart.prevent @dragover.prevent>
         </div>
         <div class="scroll-btn down-btn" title="向下" @click="scrollDown">
-          <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)">
+          <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)"  @dragstart.prevent @dragover.prevent>
         </div>
         <div class="scroll-btn downtop-btn" title="到底部" @click="scrollToBottom">
-          <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)">
+          <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)"  @dragstart.prevent @dragover.prevent>
         </div>
       </div>
 
