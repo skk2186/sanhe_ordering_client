@@ -3,7 +3,7 @@
 
     <!-- 表格容器 -->
     <div class="ordering-modal-frame">
-      <div class="btn-container">
+      <div class="btn-container" v-for="(item, index) in ['left', 'right']" :style="'order:'+ (item === 'right' ? 3: 1) + ';'">
         <div class="scroll-btn uptop-btn" title="回到顶部" @click="scrollToTop">
           <img alt="" src="/images/arrow1.png">
         </div>
@@ -18,35 +18,37 @@
         </div>
       </div>
 
-      <div class="ordering-modal">
-        <table class="order-table">
-          <thead>
-          <tr>
-            <th>序号</th>
-            <th>商品名称</th>
-            <th>商品分类</th>
-            <th>数量</th>
-            <th>下单时间</th>
-            <th>送餐状态</th>
-            <th>金额</th>
-          </tr>
-          </thead>
-          <tbody ref="tableContainer" class="table-container">
-          <tr v-for="(item, index) in orderItems" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.category }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.orderTime }}</td>
-            <td>
+      <div class="ordering-modal" style="order: 2">
+        <div class="table-container">
+          <table class="order-table">
+            <thead>
+            <tr>
+              <th>序号</th>
+              <th>商品名称</th>
+              <th>商品分类</th>
+              <th>数量</th>
+              <th>下单时间</th>
+              <th>送餐状态</th>
+              <th>金额</th>
+            </tr>
+            </thead>
+            <tr v-for="(item, index) in orderItems" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.orderTime }}</td>
+              <td>
             <span :class="['status', item.statusClass || 'delivered']">
               {{ item.status || '已送达' }}
             </span>
-            </td>
-            <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
-          </tr>
-          </tbody>
-        </table>
+              </td>
+              <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
+            </tr>
+          </table>
+
+        </div>
+
 
 
         <div class="modal-footer">
@@ -64,20 +66,6 @@
 
       </div>
 
-      <div class="btn-container">
-        <div class="scroll-btn uptop-btn" title="回到顶部" @click="scrollToTop">
-          <img alt="" src="/images/arrow1.png">
-        </div>
-        <div class="scroll-btn up-btn" title="向上" @click="scrollUp">
-          <img alt="" src="/images/arrow2.png">
-        </div>
-        <div class="scroll-btn down-btn" title="向下" @click="scrollDown">
-          <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)">
-        </div>
-        <div class="scroll-btn downtop-btn" title="到底部" @click="scrollToBottom">
-          <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)">
-        </div>
-      </div>
 
     </div>
   </div>
@@ -327,6 +315,7 @@ const confirmDeal = () => {
 
 .ordering-modal-frame {
   display: flex;
+
   align-content: center;
   align-items: center;
 }
@@ -336,19 +325,13 @@ const confirmDeal = () => {
 }
 
 .table-container {
-
   background: white;
   border-radius: 8px;
   width: 1000px;
   height: 600px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-
-
   overflow-y: auto;
-  flex: 1;
   margin: 0;
 }
 
@@ -367,6 +350,9 @@ const confirmDeal = () => {
   text-align: center;
   font-weight: bold;
   border: 1px solid black;
+  position: sticky;
+  top: 0; /* 固定表头距离顶部的距离 */
+  z-index: 1; /* 确保表头在内容上方 */
 }
 
 .order-table td {
