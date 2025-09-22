@@ -1,7 +1,7 @@
 <template>
   <div class="item-group">
     <!-- 右侧场景：先渲染下单按钮 -->
-    <div v-if="orderFirst" class="order-btn" type="button"
+    <div v-if="orderFirst" class="order-btn order-btn-left" type="button"
             :aria-label="`下单-${side}`" :title="`下单`"
             @click="$emit('place-order', side)">
 <!--      <div class="order-text">下单</div>-->
@@ -36,7 +36,7 @@
     </div>
 
     <!-- 左侧场景：最后渲染下单按钮 -->
-    <div v-if="!orderFirst" class="order-btn" type="button"
+    <div v-if="!orderFirst" class="order-btn order-btn-right" type="button"
             :aria-label="`下单-${side}`" :title="`下单`"
             @click="$emit('place-order', side)">
       <div class="order-progress">{{ count }}/4</div>

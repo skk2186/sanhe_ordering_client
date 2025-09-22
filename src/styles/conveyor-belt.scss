@@ -9,11 +9,22 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: $bg-theme;
   color: $text-primary;
   overflow: hidden;
   font-family: $font-family-body;
 }
+
+
+[data-theme="ailaotou"] .conveyor-display {
+  background: url('/images/ui/a/background.png') center/cover;
+}
+[data-theme="zhenxian"] .conveyor-display {
+  background: url('/images/ui/b/background.png') center/cover;
+}
+[data-theme="xiaoxin"] .conveyor-display {
+  background: url('/images/ui/c/background.png') center/cover;
+}
+
 
 // 顶部投碟进度区域
 .top-section {
@@ -226,11 +237,22 @@
   gap: $gap-center-layout;
   padding: 0 10px;
 }
+[data-theme="ailaotou"] .menu-btn {
+  background-image: url('/images/ui/a/caidan.png');
+}
+[data-theme="zhenxian"] .menu-btn {
+  background-image: url('/images/ui/b/caidan.png');
+}
+[data-theme="xiaoxin"] .menu-btn {
+  background-image: url('/images/ui/c/caidan.png');
+}
+
 
 .menu-btn {
-  //width: $width-menu-btn;
-  //height: $height-center-layout;
-  @include wood-button;
+  width: 138px;
+  height: 184px;
+  cursor: pointer;
+  @include hover-raise;
   writing-mode: vertical-rl;
   text-orientation: upright;
   font-size: $font-size-base;
@@ -273,27 +295,65 @@
   }
 
   &.navigation-btn {
-    background-image: url("/images/ui/a/daohang.png");
     width: 218px;
     height: 105px;
+  }
+
+  [data-theme="ailaotou"] &.navigation-btn {
+    background-image: url('/images/ui/a/daohang.png');
+  }
+  [data-theme="zhenxian"] &.navigation-btn {
+    background-image: url('/images/ui/b/daohang.png');
+  }
+  [data-theme="xiaoxin"] &.navigation-btn {
+    background-image: url('/images/ui/c/daohang.png');
   }
 
   &.checkout-btn {
-    background-image: url("/images/ui/a/jilu.png");
     width: 218px;
     height: 105px;
   }
 
+  [data-theme="ailaotou"] &.checkout-btn {
+    background-image: url('/images/ui/a/jilu.png');
+  }
+  [data-theme="zhenxian"] &.checkout-btn {
+    background-image: url('/images/ui/b/jilu.png');
+  }
+  [data-theme="xiaoxin"] &.checkout-btn {
+    background-image: url('/images/ui/c/jilu.png');
+  }
+
   &.settings-btn {
-    background-image: url("/images/ui/a/shezhi.png");
     width: 218px;
     height: 79px;
   }
+  [data-theme="ailaotou"] &.settings-btn {
+    background-image: url('/images/ui/a/shezhi.png');
+  }
+  [data-theme="zhenxian"] &.settings-btn {
+    background-image: url('/images/ui/b/shezhi.png');
+  }
+  [data-theme="xiaoxin"] &.settings-btn {
+    background-image: url('/images/ui/c/shezhi.png');
+  }
+
   &.waiter-btn {
     background-image: url("/images/ui/a/fujiao.png");
     width: 218px;
     height: 79px;
   }
+
+  [data-theme="ailaotou"] &.waiter-btn {
+    background-image: url('/images/ui/a/fujiao.png');
+  }
+  [data-theme="zhenxian"] &.waiter-btn {
+    background-image: url('/images/ui/b/fujiao.png');
+  }
+  [data-theme="xiaoxin"] &.waiter-btn {
+    background-image: url('/images/ui/c/fujiao.png');
+  }
+
 }
 
 
@@ -518,21 +578,34 @@
   }
 }
 
+
+[data-theme="ailaotou"] .order-btn-left {
+  background: url('/images/ui/a/xiadan1.png') center/cover;
+}
+[data-theme="zhenxian"] .order-btn-left {
+  background: url('/images/ui/b/xiadan1.png') center/cover;
+}
+[data-theme="xiaoxin"] .order-btn-left {
+  background: url('/images/ui/c/xiadan1.png') center/cover;
+}
+[data-theme="ailaotou"] .order-btn-right {
+  background: url('/images/ui/a/xiadan2.png') center/cover;
+}
+[data-theme="zhenxian"] .order-btn-right {
+  background: url('/images/ui/b/xiadan2.png') center/cover;
+}
+[data-theme="xiaoxin"] .order-btn-right {
+  background: url('/images/ui/c/xiadan2.png') center/cover;
+}
+
+
+
 .order-btn {
-  background-image: url("/images/ui/a/xiadan1.png");
   width: 118px;
   height: 185px;
-  //font-size: 16px;
-  //font-weight: bold;
-  //color: #553C20;
   cursor: pointer;
   transition: all 0.3s ease;
-  //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
-  //flex-direction: column;
-  //align-items: center;
-  //justify-content: center;
-
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);

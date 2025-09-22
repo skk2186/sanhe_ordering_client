@@ -146,18 +146,6 @@
   box-shadow: $shadow-combined;
 }
 
-// 木质按钮样式
-@mixin wood-button {
-  width: 138px;
-  height: 184px;
-  background-image: url("/images/ui/a/caidan.png");
-  cursor: pointer;
-
-
-  @include hover-raise;
-
-
-}
 
 // 响应式断点 Mixins (ConveyorBeltDisplay专用)
 @mixin desktop-down {
