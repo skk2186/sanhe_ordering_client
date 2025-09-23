@@ -68,73 +68,10 @@
 
 // 底部区域面板
 .bottom-left, .bottom-right {
-  flex: 0 auto; /* 自动宽度，根据内容调整 */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  background: #fffce7;
-  height: 100%;
-  padding: 20px; /* 最小内边距 */
-  border: 3px solid #8B4513;
-  border-bottom: none;
-  border-radius: 15px 15px 0 0;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
-  margin: 10px 10px; /* 只保留上下边距，移除左右边距 */
-  min-width: fit-content; /* 最小宽度适应内容 */
 
-  @include desktop-down {
-    flex: 0 0 auto;
-    padding: 8px;
-    margin: 8px 0;
-    min-width: fit-content;
-  }
 
-  @include laptop-down {
-    padding: 6px;
-    margin: 6px 0;
-  }
-
-  @include mobile-down {
-    order: 2;
-    flex: 0 0 auto;
-    padding: 15px;
-    margin: 0;
-    min-width: fit-content;
-  }
 }
 
-.bottom-center {
-  flex: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #fffce7;
-  height: 100%;
-  padding: 5px; /* 减少内边距 */
-  margin: 10px 0; /* 只保留上下边距，移除左右边距 */
-  border: 3px solid #8B4513;
-  border-bottom: none;
-  border-radius: 15px 15px 0 0;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
-
-  @include desktop-down {
-    padding: 4px;
-    margin: 8px 0;
-  }
-
-  @include laptop-down {
-    padding: 3px;
-    margin: 6px 0;
-  }
-
-  @include mobile-down {
-    order: 1;
-    flex: none;
-    padding: 15px;
-    margin: 0;
-  }
-}
 
 // ==================== 投碟进度样式 ====================
 

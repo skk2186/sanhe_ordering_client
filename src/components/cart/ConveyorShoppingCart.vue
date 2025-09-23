@@ -6,7 +6,7 @@
         <div class="order-text">下单</div>
         <div class="order-progress">{{ getCartCount() }}/4</div>
       </button>
-      
+
       <!-- 购物车圆形显示 -->
       <div
         v-for="(item, index) in cartItems"
@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 左侧：下单按钮在后 -->
       <button v-if="showOrderButton && side === 'left'" class="order-btn" @click="placeOrder">
         <div class="order-text">下单</div>
@@ -111,19 +111,9 @@ const getCartCount = () => {
 
 <style lang="scss" scoped>
 .conveyor-shopping-cart {
-  .item-group {
-    display: flex;
-    align-items: flex-end;
-    gap: 15px;
-  }
+
 }
 
-.cart-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
 
 .item-circle {
   width: 70px;
@@ -156,21 +146,21 @@ const getCartCount = () => {
       font-weight: bold;
     }
   }
-  
+
   .item-image {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     img {
       width: 80%;
       height: 80%;
       object-fit: contain;
     }
   }
-  
+
   .circle-close-btn {
     position: absolute;
     top: -8px;
@@ -320,13 +310,13 @@ const getCartCount = () => {
   &:active {
     transform: translateY(0);
   }
-  
+
   .order-text {
     font-size: 16px;
     font-weight: bold;
     line-height: 1;
   }
-  
+
   .order-progress {
     background: rgba(255, 255, 255, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.5);

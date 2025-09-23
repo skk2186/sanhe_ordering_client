@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="dish-card" 
+  <div
+    class="dish-card"
     :class="cardClasses"
     @click="handleCardClick"
     @mouseenter="handleMouseEnter"
@@ -10,39 +10,39 @@
     <div class="new-badge" v-if="item.isNew">
       <span>NEW</span>
     </div>
-    
+
     <!-- 选中状态图标 -->
     <div class="selected-icon" v-if="isSelected">
       <el-icon><Check /></el-icon>
     </div>
-    
+
     <!-- 菜品图片 -->
     <div class="dish-image-container">
-      <img 
-        :src="item.imageUrl || '/images/default-dish.jpg'" 
+      <img
+        :src="item.imageUrl || '/images/default-dish.jpg'"
         :alt="item.name"
         class="dish-image"
         :class="{ 'sold-out': item.status === 'SOLD_OUT' }"
         @load="handleImageLoad"
         @error="handleImageError"
       >
-      
+
       <!-- 售罄遮罩 -->
       <div class="sold-out-overlay" v-if="item.status === 'SOLD_OUT'">
         <span class="sold-out-text">售罄</span>
       </div>
-      
+
       <!-- 悬停时的快速添加按钮 -->
       <div class="quick-add-btn" v-if="showQuickAdd && !isSoldOut" @click.stop="quickAddToCart">
         <el-icon><Plus /></el-icon>
       </div>
     </div>
-    
+
     <!-- 菜品信息 -->
     <div class="dish-info">
       <h3 class="dish-name">{{ item.name }}</h3>
       <p class="dish-description" v-if="item.description">{{ item.description }}</p>
-      
+
       <!-- 价格和评分 -->
       <div class="dish-meta">
         <div class="price-section">
@@ -51,23 +51,23 @@
             ¥{{ item.originalPrice }}
           </span>
         </div>
-        
+
         <div class="rating-section" v-if="item.rating">
-          <el-rate 
-            v-model="item.rating" 
-            disabled 
-            show-score 
+          <el-rate
+            v-model="item.rating"
+            disabled
+            show-score
             text-color="#ff9900"
             score-template="{value}"
             size="small"
           />
         </div>
       </div>
-      
+
       <!-- 标签 -->
       <div class="dish-tags" v-if="item.tags && item.tags.length">
-        <el-tag 
-          v-for="tag in item.tags.slice(0, 2)" 
+        <el-tag
+          v-for="tag in item.tags.slice(0, 2)"
           :key="tag.id"
           size="small"
           :type="getTagType(tag.type)"
@@ -76,7 +76,7 @@
           {{ tag.name }}
         </el-tag>
       </div>
-      
+
       <!-- 操作按钮区域 -->
       <div class="dish-actions" v-if="!isSoldOut">
         <AddToCartButton
@@ -90,7 +90,7 @@
         />
       </div>
     </div>
-    
+
     <!-- 点击波纹效果 -->
     <div class="ripple-effect" ref="rippleRef"></div>
   </div>
@@ -143,16 +143,16 @@ const cardClasses = computed(() => ({
 // 方法
 const handleCardClick = (event) => {
   if (isSoldOut.value) return
-  
+
   // 创建波纹效果
   createRippleEffect(event)
-  
+
   // 触发点击状态
   isClicked.value = true
   setTimeout(() => {
     isClicked.value = false
   }, 200)
-  
+
   emit('click', props.item)
 }
 
@@ -171,17 +171,17 @@ const handleMouseLeave = () => {
 const createRippleEffect = (event) => {
   const ripple = rippleRef.value
   if (!ripple) return
-  
+
   const rect = event.currentTarget.getBoundingClientRect()
   const size = Math.max(rect.width, rect.height)
   const x = event.clientX - rect.left - size / 2
   const y = event.clientY - rect.top - size / 2
-  
+
   ripple.style.width = ripple.style.height = size + 'px'
   ripple.style.left = x + 'px'
   ripple.style.top = y + 'px'
   ripple.classList.add('ripple-active')
-  
+
   setTimeout(() => {
     ripple.classList.remove('ripple-active')
   }, 600)
@@ -189,9 +189,9 @@ const createRippleEffect = (event) => {
 
 const addToCart = async () => {
   if (isAdding.value || isSoldOut.value) return
-  
+
   isAdding.value = true
-  
+
   try {
     await cartStore.addItem(props.item, 1)
     ElMessage.success(`${props.item.name} 已加入购物车`)
@@ -266,35 +266,35 @@ const handleImageError = (event) => {
   cursor: pointer;
   transition: all $transition-base;
   user-select: none;
-  
+
   // 默认状态
   &:hover:not(.dish-card--sold-out) {
     transform: translateY(-4px);
     box-shadow: $shadow-md;
   }
-  
+
   // 点击状态
   &.dish-card--clicked {
     transform: scale(1.03);
   }
-  
+
   // 选中状态
   &.dish-card--selected {
     border: 2px solid $primary-color;
     box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
   }
-  
+
   // 售罄状态
   &.dish-card--sold-out {
     opacity: 0.6;
     cursor: not-allowed;
-    
+
     &:hover {
       transform: none;
       box-shadow: $shadow-sm;
     }
   }
-  
+
   // 新品状态
   &.dish-card--new {
     &::before {
@@ -309,20 +309,20 @@ const handleImageError = (event) => {
       z-index: 1;
     }
   }
-  
+
   // 列表布局
   &.dish-card--list {
     display: flex;
     align-items: center;
     padding: $spacing-md;
-    
+
     .dish-image-container {
       width: 12rem;
       height: 8rem;
       margin-right: $spacing-md;
       flex-shrink: 0;
     }
-    
+
     .dish-info {
       flex: 1;
       padding: 0;
@@ -553,30 +553,7 @@ const handleImageError = (event) => {
   }
 }
 
-// 响应式设计
-@media (max-width: $breakpoint-sm) {
-  .dish-card {
-    .dish-image-container {
-      height: 14rem;
-    }
 
-    .dish-info {
-      padding: $spacing-sm;
-
-      .dish-name {
-        font-size: $font-size-base;
-      }
-
-      .dish-meta {
-        .price-section {
-          .current-price {
-            font-size: $font-size-base;
-          }
-        }
-      }
-    }
-  }
-}
 
 // 动画定义
 @keyframes selectedPulse {

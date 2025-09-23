@@ -35,7 +35,6 @@
     <div class="bottom-section">
       <!-- 左侧菜品选择区 -->
       <div class="bottom-left">
-        <div class="cart-section">
           <CartPanel
             side="left"
             :items="leftCart"
@@ -46,9 +45,7 @@
             @decrease="decreaseQuantity"
             @select="selectCartSlot"
           />
-
           <MenuView  v-if="menuVisibility.left" side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
-        </div>
       </div>
 
       <!-- 中间功能按钮区 -->
@@ -62,20 +59,19 @@
 
       <!-- 右侧菜品选择区 -->
       <div class="bottom-right">
-        <div class="cart-section">
-          <CartPanel
-            side="right"
-            :items="rightCart"
-            :count="getCartCount('right')"
-            @place-order="placeOrder"
-            @remove="removeItem"
-            @increase="increaseQuantity"
-            @decrease="decreaseQuantity"
-            @select="selectCartSlot"
-          />
 
-          <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
-        </div>
+        <CartPanel
+          side="right"
+          :items="rightCart"
+          :count="getCartCount('right')"
+          @place-order="placeOrder"
+          @remove="removeItem"
+          @increase="increaseQuantity"
+          @decrease="decreaseQuantity"
+          @select="selectCartSlot"
+        />
+
+        <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
       </div>
     </div>
 
@@ -469,13 +465,6 @@ onUnmounted(() => {
     // 确保菜单不会覆盖购物车
     z-index: 10;
   }
-
-  .cart-section {
-    width: 100%;
-    // 确保购物车在菜单下方显示
-    z-index: 5;
-  }
-
 
 }
 

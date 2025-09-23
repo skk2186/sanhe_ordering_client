@@ -138,15 +138,6 @@
   }
 }
 
-// 木质面板样式
-@mixin wood-panel {
-  background: $gradient-wood-panel;
-  border: 3px solid $color-wood-border;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-combined;
-}
-
-
 // 响应式断点 Mixins (ConveyorBeltDisplay专用)
 @mixin desktop-down {
   @media (max-width: $breakpoint-xl) {
@@ -193,55 +184,7 @@
   }
 }
 
-@mixin btn-click-ripple {
-  position: relative;
-  overflow: hidden;
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
-  &:active:not(.btn-disabled):not(.btn-loading)::after {
-    width: 300px;
-    height: 300px;
-  }
-}
-
-// 卡片样式
-@mixin card-style {
-  background: white;
-  border-radius: $border-radius;
-  box-shadow: $box-shadow-sm;
-  padding: $card-padding;
-
-  &:hover {
-    box-shadow: $box-shadow;
-  }
-}
-
-// 渐变背景
-@mixin gradient-bg($start, $end, $direction: 135deg) {
-  background: linear-gradient($direction, $start 0%, $end 100%);
-}
-
-// 动画
-@mixin animation($name, $duration: 1s, $timing: ease, $delay: 0s, $iteration: 1, $direction: normal, $fill: both) {
-  animation: $name $duration $timing $delay $iteration $direction $fill;
-}
-
-// 过渡效果
-@mixin transition($property: all, $duration: $transition-base, $timing: ease) {
-  transition: $property $duration $timing;
-}
 
 // 绝对居中
 @mixin absolute-center {
@@ -291,3 +234,26 @@
 }
 
 
+
+@mixin btn-click-ripple {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  &:active:not(.btn-disabled):not(.btn-loading)::after {
+    width: 300px;
+    height: 300px;
+  }
+}

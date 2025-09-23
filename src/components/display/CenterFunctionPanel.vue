@@ -36,5 +36,27 @@ defineEmits([
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+
+[data-theme="ailaotou"] .bottom-center {
+  background: url('/images/ui/a/cart_bg2.png');
+}
+[data-theme="zhenxian"] .bottom-center {
+  background: url('/images/ui/b/cart_bg2.png') ;
+}
+[data-theme="xiaoxin"] .bottom-center {
+  background: url('/images/ui/c/cart_bg2.png') ;
+}
+
+.bottom-center {
+  flex: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0; /* 只保留上下边距，移除左右边距 */
+  height: 217px;
+  width: 790px;
+
+}
+
 </style>
 
