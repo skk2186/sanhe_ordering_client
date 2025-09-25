@@ -20,7 +20,7 @@
         <!-- 下方信息区域 - 始终显示 -->
         <div class="item-info" :class="{ 'empty-info': !item }">
           <div class="item-name-area" :class="{ 'empty-name': !item }">
-            <div class="item-name" v-if="item">{{ item.name }}</div>
+            <div v-if="item">{{ item.name }}</div>
           </div>
           <div class="item-controls" :class="{ 'empty-controls': !item }">
             <button class="minus-btn" type="button" :disabled="!item" :aria-disabled="!item"
@@ -34,12 +34,7 @@
         </div>
       </div>
 
-      <!-- 左侧场景：最后渲染下单按钮 -->
-<!--      <div v-if="!orderFirst" class="order-btn order-btn-right" type="button"-->
-<!--           :aria-label="`下单-${side}`" :title="`下单`"-->
-<!--           @click="$emit('place-order', side)">-->
-<!--        <div class="order-progress">{{ count }}/4</div>-->
-<!--      </div>-->
+
     </div>
   </div>
 </template>
@@ -52,13 +47,27 @@ const props = defineProps({
   count: { type: Number, required: true }
 })
 
-const orderFirst = computed(() => props.side === 'right')
-
 defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+.item-info {
+  width: 100%;
+  margin-top: -18px; /* 增加负边距，让信息框覆盖圆形下方约1/4 */
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 2; /* 提高层级，确保挡住圆形 */
+  position: relative;
+}
+.item-name-area {
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  padding: 2px 4px;
+  font-size: 16px;
+  color: #fff;
+}
 
 
 .item-group {
@@ -109,7 +118,7 @@ defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
   background-repeat: no-repeat;
   background-position: center center;
   .cart-item {
-    width: 112px;
+    width: 114px;
     height: 167px;
     display: flex;
     flex-direction: column;
@@ -117,6 +126,149 @@ defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
     gap: 8px;
   }
 
+}
+
+
+.item-circle {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  &.empty-item {
+    //background: transparent;
+    //border: 2px dashed rgba(189, 189, 189, 0.3);
+
+    &::after {
+      content: '+';
+      font-size: 24px;
+      color: rgba(153, 153, 153, 0.3);
+      font-weight: bold;
+    }
+  }
+
+  .item-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+    }
+  }
+
+  .circle-close-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #000;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 3;
+
+    &:hover {
+      background: #333;
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+
+
+
+  }
+}
+
+.item-name {
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.item-controls {
+  height: 30px; /* 下方4成 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px; /* 增加按钮距离边框的间距 */
+  color: #000;
+  &.empty-controls {
+
+  }
+}
+
+.item-controls .minus-btn,
+.item-controls .plus-btn {
+  width: 18px; /* 稍微减小按钮宽度，给边距留出空间 */
+  height: 18px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
+  cursor: pointer;
+  font-size: 11px; /* 稍微减小字体 */
+  font-weight: bold;
+  color: #553C20;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(.empty-btn) {
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+    transform: scale(1.1);
+  }
+
+  &:active:not(.empty-btn) {
+    transform: scale(0.95);
+  }
+
+  &.empty-btn {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &.max-quantity {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #CCCCCC 0%, #999999 100%);
+
+    &:hover {
+      background: linear-gradient(135deg, #CCCCCC 0%, #999999 100%);
+      transform: none;
+    }
+  }
 }
 </style>
 

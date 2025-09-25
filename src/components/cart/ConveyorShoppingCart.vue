@@ -110,86 +110,7 @@ const getCartCount = () => {
 </script>
 
 <style lang="scss" scoped>
-.conveyor-shopping-cart {
 
-}
-
-
-.item-circle {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FFE178 0%, #FFD54F 100%);
-  border: 2px solid #FFC107;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
-
-  &.empty-item {
-    background: transparent;
-    border: 2px dashed rgba(189, 189, 189, 0.3);
-
-    &::after {
-      content: '+';
-      font-size: 24px;
-      color: rgba(153, 153, 153, 0.3);
-      font-weight: bold;
-    }
-  }
-
-  .item-image {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    img {
-      width: 80%;
-      height: 80%;
-      object-fit: contain;
-    }
-  }
-
-  .circle-close-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 20px;
-    height: 20px;
-    border: none;
-    border-radius: 50%;
-    background: #000;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 3;
-
-    &:hover {
-      background: #333;
-      transform: scale(1.1);
-    }
-
-    &:active {
-      transform: scale(0.9);
-    }
-  }
-}
 
 .item-info {
   width: 86px;
@@ -200,19 +121,6 @@ const getCartCount = () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 2; /* 提高层级，确保挡住圆形 */
   position: relative;
-}
-
-.item-name-area {
-  height: 60%; /* 上方6成 */
-  background: linear-gradient(135deg, #FF7A00 0%, #ffcc66 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 4px;
-
-  &.empty-name {
-    background: linear-gradient(135deg, #ded6b4 0%, #ede3be 100%);
-  }
 }
 
 .item-name {
