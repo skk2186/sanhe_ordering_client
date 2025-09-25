@@ -1,11 +1,14 @@
 <template>
   <el-dialog
       v-model="visible"
-      title="主题设置"
+      title="系统设置"
       width="1300px"
       center
   >
-    <!-- 主题选择列表 -->
+    <!-- 设置选项卡 -->
+    <el-tabs v-model="activeTab" class="setting-tabs">
+      <!-- 主题设置选项卡 -->
+      <el-tab-pane label="主题设置" name="theme">
     <div class="theme-item">
       <div
           class="theme-card"
@@ -19,8 +22,62 @@
         <img :src="item.img" alt="主题背景" class="theme-card__img">
         <div class="theme-card__title">{{ item.title }}</div>
         <div class="theme-card__key">{{ item.key }}</div>
+          </div>
+        </div>
+      </el-tab-pane>
+
+      <!-- 传送带设置选项卡 -->
+      <el-tab-pane label="传送带设置" name="conveyor">
+        <div class="conveyor-settings">
+          <div class="setting-section">
+            <h3 class="section-title">移动方向</h3>
+            <div class="direction-options">
+              <div
+                  class="direction-card"
+                  :class="{ 'direction-card--active': beltDirection === 'left' }"
+                  @click="setBeltDirection('left')"
+              >
+                <div class="direction-icon">←</div>
+                <div class="direction-label">向左移动</div>
+                <div class="direction-desc">菜品从右向左滚动（默认）</div>
+                <div class="direction-check" v-if="beltDirection === 'left'">✓</div>
+              </div>
+              
+              <div
+                  class="direction-card"
+                  :class="{ 'direction-card--active': beltDirection === 'right' }"
+                  @click="setBeltDirection('right')"
+              >
+                <div class="direction-icon">→</div>
+                <div class="direction-label">向右移动</div>
+                <div class="direction-desc">菜品从左向右滚动</div>
+                <div class="direction-check" v-if="beltDirection === 'right'">✓</div>
+              </div>
       </div>
     </div>
+          
+          <div class="setting-section">
+            <h3 class="section-title">速度设置</h3>
+            <div class="speed-control">
+              <el-slider
+                  v-model="beltSpeed"
+                  :min="0.2"
+                  :max="3"
+                  :step="0.1"
+                  :format-tooltip="formatSpeedTooltip"
+                  @change="setBeltSpeed"
+                  class="speed-slider"
+              />
+              <div class="speed-labels">
+                <span>慢速</span>
+                <span>中速</span>
+                <span>快速</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
 
     <template #footer>
       <div class="dialog-footer">
@@ -31,11 +88,11 @@
 </template>
 
 <script setup>
-import { ElDialog } from "element-plus";
+import { ElDialog, ElTabs, ElTabPane, ElSlider } from "element-plus";
 import { computed, ref, watchEffect } from "vue";
 
 // 定义Props和Emits
-const emit = defineEmits(['update:modelValue', 'theme-changed'])
+const emit = defineEmits(['update:modelValue', 'theme-changed', 'belt-direction-changed', 'belt-speed-changed'])
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   // 支持父组件传入默认主题key
@@ -48,6 +105,9 @@ const visible = computed({
   set: (v) => emit('update:modelValue', v)
 })
 
+// 当前激活的选项卡
+const activeTab = ref('theme')
+
 // 主题数据（包含key）
 const themeItem = [
   { title: "AI老头", img: "/images/background22.jpg", key: "ailaotou" },
@@ -59,7 +119,11 @@ const themeItem = [
 // 2. 选中主题key：直接初始化为 "ailaotou"
 const selectedThemeKey = ref("ailaotou");
 
-// 3. 初始化函数：直接设置 data-theme
+// 传送带设置状态
+const beltDirection = ref('left') // 'left' 或 'right'
+const beltSpeed = ref(1) // 0.2-3 之间的速度值
+
+// 3. 初始化函数：直接设置 data-theme 和传送带设置
 const initTheme = () => {
   // 获取HTML根元素（<html>标签）
   const htmlRoot = document.documentElement;
@@ -73,11 +137,51 @@ const initTheme = () => {
   }
 };
 
+// 初始化传送带设置
+const initBeltSettings = () => {
+  // 从本地存储加载传送带方向设置
+  const savedDirection = localStorage.getItem('beltDirection')
+  if (savedDirection && ['left', 'right'].includes(savedDirection)) {
+    beltDirection.value = savedDirection
+  }
+
+  // 从本地存储加载传送带速度设置  
+  const savedSpeed = localStorage.getItem('beltSpeed')
+  if (savedSpeed) {
+    const speed = parseFloat(savedSpeed)
+    if (speed >= 0.2 && speed <= 3) {
+      beltSpeed.value = speed
+    }
+  }
+}
+
 
 // 选中主题逻辑
 const selectTheme = (item) => {
   selectedThemeKey.value = item.key;
   emit('theme-changed', item); // 向父组件发送完整主题信息
+}
+
+// 设置传送带移动方向
+const setBeltDirection = (direction) => {
+  beltDirection.value = direction
+  localStorage.setItem('beltDirection', direction)
+  emit('belt-direction-changed', direction)
+}
+
+// 设置传送带速度
+const setBeltSpeed = (speed) => {
+  beltSpeed.value = speed
+  localStorage.setItem('beltSpeed', speed.toString())
+  emit('belt-speed-changed', speed)
+}
+
+// 格式化速度提示
+const formatSpeedTooltip = (value) => {
+  if (value < 0.5) return '慢速'
+  if (value < 1.5) return '中速'
+  if (value < 2.5) return '快速'
+  return '极速'
 }
 
 // 监听主题变化，更新全局状态
@@ -102,8 +206,9 @@ const handleCancel = () => {
   visible.value = false
 }
 
-// 组件初始化时加载主题
+// 组件初始化时加载设置
 initTheme()
+initBeltSettings()
 </script>
 
 <style lang="scss">
@@ -197,6 +302,139 @@ initTheme()
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 传送带设置样式
+.conveyor-settings {
+  .setting-section {
+    margin-bottom: 40px;
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+  }
+}
+
+// 方向选择卡片
+.direction-options {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.direction-card {
+  position: relative;
+  flex: 1;
+  max-width: 280px;
+  padding: 24px;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+
+  .direction-icon {
+    font-size: 48px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .direction-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .direction-desc {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .direction-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background: var(--theme-active-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+
+  &--active {
+    border-color: var(--theme-active-color);
+    background: rgba(64, 158, 255, 0.05);
+
+    .direction-icon {
+      color: var(--theme-active-color);
+    }
+
+    .direction-label {
+      color: var(--theme-active-color);
+    }
+  }
+}
+
+// 速度控制样式
+.speed-control {
+  .speed-slider {
+    margin: 20px 0;
+  }
+
+  .speed-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+  }
+}
+
+// 选项卡样式优化
+.setting-tabs {
+  .el-tabs__header {
+    margin-bottom: 30px;
+  }
+
+  .el-tabs__nav-wrap {
+    &::after {
+      background-color: #f0f0f0;
+    }
+  }
+
+  .el-tabs__item {
+    font-size: 16px;
+    font-weight: 500;
+    
+    &.is-active {
+      color: var(--theme-active-color);
+    }
+  }
+
+  .el-tabs__active-bar {
+    background-color: var(--theme-active-color);
   }
 }
 </style>

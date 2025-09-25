@@ -124,12 +124,16 @@
     </el-dialog>
 
 
-    <SettingDialog v-model="settingVisible"></SettingDialog>
+    <SettingDialog 
+        v-model="settingVisible"
+        @belt-direction-changed="handleBeltDirectionChanged"
+        @belt-speed-changed="handleBeltSpeedChanged"
+    ></SettingDialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
 import MenuView from '@/views/customer/MenuView.vue'
@@ -148,8 +152,8 @@ import { useVirtualPlates } from '@/composables/useVirtualPlates'
 import { useConveyorLifecycle } from '@/composables/useConveyorLifecycle'
 import SettingDialog from "@components/display/SettingDialog.vue";
 
-// 使用前12个寿司作为传送带显示
-const displaySushiData = sushiData.slice(0, 12)
+// 使用更多寿司数据确保循环显示，并重复数据增加密度
+const displaySushiData = [...sushiData.slice(0, 12), ...sushiData.slice(0, 12), ...sushiData.slice(0, 12)]
 
 // 响应式数据（改用组合式函数统一管理购物车与进度）
 const { leftCart, rightCart, cartOf, countOf, add, remove, increase, decrease, clear } = useCart()
@@ -203,21 +207,28 @@ const beltTrack = ref(null)
 const beltItems = ref(null)
 // 由 useConveyorBelt 提供：displayOffset / isDragging / isMomentum / dragState
 
-// 传送带配置
-const beltConfig = {
+// 传送带设置状态
+const beltDirection = ref('left') // 'left' 或 'right'
+const beltSpeed = ref(1) // 速度
+
+// 传送带配置 - 支持动态方向和速度
+const beltConfig = computed(() => ({
   itemWidth: 300,
-  autoSpeed: 1, // 恢复正常滚动速度
+  autoSpeed: beltSpeed.value * (beltDirection.value === 'left' ? 1 : -1), // 根据方向调整速度符号
   maxVelocity: 15,
   decay: 0.95,
   minVelocity: 0.1,
   dragThreshold: 15,
   maxDragDistance: 50,
   longPressDelay: 600
-}
+}))
 
-// 初始化传送带（组合式）
-const belt = useConveyorBelt({ beltConfig, onUpdate: () => {} })
-const { displayOffset, isDragging, isMomentum, dragState, startDrag } = belt
+// 初始化传送带（组合式） - 使用响应式配置
+const belt = useConveyorBelt({ 
+  beltConfig: beltConfig.value, 
+  onUpdate: () => {} 
+})
+const { displayOffset, isDragging, isMomentum, dragState, startDrag, updateConfig } = belt
 
 // 动画控制由 useConveyorBelt 内部 rAF 管理
 
@@ -227,7 +238,7 @@ const { virtualScrollState, displayItems } = useVirtualPlates({
   displayOffset,
   itemWidth: 300,
   gap: 130,
-  buffer: 5
+  buffer: 10  // 增加缓冲区确保向右移动时有足够项目
 })
 
 // const singleLoopWidth = computed(() => {
@@ -286,14 +297,18 @@ const addToCart = (item, side) => {
   // 取消所有购物车操作的提醒，保持界面简洁
   if (result.ok) {
     // 静默添加成功
+    // 检查购物车是否刚刚变满
+    checkCartFull()
   } else if (result.reason === 'full') {
-    // 静默处理购物车已满
+    // 只有在尝试添加但失败时，才显示out_meal提示
+    if (side === 'left') {
+      leftCartTipsType.value = 'out_meal'
+    } else {
+      rightCartTipsType.value = 'out_meal'
+    }
   } else if (result.reason === 'max_quantity') {
     // 静默处理数量超限
   }
-  
-  // 检查购物车是否已满，需要显示out_meal提示
-  checkCartFull()
 }
 
 // 添加到指定侧的购物车 - 暂未使用
@@ -390,7 +405,7 @@ const placeOrder = (side) => {
 
   const { delta, reachedReward } = applyOrder(cartItems)
   
-  // 清空购物车 (先清空，避免触发checkCartFull)
+  // 清空购物车
   clear(side)
   
   // 更新计数器，购物车已清空
@@ -464,11 +479,16 @@ const selectCartSlot = () => {}
 const increaseQuantity = (side, index) => {
   const result = increase(side, index)
   if (!result.ok && result.reason === 'max_quantity') {
-    // 静默处理数量超限，不显示提醒
+    // 尝试增加数量但已达上限，显示out_meal提示
+    if (side === 'left') {
+      leftCartTipsType.value = 'out_meal'
+    } else {
+      rightCartTipsType.value = 'out_meal'
+    }
+  } else if (result.ok) {
+    // 成功增加数量，检查是否刚刚达到满载
+    checkCartFull()
   }
-  
-  // 检查购物车是否已满，需要显示out_meal提示
-  checkCartFull()
 }
 
 // 减少商品数量
@@ -498,13 +518,19 @@ const updateCartItem = (side, index, action) => {
   if (action === 'increase') {
     const result = increase(side, index)
     if (!result.ok && result.reason === 'max_quantity') {
-      // 静默处理数量超限
+      // 尝试增加数量但已达上限，显示out_meal提示
+      if (side === 'left') {
+        leftCartTipsType.value = 'out_meal'
+      } else {
+        rightCartTipsType.value = 'out_meal'
+      }
+    } else if (result.ok) {
+      // 成功增加数量，检查是否刚刚达到满载
+      checkCartFull()
     }
-    // 检查购物车是否已满
-    checkCartFull()
   } else if (action === 'decrease') {
     decrease(side, index)
-    // 检查购物车状态，如果不再满4个就清除out_meal提示
+    // 减少数量后，更新计数器并检查是否需要清除提示
     setTimeout(() => {
       const leftCount = getCartCount('left')
       const rightCount = getCartCount('right')
@@ -527,7 +553,7 @@ const updateCartItem = (side, index, action) => {
 const removeItem = (side, index) => {
   remove(side, index)
   
-  // 检查购物车状态，如果不再满4个就清除out_meal提示
+  // 移除商品后，更新计数器并检查是否需要清除提示
   setTimeout(() => {
     const leftCount = getCartCount('left')
     const rightCount = getCartCount('right')
@@ -542,16 +568,73 @@ const removeItem = (side, index) => {
     // 更新计数器
     leftPrevCount.value = leftCount
     rightPrevCount.value = rightCount
-  }, 0) // 使用setTimeout确保DOM更新后再检查
+  }, 0)
 }
 
-// 获取购物车商品数量
+// 获取购物车商品数量（按总数量计算）
 const getCartCount = (side) => {
-  return countOf(side)
+  return countOf(side)  // 恢复原来的总数量计算逻辑
+}
+
+// 传送带设置处理函数
+const handleBeltDirectionChanged = (direction) => {
+  beltDirection.value = direction
+  // 更新传送带配置
+  if (updateConfig) {
+    updateConfig(beltConfig.value)
+  }
+}
+
+const handleBeltSpeedChanged = (speed) => {
+  beltSpeed.value = speed
+  // 更新传送带配置
+  if (updateConfig) {
+    updateConfig(beltConfig.value)
+    // 速度变化不需要重启，只需要更新配置
+  }
+}
+
+// 初始化传送带设置
+const initBeltSettings = () => {
+  // 从本地存储加载传送带方向设置
+  const savedDirection = localStorage.getItem('beltDirection')
+  if (savedDirection && ['left', 'right'].includes(savedDirection)) {
+    beltDirection.value = savedDirection
+  }
+
+  // 从本地存储加载传送带速度设置  
+  const savedSpeed = localStorage.getItem('beltSpeed')
+  if (savedSpeed) {
+    const speed = parseFloat(savedSpeed)
+    if (speed >= 0.2 && speed <= 3) {
+      beltSpeed.value = speed
+    }
+  }
+  
+  // 立即应用设置到传送带配置
+  if (updateConfig) {
+    updateConfig(beltConfig.value)
+  }
 }
 
 // 生命周期：改用组合式函数封装
 useConveyorLifecycle({ beltTrackRef: beltTrack, virtualScrollState, belt })
+
+// 组件挂载时初始化设置
+onMounted(() => {
+  initBeltSettings()
+  
+  // 初始化计数器
+  leftPrevCount.value = getCartCount('left')
+  rightPrevCount.value = getCartCount('right')
+})
+
+// 监听传送带配置变化
+watch(beltConfig, (newConfig) => {
+  if (updateConfig) {
+    updateConfig(newConfig)
+  }
+}, { deep: true })
 
 // 监听菜品数据变化，自动重新计算
 watch(() => displaySushiData.length, () => {

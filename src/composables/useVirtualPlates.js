@@ -18,25 +18,39 @@ export function useVirtualPlates({ data, displayOffset, itemWidth = 200, gap = 1
   })
 
   const displayItems = computed(() => {
-    const currentOffset = Math.abs(displayOffset.value)
+    const rawOffset = displayOffset.value
     const step = virtualScrollState.itemWidth + virtualScrollState.gap
-    const startIndex = Math.floor(currentOffset / step)
-
+    
+    // 计算相对于当前显示窗口的起始位置
     const containerWidth = virtualScrollState.containerWidth || window.innerWidth || 1920
-    const visibleCount = Math.ceil(containerWidth / step) + virtualScrollState.renderBuffer * 2
-
+    
+    // 计算需要渲染的范围（相对于显示窗口）
+    const leftBoundary = -rawOffset - (virtualScrollState.renderBuffer * step)
+    const rightBoundary = -rawOffset + containerWidth + (virtualScrollState.renderBuffer * step)
+    
+    // 计算起始和结束的虚拟索引
+    const startVirtualIndex = Math.floor(leftBoundary / step)
+    const endVirtualIndex = Math.ceil(rightBoundary / step)
+    
     const items = []
-    for (let i = 0; i < visibleCount; i++) {
-      const dataIndex = (startIndex + i) % data.length
+    for (let virtualIndex = startVirtualIndex; virtualIndex <= endVirtualIndex; virtualIndex++) {
+      // 确保数据索引始终为正数
+      const dataIndex = ((virtualIndex % data.length) + data.length) % data.length
       const item = data[dataIndex]
-      const virtualIndex = startIndex + i
+      
+      // 每个项目相对于传送带的绝对位置
+      const absolutePosition = virtualIndex * step
+      
       items.push({
         ...item,
         virtualIndex,
         uniqueKey: `${item.id}-${virtualIndex}`,
-        transform: `translateX(${virtualIndex * step}px)`
+        transform: `translateX(${absolutePosition}px)`
       })
     }
+    
+    // 调试信息已移除
+    
     return items
   })
 

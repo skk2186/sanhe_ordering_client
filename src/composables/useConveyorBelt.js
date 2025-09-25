@@ -96,6 +96,11 @@ export function useConveyorBelt({ beltConfig, onUpdate }) {
     y: e.type.includes('mouse') ? e.clientY : e.touches[0].clientY,
   })
 
+  // 更新配置的函数
+  const updateConfig = (newConfig) => {
+    Object.assign(cfg, newConfig)
+  }
+
   const startDrag = (e) => {
     if (dragState.isActive) return
     // 移除preventDefault以支持被动事件监听器
@@ -207,6 +212,7 @@ export function useConveyorBelt({ beltConfig, onUpdate }) {
     stop,
     startMomentum,
     startDrag,
+    updateConfig,
   }
 }
 
