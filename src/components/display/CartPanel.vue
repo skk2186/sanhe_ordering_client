@@ -1,6 +1,24 @@
 <template>
   <div class="cart-section">
-    <div class="item-group">
+
+    <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
+        class="tips-overlay"
+        :class="tipsType"
+    >
+      <!-- 2. out_meal 专属确定按钮 -->
+      <button
+          v-if="tipsType === 'out_meal'"
+          class="tips-confirm-btn"
+          type="button"
+          aria-label="确认关闭出餐提示"
+          title="确定"
+          @click="$emit('close-tips')"
+      >
+        确定
+      </button>
+    </div>
+
+    <div class="item-group" v-if="!tipsType">
       <div :class="'order-btn order-btn-' + side" type="button" :style="'order: ' + (side ==='left' ? '1' : '0') "
            :aria-label="`下单-${side}`" :title="`下单`"
            @click="$emit('place-order', side)">
@@ -44,7 +62,14 @@ import { computed } from 'vue'
 const props = defineProps({
   side: { type: String, required: true },
   items: { type: Array, required: true },
-  count: { type: Number, required: true }
+  count: { type: Number, required: true },
+  tipsType: {
+    type: String,
+    default: '',
+    validator: (val) => {
+      return ['', 'order_meal', 'out_meal'].includes(val)
+    }
+  }
 })
 
 defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
@@ -52,6 +77,87 @@ defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+
+.tips-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 10; // 确保覆盖原有内容
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 7. order_meal 背景图
+.tips-overlay.order_meal {
+  background-image: url('images/ui/b/order_meal.png');
+}
+
+// 8. out_meal 背景图
+.tips-overlay.out_meal {
+  background-image: url('images/ui/b/out_meal.png');
+}
+
+// 9. out_meal 确定按钮样式（可根据设计调整位置/样式）
+.tips-confirm-btn {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
+  color: #553C20;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 120px; // 按背景图布局调整按钮位置
+
+  &:hover {
+    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// 10. 父容器增加相对定位：确保 tips-overlay 绝对定位生效
+.cart-section {
+  width: 827px;
+  height: 217px;
+  flex: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  position: relative; // 关键：为子元素绝对定位提供参考
+  overflow: hidden; // 防止内容溢出
+
+  .cart-item {
+    width: 114px;
+    height: 167px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.item-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 50px;
+}
+
 .item-info {
   width: 100%;
   margin-top: -18px; /* 增加负边距，让信息框覆盖圆形下方约1/4 */
@@ -69,12 +175,6 @@ defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
   color: #fff;
 }
 
-
-.item-group {
-  display: flex;
-  align-items: flex-end;
-  gap: 50px;
-}
 
 [data-theme="ailaotou"] .cart-section {
   background: url('/images/ui/a/cart_bg.png');

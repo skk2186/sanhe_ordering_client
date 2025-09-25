@@ -7,8 +7,6 @@
 
     <!-- 中间传送带区域 -->
     <div class="middle-section">
-
-
       <!-- 传送带（组件化） -->
       <ConveyorBeltContainer
         v-model:beltTrack="beltTrack"
