@@ -164,20 +164,28 @@ const settingVisible = ref(false)
 const leftCartTipsType = ref('')
 const rightCartTipsType = ref('')
 
-// 检查购物车是否已满（4个商品）
+// 记录每侧购物车的上一次商品数量，用于判断是否刚刚变满
+const leftPrevCount = ref(0)
+const rightPrevCount = ref(0)
+
+// 检查购物车是否刚刚变满（从<4变成>=4）
 const checkCartFull = () => {
   const leftCount = getCartCount('left')
   const rightCount = getCartCount('right')
   
-  // 左侧购物车满4个商品时显示out_meal提示
-  if (leftCount >= 4 && leftCartTipsType.value === '') {
+  // 左侧：只有从<4变成>=4时才显示out_meal提示
+  if (leftCount >= 4 && leftPrevCount.value < 4 && leftCartTipsType.value === '') {
     leftCartTipsType.value = 'out_meal'
   }
   
-  // 右侧购物车满4个商品时显示out_meal提示  
-  if (rightCount >= 4 && rightCartTipsType.value === '') {
+  // 右侧：只有从<4变成>=4时才显示out_meal提示
+  if (rightCount >= 4 && rightPrevCount.value < 4 && rightCartTipsType.value === '') {
     rightCartTipsType.value = 'out_meal'
   }
+  
+  // 更新上一次的数量记录
+  leftPrevCount.value = leftCount
+  rightPrevCount.value = rightCount
 }
 
 // 关闭购物车满的提示
@@ -385,6 +393,13 @@ const placeOrder = (side) => {
   // 清空购物车 (先清空，避免触发checkCartFull)
   clear(side)
   
+  // 更新计数器，购物车已清空
+  if (side === 'left') {
+    leftPrevCount.value = 0
+  } else {
+    rightPrevCount.value = 0
+  }
+  
   // 显示感谢点餐图片 (覆盖可能存在的out_meal提示)
   if (side === 'left') {
     leftCartTipsType.value = 'order_meal'
@@ -471,6 +486,10 @@ const decreaseQuantity = (side, index) => {
     if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
       rightCartTipsType.value = ''
     }
+    
+    // 更新计数器
+    leftPrevCount.value = leftCount
+    rightPrevCount.value = rightCount
   }, 0) // 使用setTimeout确保DOM更新后再检查
 }
 
@@ -496,6 +515,10 @@ const updateCartItem = (side, index, action) => {
       if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
         rightCartTipsType.value = ''
       }
+      
+      // 更新计数器
+      leftPrevCount.value = leftCount
+      rightPrevCount.value = rightCount
     }, 0)
   }
 }
@@ -515,6 +538,10 @@ const removeItem = (side, index) => {
     if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
       rightCartTipsType.value = ''
     }
+    
+    // 更新计数器
+    leftPrevCount.value = leftCount
+    rightPrevCount.value = rightCount
   }, 0) // 使用setTimeout确保DOM更新后再检查
 }
 
