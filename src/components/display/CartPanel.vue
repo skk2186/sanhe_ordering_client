@@ -4,18 +4,9 @@
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
         :class="tipsType"
+        @click="handleTipsClick"
     >
-      <!-- 2. out_meal 专属确定按钮 -->
-      <button
-          v-if="tipsType === 'out_meal'"
-          class="tips-confirm-btn"
-          type="button"
-          aria-label="确认关闭出餐提示"
-          title="确定"
-          @click="$emit('close-tips')"
-      >
-        确定
-      </button>
+      <!-- out_meal 提示：点击任意位置关闭 -->
     </div>
 
     <div class="item-group" v-if="!tipsType">
@@ -72,7 +63,16 @@ const props = defineProps({
   }
 })
 
-defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
+const emit = defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select', 'close-tips'])
+
+// 处理提示点击事件
+const handleTipsClick = () => {
+  // 只有out_meal类型的提示支持点击关闭
+  if (props.tipsType === 'out_meal') {
+    emit('close-tips')
+  }
+  // order_meal类型不处理点击，让它自动3秒后关闭
+}
 </script>
 
 <style lang="scss" scoped>
@@ -93,36 +93,35 @@ defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select'])
   justify-content: center;
 }
 
-// 7. order_meal 背景图
-.tips-overlay.order_meal {
-  background-image: url('images/ui/b/order_meal.png');
+// 7. order_meal 背景图 - 根据主题切换
+[data-theme="ailaotou"] .tips-overlay.order_meal {
+  background-image: url('/images/ui/a/order_meal.png');
+}
+[data-theme="zhenxian"] .tips-overlay.order_meal {
+  background-image: url('/images/ui/b/order_meal.png');
+}
+[data-theme="xiaoxin"] .tips-overlay.order_meal {
+  background-image: url('/images/ui/c/order_meal.png');
 }
 
-// 8. out_meal 背景图
-.tips-overlay.out_meal {
-  background-image: url('images/ui/b/out_meal.png');
+// 8. out_meal 背景图 - 根据主题切换
+[data-theme="ailaotou"] .tips-overlay.out_meal {
+  background-image: url('/images/ui/a/out_meal.png');
+}
+[data-theme="zhenxian"] .tips-overlay.out_meal {
+  background-image: url('/images/ui/b/out_meal.png');
+}
+[data-theme="xiaoxin"] .tips-overlay.out_meal {
+  background-image: url('/images/ui/c/out_meal.png');
 }
 
-// 9. out_meal 确定按钮样式（可根据设计调整位置/样式）
-.tips-confirm-btn {
-  padding: 8px 24px;
-  border: none;
-  border-radius: 4px;
-  background: linear-gradient(135deg, #FFD54F 0%, #FFC107 100%);
-  color: #553C20;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 120px; // 按背景图布局调整按钮位置
+// 9. 提示覆盖层交互样式
+.tips-overlay {
+  cursor: pointer; // 显示可点击状态
 
-  &:hover {
-    background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.98);
+  // order_meal 不显示点击提示，让用户知道会自动关闭
+  &.order_meal {
+    cursor: default;
   }
 }
 

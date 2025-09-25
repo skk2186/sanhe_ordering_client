@@ -79,7 +79,7 @@ const selectCartSlot = (index) => {
 // 从购物车移除
 const removeFromCart = (index) => {
   if (props.cartItems[index]) {
-    ElMessage.info(`已移除 ${props.cartItems[index].name}`)
+    // 静默移除，不显示提醒
     emit('remove-from-cart', index)
   }
 }

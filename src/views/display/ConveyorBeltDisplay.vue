@@ -37,11 +37,13 @@
             side="left"
             :items="leftCart"
             :count="getCartCount('left')"
+            :tips-type="leftCartTipsType"
             @place-order="placeOrder"
             @remove="removeItem"
             @increase="increaseQuantity"
             @decrease="decreaseQuantity"
             @select="selectCartSlot"
+            @close-tips="closeCartFullTips('left')"
           />
           <MenuView  v-if="menuVisibility.left" side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
       </div>
@@ -62,11 +64,13 @@
           side="right"
           :items="rightCart"
           :count="getCartCount('right')"
+          :tips-type="rightCartTipsType"
           @place-order="placeOrder"
           @remove="removeItem"
           @increase="increaseQuantity"
           @decrease="decreaseQuantity"
           @select="selectCartSlot"
+          @close-tips="closeCartFullTips('right')"
         />
 
         <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
@@ -156,6 +160,35 @@ const menuVisibility = ref({ left: false, right: false });
 const showSushiNavigation = ref(false)
 const settingVisible = ref(false)
 
+// 购物车提示状态管理
+const leftCartTipsType = ref('')
+const rightCartTipsType = ref('')
+
+// 检查购物车是否已满（4个商品）
+const checkCartFull = () => {
+  const leftCount = getCartCount('left')
+  const rightCount = getCartCount('right')
+  
+  // 左侧购物车满4个商品时显示out_meal提示
+  if (leftCount >= 4 && leftCartTipsType.value === '') {
+    leftCartTipsType.value = 'out_meal'
+  }
+  
+  // 右侧购物车满4个商品时显示out_meal提示  
+  if (rightCount >= 4 && rightCartTipsType.value === '') {
+    rightCartTipsType.value = 'out_meal'
+  }
+}
+
+// 关闭购物车满的提示
+const closeCartFullTips = (side) => {
+  if (side === 'left') {
+    leftCartTipsType.value = ''
+  } else {
+    rightCartTipsType.value = ''
+  }
+}
+
 
 // 传送带相关
 const beltTrack = ref(null)
@@ -242,17 +275,17 @@ const handleSushiDragEnd = (data) => {
 // 购物车操作
 const addToCart = (item, side) => {
   const result = add(item, side)
+  // 取消所有购物车操作的提醒，保持界面简洁
   if (result.ok) {
-    if (result.increased) {
-      ElMessage.success(`${item.name} 数量已增加到 ${cartOf(result.side)[result.index].quantity} 份`)
-    } else {
-      ElMessage.success(`${item.name} 已添加到${result.side === 'left' ? '左侧' : '右侧'}购物车`)
-    }
+    // 静默添加成功
   } else if (result.reason === 'full') {
-    ElMessage.warning(`${side === 'left' ? '左侧' : '右侧'}购物车已满！`)
+    // 静默处理购物车已满
   } else if (result.reason === 'max_quantity') {
-    ElMessage.warning('该商品已达到最大数量（4份）！')
+    // 静默处理数量超限
   }
+  
+  // 检查购物车是否已满，需要显示out_meal提示
+  checkCartFull()
 }
 
 // 添加到指定侧的购物车 - 暂未使用
@@ -332,7 +365,7 @@ const placeOrder = (side) => {
   const cart = cartOf(side)
   const cartItems = cart.filter(item => item !== null)
   if (cartItems.length === 0) {
-    ElMessage.warning('购物车为空，无法下单')
+    // 静默处理空购物车，不显示提醒
     return
   }
 
@@ -348,12 +381,29 @@ const placeOrder = (side) => {
   orderHistory.value.push(...newOrderItems)
 
   const { delta, reachedReward } = applyOrder(cartItems)
-  ElMessage.success(`下单成功！进度增加${delta}%`)
+  
+  // 清空购物车 (先清空，避免触发checkCartFull)
   clear(side)
+  
+  // 显示感谢点餐图片 (覆盖可能存在的out_meal提示)
+  if (side === 'left') {
+    leftCartTipsType.value = 'order_meal'
+  } else {
+    rightCartTipsType.value = 'order_meal'
+  }
+  
+  // 3秒后恢复原状态
+  setTimeout(() => {
+    if (side === 'left') {
+      leftCartTipsType.value = ''
+    } else {
+      rightCartTipsType.value = ''
+    }
+  }, 3000)
+  
+  // 静默处理扭蛋奖励（不显示提醒）
   if (reachedReward) {
-    ElMessage.success('🎉 恭喜！您已集满进度，可以获得扭蛋奖励！')
     resetLater(2000)
-    ElMessage.info('🔄 进度将自动重置，继续享受美食之旅！')
   }
 }
 
@@ -399,13 +449,29 @@ const selectCartSlot = () => {}
 const increaseQuantity = (side, index) => {
   const result = increase(side, index)
   if (!result.ok && result.reason === 'max_quantity') {
-    ElMessage.warning('每个商品最多只能添加4份')
+    // 静默处理数量超限，不显示提醒
   }
+  
+  // 检查购物车是否已满，需要显示out_meal提示
+  checkCartFull()
 }
 
 // 减少商品数量
 const decreaseQuantity = (side, index) => {
   decrease(side, index)
+  
+  // 检查购物车状态，如果不再满4个就清除out_meal提示
+  setTimeout(() => {
+    const leftCount = getCartCount('left')
+    const rightCount = getCartCount('right')
+    
+    if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
+      leftCartTipsType.value = ''
+    }
+    if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
+      rightCartTipsType.value = ''
+    }
+  }, 0) // 使用setTimeout确保DOM更新后再检查
 }
 
 // 更新购物车商品数量 - 供寿司导航组件调用
@@ -413,17 +479,43 @@ const updateCartItem = (side, index, action) => {
   if (action === 'increase') {
     const result = increase(side, index)
     if (!result.ok && result.reason === 'max_quantity') {
-      ElMessage.warning('该商品已达到最大数量（4份）！')
+      // 静默处理数量超限
     }
+    // 检查购物车是否已满
+    checkCartFull()
   } else if (action === 'decrease') {
     decrease(side, index)
+    // 检查购物车状态，如果不再满4个就清除out_meal提示
+    setTimeout(() => {
+      const leftCount = getCartCount('left')
+      const rightCount = getCartCount('right')
+      
+      if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
+        leftCartTipsType.value = ''
+      }
+      if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
+        rightCartTipsType.value = ''
+      }
+    }, 0)
   }
 }
 
 // 移除商品
 const removeItem = (side, index) => {
   remove(side, index)
-  ElMessage.success('商品已移除')
+  
+  // 检查购物车状态，如果不再满4个就清除out_meal提示
+  setTimeout(() => {
+    const leftCount = getCartCount('left')
+    const rightCount = getCartCount('right')
+    
+    if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
+      leftCartTipsType.value = ''
+    }
+    if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
+      rightCartTipsType.value = ''
+    }
+  }, 0) // 使用setTimeout确保DOM更新后再检查
 }
 
 // 获取购物车商品数量
