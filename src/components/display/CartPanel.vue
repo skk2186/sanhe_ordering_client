@@ -19,7 +19,7 @@
       <!-- 购物车圆形显示 -->
       <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" :class="'cart-item cart-item-'+side">
         <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" @click="$emit('select', side, index)">
-          <div v-if="item" class="item-image">
+          <div v-if="item" class="item-image w3-animate-top">
             <img :src="item.image" :alt="item.name" />
           </div>
           <button v-if="item" class="circle-close-btn" type="button"
@@ -369,5 +369,7 @@ const handleTipsClick = () => {
     }
   }
 }
+
+.w3-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
 </style>
 

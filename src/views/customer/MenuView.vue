@@ -135,6 +135,7 @@ function prevPage() {
   display: flex;
   padding: 20px;
   gap: 20px;
+  z-index: 99;
   // position, top, left, z-index等由父组件控制
 }
 
