@@ -1,10 +1,7 @@
 <template>
   <div class="menu-view-container">
-    <!-- 错误提示 -->
-    <div v-if="error" class="error-message">
-      {{ error }}
-    </div>
-    
+
+
     <!-- 左侧分类导航 -->
     <div class="left-panel"  :style="'order: ' + (side === 'right' ? '1' : '0')">
       <div class="header">
@@ -50,26 +47,27 @@
 
       <!-- 右侧菜品网格 -->
       <div class="main-panel">
-        <LoadingSpinner v-if="loading" text="加载中..." containerClass="grid-placeholder" />
-        <div v-else class="grid-container">
-      
-          <div v-if="paginatedItems.length === 0" class="empty-container">
-            <span>暂无商品</span>
+
+        <div  v-if="loading || !paginatedItems || paginatedItems.length === 0" class="tigs-container">
+          <LoadingSpinner v-if="loading" text="加载中..." class="loading-container" />
+          <div v-else-if="!paginatedItems || paginatedItems.length === 0" class="empty-container">
+              <span>暂无商品</span>
           </div>
-            <div
-              v-else
-              v-for="item in paginatedItems"
-              :key="item.id"
-              class="dish-card"
-              @click="onAddToCart(item)"
-            >
-              <div class="dish-image">
-                <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
-              </div>
-              <div class="dish-info">
-                <p class="dish-name">{{ item.storeName }}</p>
-                <p class="dish-price">¥{{ item.price }}</p>
-              </div>
+        </div>
+        <div v-else class="grid-container">
+          <div
+            v-for="item in paginatedItems"
+            :key="item.id"
+            class="dish-card"
+            @click="onAddToCart(item)"
+          >
+            <div class="dish-image">
+              <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
+            </div>
+            <div class="dish-info">
+              <p class="dish-name">{{ item.storeName }}</p>
+              <p class="dish-price">¥{{ item.price }}</p>
+            </div>
         
           </div>
         </div>
@@ -288,11 +286,9 @@ onMounted(async () => {
   }
   
   .empty-container {
-    grid-column: 1 / -1;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
     color: #999;
     font-size: 18px;
   }
@@ -321,6 +317,7 @@ onMounted(async () => {
 
 .right-panel {
   display: flex;
+  flex: 1;
   .pagination-panel {
     display: flex;
     flex-direction: column;
@@ -360,9 +357,22 @@ onMounted(async () => {
 
   .main-panel {
     flex: 1;
-
     padding-left: 20px;
-
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .tigs-container{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .loading-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
     .grid-container {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -371,6 +381,9 @@ onMounted(async () => {
       height: 100%;
       overflow-y: auto;
     }
+
+    // 确保LoadingSpinner在main-panel中居中
+
   }
 
 }
