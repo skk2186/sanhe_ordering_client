@@ -50,12 +50,10 @@
 
       <!-- 右侧菜品网格 -->
       <div class="main-panel">
-        <div class="grid-container">
-          <div v-if="loading" class="loading-container">
-            <div class="loading-spinner"></div>
-            <span>加载中...</span>
-          </div>
-          <div v-else-if="paginatedItems.length === 0" class="empty-container">
+        <LoadingSpinner v-if="loading" text="加载中..." containerClass="grid-placeholder" />
+        <div v-else class="grid-container">
+      
+          <div v-if="paginatedItems.length === 0" class="empty-container">
             <span>暂无商品</span>
           </div>
             <div
@@ -86,6 +84,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { menuApi } from '@/api/menu.js';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const props = defineProps({
   side: {
@@ -268,23 +267,7 @@ onMounted(async () => {
     }
   }
   
-  .loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    
-    .loading-spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top-color: #f3a633;
-      animation: spin 1s ease-in-out infinite;
-      margin-bottom: 10px;
-    }
-  }
+
   
   .empty-message {
     text-align: center;
