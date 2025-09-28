@@ -16,7 +16,7 @@
       v-if="globalLoading"
       class="global-loading"
       v-loading="true"
-      element-loading-text="处理中..."
+      element-loading-text="处理中...22"
       element-loading-background="rgba(0, 0, 0, 0.7)"
     ></div>
   </div>

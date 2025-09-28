@@ -24,23 +24,17 @@ service.interceptors.request.use(
       console.log(`🚀 模拟API请求: ${config.method?.toUpperCase()} ${config.url}`)
       return config
     }
-    
-    // 开始进度条
-    NProgress.start()
-    
-    // 设置全局加载状态
-    const globalStore = useGlobalStore()
-    globalStore.setLoading(true)
-    
+
+
     // 添加认证token
     const authStore = useAuthStore()
     if (authStore.token) {
       config.headers.Authorization = `Bearer ${authStore.token}`
     }
-    
+
     // 添加请求ID用于追踪
     config.headers['X-Request-ID'] = generateRequestId()
-    
+
     // 添加时间戳防止缓存
     if (config.method === 'get') {
       config.params = {
@@ -48,21 +42,12 @@ service.interceptors.request.use(
         _t: Date.now()
       }
     }
-    
-    console.log(`🚀 API请求: ${config.method?.toUpperCase()} ${config.url}`, {
-      params: config.params,
-      data: config.data
-    })
-    
+
+
     return config
   },
   error => {
-    NProgress.done()
-    const globalStore = useGlobalStore()
-    globalStore.setLoading(false)
-    
-    console.error('❌ 请求配置错误:', error)
-    ElMessage.error('请求配置错误')
+
     return Promise.reject(error)
   }
 )
@@ -72,19 +57,19 @@ service.interceptors.response.use(
   response => {
     // 结束进度条
     NProgress.done()
-    
+
     // 关闭全局加载状态
     const globalStore = useGlobalStore()
     globalStore.setLoading(false)
-    
+
     const { data, config } = response
-    
+
     console.log(`✅ API响应: ${config.method?.toUpperCase()} ${config.url}`, data)
-    
+
     // 检查业务状态码
     if (data.code !== undefined && data.code !== 0) {
       const errorMessage = data.message || '请求失败'
-      
+
       // 特殊错误码处理
       switch (data.code) {
         case 401:
@@ -102,27 +87,27 @@ service.interceptors.response.use(
         default:
           ElMessage.error(errorMessage)
       }
-      
+
       return Promise.reject(new Error(errorMessage))
     }
-    
+
     return data
   },
   error => {
     // 结束进度条
     NProgress.done()
-    
+
     // 关闭全局加载状态
     const globalStore = useGlobalStore()
     globalStore.setLoading(false)
-    
+
     console.error('❌ API响应错误:', error)
-    
+
     const { response, config } = error
-    
+
     if (response) {
       const { status, data } = response
-      
+
       switch (status) {
         case 400:
           ElMessage.error(data?.message || '请求参数错误')
@@ -161,7 +146,7 @@ service.interceptors.response.use(
     } else {
       ElMessage.error('请求失败，请稍后重试')
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -169,7 +154,7 @@ service.interceptors.response.use(
 // 处理未授权
 function handleUnauthorized() {
   const authStore = useAuthStore()
-  
+
   ElMessageBox.confirm(
     '登录状态已过期，请重新登录',
     '系统提示',
@@ -188,7 +173,7 @@ function handleUnauthorized() {
 
 // 生成请求ID
 function generateRequestId() {
-  return Math.random().toString(36).substring(2, 15) + 
+  return Math.random().toString(36).substring(2, 15) +
          Math.random().toString(36).substring(2, 15)
 }
 
@@ -197,19 +182,19 @@ export const request = {
   get(url, params = {}, config = {}) {
     return service.get(url, { params, ...config })
   },
-  
+
   post(url, data = {}, config = {}) {
     return service.post(url, data, config)
   },
-  
+
   put(url, data = {}, config = {}) {
     return service.put(url, data, config)
   },
-  
+
   delete(url, config = {}) {
     return service.delete(url, config)
   },
-  
+
   upload(url, formData, config = {}) {
     return service.post(url, formData, {
       headers: {

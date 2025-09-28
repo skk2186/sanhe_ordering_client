@@ -12,11 +12,7 @@
         争鲜寿司
       </div>
       <div class="category-list">
-        <div v-if="loading" class="loading-container">
-          <div class="loading-spinner"></div>
-          <span>加载中...</span>
-        </div>
-        <div v-else>
+    
           <div
             v-for="category in localCategories"
             :key="category.id"
@@ -29,7 +25,7 @@
           <div v-if="localCategories.length === 0" class="empty-message">
             暂无分类
           </div>
-        </div>
+ 
       </div>
       <div class="footer">
         <el-button class="exit-btn" @click="$emit('close')">
@@ -62,21 +58,21 @@
           <div v-else-if="paginatedItems.length === 0" class="empty-container">
             <span>暂无商品</span>
           </div>
-          <div v-else>
             <div
-                v-for="item in paginatedItems"
-                :key="item.id"
-                class="dish-card"
-                @click="onAddToCart(item)"
+              v-else
+              v-for="item in paginatedItems"
+              :key="item.id"
+              class="dish-card"
+              @click="onAddToCart(item)"
             >
               <div class="dish-image">
                 <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
               </div>
               <div class="dish-info">
-                <p class="dish-name">{{ item.name }}</p>
+                <p class="dish-name">{{ item.storeName }}</p>
                 <p class="dish-price">¥{{ item.price }}</p>
               </div>
-            </div>
+        
           </div>
         </div>
       </div>
