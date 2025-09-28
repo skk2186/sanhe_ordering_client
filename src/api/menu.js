@@ -1,10 +1,33 @@
 import { request } from '@/utils/request'
 
+import service from '@/utils/request'
+
 /**
  * 菜品相关API
- * 对接后端菜品服务的37个接口
+ * 对接后端菜品服务的接口
  */
 export const menuApi = {
+  // ==================== 客户端API ====================
+  /**
+   * 获取店铺分类列表
+   * @param {number} shopId - 店铺ID
+   */
+  getCategory(shopId) {
+    return service.get('/app-api/product/getCategory', { params: { shopId } })
+  },
+
+  /**
+   * 获取商品列表
+   * @param {Object} params - 查询参数
+   * @param {number} params.shopId - 店铺ID
+   * @param {number} params.categoryId - 分类ID
+   * @param {number} params.pageNo - 页码
+   * @param {number} params.pageSize - 每页大小
+   */
+  getProducts(params) {
+    return service.get('/app-api/product/getProducts', { params })
+  },
+
   // ==================== 分类管理API ====================
   
   /**

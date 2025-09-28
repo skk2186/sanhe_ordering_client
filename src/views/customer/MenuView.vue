@@ -1,5 +1,10 @@
 <template>
-  <div class="menu-view-container" >
+  <div class="menu-view-container">
+    <!-- 错误提示 -->
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+    
     <!-- 左侧分类导航 -->
     <div class="left-panel"  :style="'order: ' + (side === 'right' ? '1' : '0')">
       <div class="header">
@@ -7,15 +12,23 @@
         争鲜寿司
       </div>
       <div class="category-list">
-        <div
-          v-for="category in localCategories"
-          :key="category.id"
-          class="category-item"
-          :class="{ active: currentCategory && currentCategory.id === category.id }"
-          @click="handleCategoryChange(category)"
-        >
-          {{ category.name }}
-          <span v-if="category.id === 'special'"> > </span>
+        <div v-if="loading" class="loading-container">
+          <div class="loading-spinner"></div>
+          <span>加载中...</span>
+        </div>
+        <div v-else>
+          <div
+            v-for="category in localCategories"
+            :key="category.id"
+            class="category-item"
+            :class="{ active: currentCategory && currentCategory.id === category.id }"
+            @click="handleCategoryChange(category)"
+          >
+            {{ category.name }}
+          </div>
+          <div v-if="localCategories.length === 0" class="empty-message">
+            暂无分类
+          </div>
         </div>
       </div>
       <div class="footer">
@@ -42,18 +55,27 @@
       <!-- 右侧菜品网格 -->
       <div class="main-panel">
         <div class="grid-container">
-          <div
-              v-for="item in paginatedItems"
-              :key="item.id"
-              class="dish-card"
-              @click="onAddToCart(item)"
-          >
-            <div class="dish-image">
-              <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
-            </div>
-            <div class="dish-info">
-              <p class="dish-name">{{ item.name }}</p>
-              <p class="dish-price">¥{{ item.price }}</p>
+          <div v-if="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <span>加载中...</span>
+          </div>
+          <div v-else-if="paginatedItems.length === 0" class="empty-container">
+            <span>暂无商品</span>
+          </div>
+          <div v-else>
+            <div
+                v-for="item in paginatedItems"
+                :key="item.id"
+                class="dish-card"
+                @click="onAddToCart(item)"
+            >
+              <div class="dish-image">
+                <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
+              </div>
+              <div class="dish-info">
+                <p class="dish-name">{{ item.name }}</p>
+                <p class="dish-price">¥{{ item.price }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -66,57 +88,122 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { sushiData, filterCategories } from '@/data/sushiData.js';
-import { DArrowLeft, DArrowRight, SwitchButton } from '@element-plus/icons-vue';
+import { ref, computed, onMounted } from 'vue';
+import { menuApi } from '@/api/menu.js';
 
 const props = defineProps({
   side: {
     type: String,
     default: 'left'
-  }
+  },
+  shopId: {
+    type: Number,
+    default: 2 // 默认店铺ID
+  }    
 });
 
 const emit = defineEmits(['close', 'add-to-cart']);
 
 const currentPage = ref(1);
 const pageSize = 8; // 2行4列，一页8个
-const currentCategory = ref(filterCategories.find(c => c.id === 'special')); // 默认选中 “限定新品”
+const currentCategory = ref(null);
+const localCategories = ref([]);
+const products = ref([]);
+const totalCount = ref(0);
+const loading = ref(false);
+const error = ref('');
 
-const localCategories = ref(filterCategories.filter(c => ['special', 'maki', 'sashimi', 'nigiri', 'hot'].includes(c.id)));
+// 计算总页数
+const totalPages = computed(() => Math.ceil(totalCount.value / pageSize));
 
-const filteredItems = computed(() => {
-  if (!currentCategory.value || currentCategory.value.id === 'all') {
-    return sushiData;
-  }
-  return sushiData.filter(item => item.category === currentCategory.value.id);
-});
-
-const totalPages = computed(() => Math.ceil(filteredItems.value.length / pageSize));
-
+// 计算当前页的商品
 const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * pageSize;
-  const end = start + pageSize;
-  return filteredItems.value.slice(start, end);
+  // 由于后端API已经做了分页，这里直接返回products
+  return products.value;
 });
 
+// 获取分类列表
+const fetchCategories = async () => {
+  loading.value = true;
+  error.value = '';
+  try {
+    const response = await menuApi.getCategory(props.shopId);
+    if (response.code === 0 && response.data) {
+      localCategories.value = response.data;
+      // 默认选中第一个分类
+      if (localCategories.value.length > 0 && !currentCategory.value) {
+        currentCategory.value = localCategories.value[0];
+      }
+    }
+  } catch (err) {
+    error.value = '获取分类失败';
+    console.error('获取分类失败:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 获取商品列表
+const fetchProducts = async () => {
+  if (!currentCategory.value) return;
+  
+  loading.value = true;
+  error.value = '';
+  try {
+    const response = await menuApi.getProducts({
+      shopId: props.shopId,
+      categoryId: currentCategory.value.id,
+      pageNo: currentPage.value,
+      pageSize: pageSize
+    });
+    if (response.code === 0 && response.data) {
+      products.value = response.data.list || [];
+      totalCount.value = response.data.total || 0;
+    }
+  } catch (err) {
+    error.value = '获取商品失败';
+    console.error('获取商品失败:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 切换分类
 const handleCategoryChange = (category) => {
   currentCategory.value = category;
   currentPage.value = 1;
+  fetchProducts();
 };
 
+// 添加到购物车
 const onAddToCart = (item) => {
   // 菜单组件不区分左右，由父组件决定
   emit('add-to-cart', item, props.side);
 };
 
+// 下一页
 function nextPage() {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchProducts();
+  }
 }
 
+// 上一页
 function prevPage() {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchProducts();
+  }
 }
+
+// 初始化数据
+onMounted(async () => {
+  await fetchCategories();
+  if (currentCategory.value) {
+    await fetchProducts();
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -175,18 +262,65 @@ function prevPage() {
     transition: all 0.2s;
     border-bottom: 1px solid #c8e1f0;
 
-    &:first-child {
-      color: #f3a633;
-      font-weight: bold;
-    }
-
     &.active {
       background-color: #fff;
       font-weight: bold;
     }
 
     &:hover:not(.active) {
-      background-color: rgba(255,255,0.5);
+      background-color: rgba(255,255,255,0.5);
+    }
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #f3a633;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+  }
+  
+  .empty-message {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+  }
+  
+  .error-message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 100;
+  }
+  
+  .empty-container {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    font-size: 18px;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
     }
   }
 

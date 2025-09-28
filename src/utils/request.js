@@ -8,10 +8,11 @@ import NProgress from 'nprogress'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '/api', // API网关地址
+  baseURL: '', // 空字符串，使用完整路径
   timeout: 30000, // 请求超时时间
   headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
+    'Content-Type': 'application/json;charset=UTF-8',
+    'tenant-id': 1
   }
 })
 
@@ -81,7 +82,7 @@ service.interceptors.response.use(
     console.log(`✅ API响应: ${config.method?.toUpperCase()} ${config.url}`, data)
     
     // 检查业务状态码
-    if (data.code !== undefined && data.code !== 200) {
+    if (data.code !== undefined && data.code !== 0) {
       const errorMessage = data.message || '请求失败'
       
       // 特殊错误码处理
