@@ -162,16 +162,8 @@ const fetchSushiData = async () => {
     // 调用后端API获取商品列表，使用shopId=2
     const response = await menuApi.getProducts({ shopId: 2 });
     if (response.code === 0 && response.data && response.data.list) {
-      // 将获取的数据存储到displaySushiData中
+      // 保留所有从后端获取的原始菜品数据，不进行重复填充
       displaySushiData.value = response.data.list;
-      // 如果数据不足，重复数据以确保循环效果
-      if (displaySushiData.value.length < 36) {
-        const repeatedData = [...displaySushiData.value];
-        // 重复数据直到达到或超过36个
-        while (displaySushiData.value.length < 36) {
-          displaySushiData.value = [...displaySushiData.value, ...repeatedData];
-        }
-      }
     } else {
       console.error('获取商品数据失败:', response);
       ElMessage.error('获取商品数据失败');
@@ -259,13 +251,13 @@ const { displayOffset, isDragging, isMomentum, dragState, startDrag, updateConfi
 
 // 动画控制由 useConveyorBelt 内部 rAF 管理
 
-// 虚拟滚动：改用组合式函数封装
+// 虚拟滚动：改用组合式函数封装，增大缓冲区以确保能看到所有菜品
 const { virtualScrollState, displayItems } = useVirtualPlates({
   data: displaySushiData,
   displayOffset,
   itemWidth: 300,
   gap: 130,
-  buffer: 10  // 增加缓冲区确保向右移动时有足够项目
+  buffer: 15  // 增大缓冲区确保能展示更多菜品
 })
 
 // const singleLoopWidth = computed(() => {

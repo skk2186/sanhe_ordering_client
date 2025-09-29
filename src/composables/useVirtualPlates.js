@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue'
+import { reactive, computed, onMounted, onUnmounted } from 'vue'
 
 /**
  * 虚拟寿司盘列表计算
@@ -11,19 +11,38 @@ import { reactive, computed } from 'vue'
  */
 export function useVirtualPlates({ data, displayOffset, itemWidth = 200, gap = 10, buffer = 5 }) {
   const virtualScrollState = reactive({
-    containerWidth: 0,
+    containerWidth: window.innerWidth * 2, // 初始设置为两倍窗口宽度，确保有足够的空间显示更多菜品
     itemWidth,
     gap,
     renderBuffer: buffer
+  })
+
+  // 监听窗口大小变化，更新containerWidth
+  const handleResize = () => {
+    virtualScrollState.containerWidth = window.innerWidth * 2
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', handleResize)
+    handleResize() // 初始化containerWidth
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize)
   })
 
   const displayItems = computed(() => {
     const rawOffset = displayOffset.value
     const step = virtualScrollState.itemWidth + virtualScrollState.gap
     const data2 = data.value || []
+    
+    // 确保数据不为空
+    if (data2.length === 0) {
+      return []
+    }
 
-    // 计算相对于当前显示窗口的起始位置
-    const containerWidth = virtualScrollState.containerWidth || window.innerWidth || 1920
+    // 计算容器宽度，确保有足够空间显示所有菜品
+    const containerWidth = virtualScrollState.containerWidth || window.innerWidth * 2
 
     // 计算需要渲染的范围（相对于显示窗口）
     const leftBoundary = -rawOffset - (virtualScrollState.renderBuffer * step)
@@ -53,7 +72,27 @@ export function useVirtualPlates({ data, displayOffset, itemWidth = 200, gap = 1
       })
     }
 
-    // 调试信息已移除
+    // 确保至少渲染一定数量的菜品
+    const minItemsToRender = Math.min(30, data2.length * 2) // 最多渲染数据量的两倍，但不超过30个
+    if (items.length < minItemsToRender) {
+      // 如果渲染的项目不足，增加一些额外的项目
+      const additionalItems = []
+      const currentDataLength = data2.length
+      for (let i = endVirtualIndex + 1; i <= endVirtualIndex + (minItemsToRender - items.length); i++) {
+        const dataIndex = i % currentDataLength
+        const item = data2[dataIndex]
+        if (item) {
+          const absolutePosition = i * step
+          additionalItems.push({
+            ...item,
+            virtualIndex: i,
+            uniqueKey: `${item.id}-${i}`,
+            transform: `translateX(${absolutePosition}px)`
+          })
+        }
+      }
+      return [...items, ...additionalItems]
+    }
 
     return items
   })
