@@ -232,7 +232,7 @@ const beltSpeed = ref(1) // 速度
 
 // 传送带配置 - 支持动态方向和速度
 const beltConfig = computed(() => ({
-  itemWidth: 300,
+  itemWidth: 380,
   autoSpeed: beltSpeed.value * (beltDirection.value === 'left' ? 1 : -1), // 根据方向调整速度符号
   maxVelocity: 15,
   decay: 0.95,

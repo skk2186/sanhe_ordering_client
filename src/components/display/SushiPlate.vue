@@ -319,14 +319,6 @@ onUnmounted(() => {
     }
   }
 
-  // 停顿状态
-  //&.paused {
-  //  .sushi-circle {
-  //    box-shadow: 0 8px 25px rgba(255, 122, 0, 0.4);
-  //    border: 2px solid rgba(255, 122, 0, 0.6);
-  //    animation: pausePulse 1s ease-in-out;
-  //  }
-  //}
 
   // 拖动状态
   &.dragging {
@@ -338,19 +330,12 @@ onUnmounted(() => {
     cursor: grabbing;
   }
 
-  //&.clicked:not(.paused):not(.dragging) {
-  //  .sushi-circle {
-  //    box-shadow: 0 8px 25px rgba(255, 122, 0, 0.3);
-  //  }
-  //}
 }
 .sushi-circle {
   position: relative;
-  width: 300px;
-  height: 300px;
-  //background: radial-gradient(circle, #FFFFFF 0%, #F0F0F0 70%, #E0E0E0 100%);
-  //border-radius: 50%;
-  //box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  width: 380px;
+  height: 380px;
+
   display: flex;
   //align-items: center;
   justify-content: center;
@@ -375,7 +360,7 @@ onUnmounted(() => {
 }
 
 .sushi-info {
-  width: 100%;
+  width: 70%;
   padding: 10px 0;
   margin-top: -8px;
   border-radius: 8px;
