@@ -389,7 +389,6 @@ const applyMomentumScroll = () => {
 
 // 关闭导航
 const closeNavigation = () => {
-  console.log(3213213321)
   emit('close')
 }
 

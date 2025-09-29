@@ -19,7 +19,7 @@
       <div class="sushi-image">
         <img
           :src="getImageSrc(item.image)"
-          :alt="item.name"
+          :alt="item.storeName"
           @error="handleImageError"
           @load="handleImageLoad"
         />
@@ -36,7 +36,7 @@
     <div class="sushi-info">
       <!-- 上方橙色区域显示名称 -->
       <div class="sushi-name-area">
-        <div class="sushi-name">{{ item.name }}</div>
+        <div class="sushi-name">{{ item.storeName }}</div>
       </div>
       <!-- 下方价格区域 -->
       <div class="sushi-price-area">
@@ -101,14 +101,7 @@ const getImageSrc = (imagePath) => {
   if (!imagePath) {
     return '/images/default-dish.jpg'
   }
-
-  // 如果是相对路径，直接返回
-  if (imagePath.startsWith('/')) {
-    return imagePath
-  }
-
-  // 否则添加前缀
-  return `/${imagePath}`
+  return imagePath
 }
 
 const DEFAULT_FALLBACK = '/images/default-dish.jpg'

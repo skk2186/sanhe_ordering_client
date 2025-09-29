@@ -124,7 +124,7 @@
     </el-dialog>
 
 
-    <SettingDialog 
+    <SettingDialog
         v-model="settingVisible"
         @belt-direction-changed="handleBeltDirectionChanged"
         @belt-speed-changed="handleBeltSpeedChanged"
@@ -144,16 +144,43 @@ import ConveyorPlates from '@/components/display/ConveyorPlates.vue'
 import TopPlateProgress from '@/components/display/TopPlateProgress.vue'
 import CartPanel from '@/components/display/CartPanel.vue'
 import CenterFunctionPanel from '@/components/display/CenterFunctionPanel.vue'
-import { sushiData } from '@/data/sushiData.js'
 import { useCart } from '@/composables/useCart'
 import { useOrderProgress } from '@/composables/useOrderProgress'
 import { useConveyorBelt } from '@/composables/useConveyorBelt'
 import { useVirtualPlates } from '@/composables/useVirtualPlates'
 import { useConveyorLifecycle } from '@/composables/useConveyorLifecycle'
 import SettingDialog from "@components/display/SettingDialog.vue";
+import { menuApi } from '@/api/menu.js';
 
-// 使用更多寿司数据确保循环显示，并重复数据增加密度
-const displaySushiData = [...sushiData.slice(0, 12), ...sushiData.slice(0, 12), ...sushiData.slice(0, 12)]
+
+// 从服务器获取的传送带商品数据
+const displaySushiData = ref([]);
+
+// 从服务器获取商品数据
+const fetchSushiData = async () => {
+  try {
+    // 调用后端API获取商品列表，使用shopId=2
+    const response = await menuApi.getProducts({ shopId: 2 });
+    if (response.code === 0 && response.data && response.data.list) {
+      // 将获取的数据存储到displaySushiData中
+      displaySushiData.value = response.data.list;
+      // 如果数据不足，重复数据以确保循环效果
+      if (displaySushiData.value.length < 36) {
+        const repeatedData = [...displaySushiData.value];
+        // 重复数据直到达到或超过36个
+        while (displaySushiData.value.length < 36) {
+          displaySushiData.value = [...displaySushiData.value, ...repeatedData];
+        }
+      }
+    } else {
+      console.error('获取商品数据失败:', response);
+      ElMessage.error('获取商品数据失败');
+    }
+  } catch (error) {
+    console.error('获取商品数据异常:', error);
+    ElMessage.error('获取商品数据异常，请稍后再试');
+  }
+}
 
 // 响应式数据（改用组合式函数统一管理购物车与进度）
 const { leftCart, rightCart, cartOf, countOf, add, remove, increase, decrease, clear } = useCart()
@@ -176,17 +203,17 @@ const rightPrevCount = ref(0)
 const checkCartFull = () => {
   const leftCount = getCartCount('left')
   const rightCount = getCartCount('right')
-  
+
   // 左侧：只有从<4变成>=4时才显示out_meal提示
   if (leftCount >= 4 && leftPrevCount.value < 4 && leftCartTipsType.value === '') {
     leftCartTipsType.value = 'out_meal'
   }
-  
+
   // 右侧：只有从<4变成>=4时才显示out_meal提示
   if (rightCount >= 4 && rightPrevCount.value < 4 && rightCartTipsType.value === '') {
     rightCartTipsType.value = 'out_meal'
   }
-  
+
   // 更新上一次的数量记录
   leftPrevCount.value = leftCount
   rightPrevCount.value = rightCount
@@ -224,9 +251,9 @@ const beltConfig = computed(() => ({
 }))
 
 // 初始化传送带（组合式） - 使用响应式配置
-const belt = useConveyorBelt({ 
-  beltConfig: beltConfig.value, 
-  onUpdate: () => {} 
+const belt = useConveyorBelt({
+  beltConfig: beltConfig.value,
+  onUpdate: () => {}
 })
 const { displayOffset, isDragging, isMomentum, dragState, startDrag, updateConfig } = belt
 
@@ -404,24 +431,24 @@ const placeOrder = (side) => {
   orderHistory.value.push(...newOrderItems)
 
   const { delta, reachedReward } = applyOrder(cartItems)
-  
+
   // 清空购物车
   clear(side)
-  
+
   // 更新计数器，购物车已清空
   if (side === 'left') {
     leftPrevCount.value = 0
   } else {
     rightPrevCount.value = 0
   }
-  
+
   // 显示感谢点餐图片 (覆盖可能存在的out_meal提示)
   if (side === 'left') {
     leftCartTipsType.value = 'order_meal'
   } else {
     rightCartTipsType.value = 'order_meal'
   }
-  
+
   // 3秒后恢复原状态
   setTimeout(() => {
     if (side === 'left') {
@@ -430,7 +457,7 @@ const placeOrder = (side) => {
       rightCartTipsType.value = ''
     }
   }, 3000)
-  
+
   // 静默处理扭蛋奖励（不显示提醒）
   if (reachedReward) {
     resetLater(2000)
@@ -494,19 +521,19 @@ const increaseQuantity = (side, index) => {
 // 减少商品数量
 const decreaseQuantity = (side, index) => {
   decrease(side, index)
-  
+
   // 检查购物车状态，如果不再满4个就清除out_meal提示
   setTimeout(() => {
     const leftCount = getCartCount('left')
     const rightCount = getCartCount('right')
-    
+
     if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
       leftCartTipsType.value = ''
     }
     if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
       rightCartTipsType.value = ''
     }
-    
+
     // 更新计数器
     leftPrevCount.value = leftCount
     rightPrevCount.value = rightCount
@@ -534,14 +561,14 @@ const updateCartItem = (side, index, action) => {
     setTimeout(() => {
       const leftCount = getCartCount('left')
       const rightCount = getCartCount('right')
-      
+
       if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
         leftCartTipsType.value = ''
       }
       if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
         rightCartTipsType.value = ''
       }
-      
+
       // 更新计数器
       leftPrevCount.value = leftCount
       rightPrevCount.value = rightCount
@@ -552,19 +579,19 @@ const updateCartItem = (side, index, action) => {
 // 移除商品
 const removeItem = (side, index) => {
   remove(side, index)
-  
+
   // 移除商品后，更新计数器并检查是否需要清除提示
   setTimeout(() => {
     const leftCount = getCartCount('left')
     const rightCount = getCartCount('right')
-    
+
     if (leftCount < 4 && leftCartTipsType.value === 'out_meal') {
       leftCartTipsType.value = ''
     }
     if (rightCount < 4 && rightCartTipsType.value === 'out_meal') {
       rightCartTipsType.value = ''
     }
-    
+
     // 更新计数器
     leftPrevCount.value = leftCount
     rightPrevCount.value = rightCount
@@ -602,7 +629,7 @@ const initBeltSettings = () => {
     beltDirection.value = savedDirection
   }
 
-  // 从本地存储加载传送带速度设置  
+  // 从本地存储加载传送带速度设置
   const savedSpeed = localStorage.getItem('beltSpeed')
   if (savedSpeed) {
     const speed = parseFloat(savedSpeed)
@@ -610,7 +637,7 @@ const initBeltSettings = () => {
       beltSpeed.value = speed
     }
   }
-  
+
   // 立即应用设置到传送带配置
   if (updateConfig) {
     updateConfig(beltConfig.value)
@@ -621,12 +648,15 @@ const initBeltSettings = () => {
 useConveyorLifecycle({ beltTrackRef: beltTrack, virtualScrollState, belt })
 
 // 组件挂载时初始化设置
-onMounted(() => {
+onMounted(async () => {
   initBeltSettings()
-  
+
   // 初始化计数器
   leftPrevCount.value = getCartCount('left')
   rightPrevCount.value = getCartCount('right')
+
+  // 从服务器获取传送带商品数据
+  await fetchSushiData();
 })
 
 // 监听传送带配置变化
