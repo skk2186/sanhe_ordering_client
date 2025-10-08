@@ -29,7 +29,7 @@
         <!-- 下方信息区域 - 始终显示 -->
         <div class="item-info" :class="{ 'empty-info': !item }">
           <div class="item-name-area" :class="{ 'empty-name': !item }">
-            <div v-if="item">{{ item.storeName }}</div>
+            <div v-if="item" >{{ item.storeName }}</div>
           </div>
           <div class="item-controls" :class="{ 'empty-controls': !item }">
             <button class="minus-btn" type="button" :disabled="!item" :aria-disabled="!item"
@@ -93,27 +93,8 @@ const handleTipsClick = () => {
   justify-content: center;
 }
 
-// 7. order_meal 背景图 - 根据主题切换
-[data-theme="ailaotou"] .tips-overlay.order_meal {
-  background-image: url('/images/ui/a/order_meal.png');
-}
-[data-theme="zhenxian"] .tips-overlay.order_meal {
-  background-image: url('/images/ui/b/order_meal.png');
-}
-[data-theme="xiaoxin"] .tips-overlay.order_meal {
-  background-image: url('/images/ui/c/order_meal.png');
-}
 
-// 8. out_meal 背景图 - 根据主题切换
-[data-theme="ailaotou"] .tips-overlay.out_meal {
-  background-image: url('/images/ui/a/out_meal.png');
-}
-[data-theme="zhenxian"] .tips-overlay.out_meal {
-  background-image: url('/images/ui/b/out_meal.png');
-}
-[data-theme="xiaoxin"] .tips-overlay.out_meal {
-  background-image: url('/images/ui/c/out_meal.png');
-}
+
 
 // 9. 提示覆盖层交互样式
 .tips-overlay {
@@ -171,7 +152,7 @@ const handleTipsClick = () => {
   line-height: 30px;
   padding: 2px 4px;
   font-size: 16px;
-  color: #fff;
+  overflow: hidden;
 }
 
 
@@ -183,6 +164,16 @@ const handleTipsClick = () => {
   .cart-item-right {
     background: url('/images/ui/a/diezi2.png') ;
   }
+  .item-name-area {
+    color: #fff;
+  }
+  .tips-overlay.order_meal {
+    background-image: url('/images/ui/a/order_meal.png');
+  }
+  .tips-overlay.out_meal {
+    background-image: url('/images/ui/a/out_meal.png');
+  }
+
 }
 [data-theme="zhenxian"] .cart-section {
   background: url('/images/ui/b/cart_bg.png') ;
@@ -192,6 +183,16 @@ const handleTipsClick = () => {
   .cart-item-right {
     background: url('/images/ui/b/diezi2.png') ;
   }
+  .item-name-area {
+    color: #fff;
+  }
+  .tips-overlay.order_meal {
+    background-image: url('/images/ui/b/order_meal.png');
+  }
+  .tips-overlay.out_meal {
+    background-image: url('/images/ui/b/out_meal.png');
+  }
+
 }
 [data-theme="xiaoxin"] .cart-section {
   background: url('/images/ui/c/cart_bg.png') ;
@@ -201,6 +202,16 @@ const handleTipsClick = () => {
   .cart-item-right {
     background: url('/images/ui/c/diezi2.png') ;
   }
+  .item-name-area {
+    color: #000;
+  }
+  .tips-overlay.order_meal {
+    background-image: url('/images/ui/c/order_meal.png');
+  }
+  .tips-overlay.out_meal {
+    background-image: url('/images/ui/c/out_meal.png');
+  }
+
 }
 
 
