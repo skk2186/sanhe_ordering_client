@@ -9,19 +9,19 @@
     <el-tabs v-model="activeTab" class="setting-tabs">
       <!-- 主题设置选项卡 -->
       <el-tab-pane label="主题设置" name="theme">
-    <div class="theme-item">
-      <div
-          class="theme-card"
-          v-for="(item, index) in themeItem"
-          :key="item.key"
-          @click="selectTheme(item)"
-          :class="{ 'theme-card--active': selectedThemeKey === item.key }"
-      >
-        <!-- 选中状态标识 -->
-        <div class="theme-card__check" v-if="selectedThemeKey === item.key">✓</div>
-        <img :src="item.img" alt="主题背景" class="theme-card__img">
-        <div class="theme-card__title">{{ item.title }}</div>
-        <div class="theme-card__key">{{ item.key }}</div>
+        <div class="theme-item">
+          <div
+              class="theme-card"
+              v-for="(item, index) in themeItem"
+              :key="item.key"
+              @click="selectTheme(item)"
+              :class="{ 'theme-card--active': selectedThemeKey === item.key }"
+          >
+            <!-- 选中状态标识 -->
+            <div class="theme-card__check" v-if="selectedThemeKey === item.key">✓</div>
+            <img :src="item.img" alt="主题背景" class="theme-card__img">
+            <div class="theme-card__title">{{ item.title }}</div>
+            <div class="theme-card__key">{{ item.key }}</div>
           </div>
         </div>
       </el-tab-pane>
@@ -42,7 +42,7 @@
                 <div class="direction-desc">菜品从右向左滚动（默认）</div>
                 <div class="direction-check" v-if="beltDirection === 'left'">✓</div>
               </div>
-              
+
               <div
                   class="direction-card"
                   :class="{ 'direction-card--active': beltDirection === 'right' }"
@@ -53,9 +53,9 @@
                 <div class="direction-desc">菜品从左向右滚动</div>
                 <div class="direction-check" v-if="beltDirection === 'right'">✓</div>
               </div>
-      </div>
-    </div>
-          
+            </div>
+          </div>
+
           <div class="setting-section">
             <h3 class="section-title">速度设置</h3>
             <div class="speed-control">
@@ -117,7 +117,7 @@ const themeItem = [
 
 
 // 2. 选中主题key：直接初始化为 "ailaotou"
-const selectedThemeKey = ref("ailaotou");
+const selectedThemeKey = ref("xiaoxin");
 
 // 传送带设置状态
 const beltDirection = ref('left') // 'left' 或 'right'
@@ -131,7 +131,7 @@ const initTheme = () => {
   htmlRoot.setAttribute("data-theme", selectedThemeKey.value);
 
   // （可选）同步初始化全局CSS变量（如背景图）
-  const defaultTheme = themeItem.find(item => item.key === "ailaotou");
+  const defaultTheme = themeItem.find(item => item.key === "xiaoxin");
   if (defaultTheme) {
     htmlRoot.style.setProperty("--theme-bg", `url(${defaultTheme.img})`);
   }
@@ -145,7 +145,7 @@ const initBeltSettings = () => {
     beltDirection.value = savedDirection
   }
 
-  // 从本地存储加载传送带速度设置  
+  // 从本地存储加载传送带速度设置
   const savedSpeed = localStorage.getItem('beltSpeed')
   if (savedSpeed) {
     const speed = parseFloat(savedSpeed)
@@ -309,7 +309,7 @@ initBeltSettings()
 .conveyor-settings {
   .setting-section {
     margin-bottom: 40px;
-    
+
     .section-title {
       font-size: 18px;
       font-weight: 600;
@@ -427,7 +427,7 @@ initBeltSettings()
   .el-tabs__item {
     font-size: 16px;
     font-weight: 500;
-    
+
     &.is-active {
       color: var(--theme-active-color);
     }

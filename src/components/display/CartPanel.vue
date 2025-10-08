@@ -29,7 +29,7 @@
         <!-- 下方信息区域 - 始终显示 -->
         <div class="item-info" :class="{ 'empty-info': !item }">
           <div class="item-name-area" :class="{ 'empty-name': !item }">
-            <div v-if="item">{{ item.name }}</div>
+            <div v-if="item">{{ item.storeName }}</div>
           </div>
           <div class="item-controls" :class="{ 'empty-controls': !item }">
             <button class="minus-btn" type="button" :disabled="!item" :aria-disabled="!item"
