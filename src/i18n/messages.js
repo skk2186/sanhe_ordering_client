@@ -83,7 +83,11 @@ const messages = {
         invalid_server_event: '语音服务返回了无效结果',
         recognition_failed: '这句话没有识别成功，请重试',
         speech_too_short: '录音太短，请完整说出菜品名称',
-        no_speech: '没有检测到有效语音，请靠近麦克风再说一次'
+        no_speech: '没有检测到有效语音，请靠近麦克风再说一次',
+        processing_timeout: '语音识别时间过长，请重试',
+        audio_too_long: '录音时间过长，请缩短后重试',
+        unsupported_audio_format: '当前录音格式不受语音服务支持',
+        model_busy: '语音服务正忙，请稍后重试'
       }
     },
     settings: {
@@ -459,7 +463,11 @@ replaceMessages(en, {
   'assistant.audioReceived': 'Recording received. Recognizing',
   'assistant.heardTranscript': 'I heard: “{transcript}”',
   'assistant.errors.speech_too_short': 'The recording was too short. Say the dish name again',
-  'assistant.errors.no_speech': 'No clear speech was detected. Please try again'
+  'assistant.errors.no_speech': 'No clear speech was detected. Please try again',
+  'assistant.errors.processing_timeout': 'Voice recognition took too long. Please try again',
+  'assistant.errors.audio_too_long': 'The recording is too long. Please try a shorter request',
+  'assistant.errors.unsupported_audio_format': 'The voice service does not support this recording format',
+  'assistant.errors.model_busy': 'The voice service is busy. Please try again shortly'
 })
 
 replaceMessages(ja, {
@@ -468,7 +476,11 @@ replaceMessages(ja, {
   'assistant.audioReceived': '録音を受け取りました。認識中です',
   'assistant.heardTranscript': '「{transcript}」と聞き取りました',
   'assistant.errors.speech_too_short': '録音が短すぎます。料理名をもう一度話してください',
-  'assistant.errors.no_speech': '音声を検出できませんでした。もう一度お試しください'
+  'assistant.errors.no_speech': '音声を検出できませんでした。もう一度お試しください',
+  'assistant.errors.processing_timeout': '音声認識に時間がかかりすぎました。もう一度お試しください',
+  'assistant.errors.audio_too_long': '録音が長すぎます。短くしてもう一度お試しください',
+  'assistant.errors.unsupported_audio_format': 'この録音形式には対応していません',
+  'assistant.errors.model_busy': '音声サービスが混み合っています。少し待ってからお試しください'
 })
 
 replaceMessages(en, {

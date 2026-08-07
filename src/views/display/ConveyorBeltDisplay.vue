@@ -204,10 +204,10 @@ const submittingSide = ref(null)
 const voiceSearchKeyword = ref('')
 const voiceMatchCount = ref(null)
 
-const assistantHotwords = computed(() => displaySushiData.value
-  .map((item) => item.name || item.storeName)
+const assistantHotwords = computed(() => [...new Set(displaySushiData.value
+  .flatMap((item) => [item.name, item.storeName])
   .filter((name) => typeof name === 'string' && name.trim())
-  .map((name) => name.trim())
+  .map((name) => name.trim()))]
   .slice(0, 100))
 
 const normalizeVoiceText = (value) => String(value || '')

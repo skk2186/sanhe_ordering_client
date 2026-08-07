@@ -7,6 +7,7 @@ const createSessionId = () => {
 }
 
 const detectErrorCode = (error) => {
+  if (error?.code) return error.code
   if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') return 'permission_denied'
   if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') return 'microphone_missing'
   if (error?.name === 'NotReadableError' || error?.name === 'TrackStartError') return 'microphone_busy'
@@ -52,7 +53,12 @@ export const useVoiceRecognition = ({ getHotwords, onFinal } = {}) => {
     const currentStop = (async () => {
       try {
         // Keep the event subscription alive while VoiceClient commits the final utterance.
-        await activeClient.stop().catch(() => undefined)
+        await activeClient.stop()
+      } catch (error) {
+        if (!preservePhase && phase.value !== 'result') {
+          errorCode.value = detectErrorCode(error)
+          phase.value = 'error'
+        }
       } finally {
         if (client === activeClient) client = null
         disposeSubscriptions()
@@ -76,8 +82,13 @@ export const useVoiceRecognition = ({ getHotwords, onFinal } = {}) => {
       phase.value = 'processing'
       return
     }
+    if (event.type === 'transcription.started') {
+      phase.value = 'processing'
+      return
+    }
     if (event.type === 'utterance.discarded') {
-      errorCode.value = 'speech_too_short'
+      const reason = event.code || event.reason
+      errorCode.value = reason === 'no_speech' ? 'no_speech' : 'speech_too_short'
       phase.value = 'error'
       await stop({ preservePhase: true })
       return
@@ -129,6 +140,7 @@ export const useVoiceRecognition = ({ getHotwords, onFinal } = {}) => {
       url: resolveWebSocketUrl(import.meta.env.VITE_VOICE_WS_URL),
       sessionId: createSessionId(),
       language: 'zh',
+      finalizeTimeoutMs: Number(import.meta.env.VITE_VOICE_FINALIZE_TIMEOUT_MS) || 30000,
       hotwords: (getHotwords?.() || []).filter(Boolean).slice(0, 100)
     })
     subscriptions = [

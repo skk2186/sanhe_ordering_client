@@ -1,4 +1,4 @@
-import { PCM_WORKLET_SOURCE } from './pcm-worklet-source'
+import { PCM_WORKLET_SOURCE } from './pcm-worklet-source.js'
 
 const DEFAULT_MEDIA_CONSTRAINTS = {
   channelCount: 1,
@@ -24,6 +24,7 @@ export class VoiceClient {
       targetSampleRate: 16000,
       frameDurationMs: 20,
       connectTimeoutMs: 10000,
+      finalizeTimeoutMs: 30000,
       ...options
     }
     this.socket = null
@@ -84,14 +85,21 @@ export class VoiceClient {
     if (this.currentState === 'idle') return
     this.setState('stopping')
 
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      const stopped = this.waitForStopped(5000)
-      this.sendControl({ type: 'stop' })
-      await stopped.catch(() => undefined)
+    let stopError = null
+    try {
+      if (this.socket?.readyState === WebSocket.OPEN) {
+        const stopped = this.waitForStopped(this.options.finalizeTimeoutMs)
+        this.sendControl({ type: 'stop' })
+        await stopped
+      }
+    } catch (error) {
+      stopError = error
+    } finally {
+      await this.releaseResources()
+      this.setState('idle')
     }
 
-    await this.releaseResources()
-    this.setState('idle')
+    if (stopError) throw stopError
   }
 
   async connectSocket() {
@@ -160,16 +168,30 @@ export class VoiceClient {
   waitForStopped(timeoutMs) {
     return new Promise((resolve, reject) => {
       let unsubscribe = () => {}
-      const timeout = window.setTimeout(() => {
+      const socket = this.socket
+      const cleanup = () => {
+        window.clearTimeout(timeout)
         unsubscribe()
-        reject(new Error('Voice session stop timed out'))
+        socket?.removeEventListener('close', handleClose)
+      }
+      const handleClose = () => {
+        cleanup()
+        const error = new Error('Voice service closed before recognition completed')
+        error.code = 'service_unavailable'
+        reject(error)
+      }
+      const timeout = window.setTimeout(() => {
+        cleanup()
+        const error = new Error('Voice recognition processing timed out')
+        error.code = 'processing_timeout'
+        reject(error)
       }, timeoutMs)
       unsubscribe = this.onEvent((event) => {
         if (event.type !== 'session.stopped') return
-        window.clearTimeout(timeout)
-        unsubscribe()
+        cleanup()
         resolve()
       })
+      socket?.addEventListener('close', handleClose, { once: true })
     })
   }
 
