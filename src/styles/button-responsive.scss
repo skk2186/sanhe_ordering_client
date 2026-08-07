@@ -1,0 +1,428 @@
+// 响应式按钮样式
+@use './variables.scss' as *;
+@use './mixins.scss' as *;
+
+// 触摸友好的按钮基础样式
+.touch-friendly-button {
+  // 确保最小触摸目标尺寸 (44px x 44px)
+  min-height: 44px;
+  min-width: 44px;
+  
+  // 触摸反馈
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  
+  // 触摸时的视觉反馈
+  &:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+// 响应式按钮尺寸
+@mixin responsive-button-sizes {
+  // 超小屏幕 (手机竖屏)
+  @include mobile {
+    &.btn-mini {
+      min-height: 32px;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    
+    &.btn-small {
+      min-height: 36px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    
+    &.btn-medium {
+      min-height: 44px;
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+    
+    &.btn-large {
+      min-height: 52px;
+      padding: 14px 20px;
+      font-size: 16px;
+    }
+    
+    &.btn-xl {
+      min-height: 60px;
+      padding: 18px 24px;
+      font-size: 18px;
+    }
+  }
+  
+  // 平板屏幕
+  @include tablet {
+    &.btn-mini {
+      min-height: 28px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    &.btn-small {
+      min-height: 36px;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+    
+    &.btn-medium {
+      min-height: 44px;
+      padding: 10px 18px;
+      font-size: 14px;
+    }
+    
+    &.btn-large {
+      min-height: 52px;
+      padding: 14px 22px;
+      font-size: 16px;
+    }
+    
+    &.btn-xl {
+      min-height: 60px;
+      padding: 18px 26px;
+      font-size: 18px;
+    }
+  }
+  
+  // 桌面屏幕
+  @include desktop {
+    &.btn-mini {
+      min-height: 24px;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    
+    &.btn-small {
+      min-height: 32px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    
+    &.btn-medium {
+      min-height: 40px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    &.btn-large {
+      min-height: 48px;
+      padding: 12px 20px;
+      font-size: 16px;
+    }
+    
+    &.btn-xl {
+      min-height: 56px;
+      padding: 16px 24px;
+      font-size: 18px;
+    }
+  }
+}
+
+// 响应式间距
+@mixin responsive-button-spacing {
+  @include mobile {
+    gap: 6px;
+    
+    .btn-icon {
+      &.btn-icon-left {
+        margin-right: 6px;
+      }
+    }
+    
+    .btn-icon-right {
+      margin-left: 6px;
+    }
+  }
+  
+  @include tablet {
+    gap: 8px;
+    
+    .btn-icon {
+      &.btn-icon-left {
+        margin-right: 6px;
+      }
+    }
+    
+    .btn-icon-right {
+      margin-left: 6px;
+    }
+  }
+  
+  @include desktop {
+    gap: 8px;
+    
+    .btn-icon {
+      &.btn-icon-left {
+        margin-right: 4px;
+      }
+    }
+    
+    .btn-icon-right {
+      margin-left: 4px;
+    }
+  }
+}
+
+// 响应式圆角
+@mixin responsive-button-radius {
+  @include mobile {
+    &.btn-default {
+      border-radius: 12px;
+    }
+    
+    &.btn-round {
+      border-radius: 26px;
+    }
+  }
+  
+  @include tablet {
+    &.btn-default {
+      border-radius: 10px;
+    }
+    
+    &.btn-round {
+      border-radius: 24px;
+    }
+  }
+  
+  @include desktop {
+    &.btn-default {
+      border-radius: $border-radius-button;
+    }
+    
+    &.btn-round {
+      border-radius: 50px;
+    }
+  }
+}
+
+// 响应式阴影
+@mixin responsive-button-shadow {
+  @include mobile {
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  @include tablet {
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+  
+  @include desktop {
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// 按钮组响应式布局
+.button-group {
+  display: flex;
+  gap: 8px;
+  
+  @include mobile {
+    flex-direction: column;
+    gap: 12px;
+    
+    .base-button {
+      width: 100%;
+    }
+  }
+  
+  @include tablet {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    
+    .base-button {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+  
+  @include desktop {
+    flex-direction: row;
+    gap: 8px;
+    
+    .base-button {
+      flex: none;
+      width: auto;
+    }
+  }
+}
+
+// 底部按钮栏响应式
+.bottom-button-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: $white;
+  border-top: 1px solid $light-gray;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: $z-index-dropdown;
+  
+  @include mobile {
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    
+    .base-button {
+      width: 100%;
+      min-height: 52px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+  
+  @include tablet {
+    padding: 16px 24px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    
+    .button-group {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+  
+  @include desktop {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    padding: 20px 0;
+    background: transparent;
+    border-top: none;
+    box-shadow: none;
+    
+    .button-group {
+      justify-content: flex-end;
+    }
+  }
+}
+
+// 浮动操作按钮响应式
+.floating-action-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: $z-index-dropdown;
+  
+  @include mobile {
+    bottom: 80px; // 避免与底部导航冲突
+    right: 16px;
+    
+    .base-button {
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  @include tablet {
+    bottom: 32px;
+    right: 32px;
+    
+    .base-button {
+      width: 64px;
+      height: 64px;
+      border-radius: 32px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  @include desktop {
+    bottom: 40px;
+    right: 40px;
+    
+    .base-button {
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+// 卡片内按钮响应式
+.card-button {
+  @include mobile {
+    width: 100%;
+    margin-top: 12px;
+  }
+  
+  @include tablet {
+    width: auto;
+    margin-top: 8px;
+  }
+  
+  @include desktop {
+    width: auto;
+    margin-top: 0;
+  }
+}
+
+// 导航按钮响应式
+.nav-button {
+  @include mobile {
+    .btn-content {
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .btn-icon {
+      margin-right: 0;
+      margin-bottom: 2px;
+    }
+    
+    .btn-text {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+  }
+  
+  @include tablet {
+    .btn-content {
+      flex-direction: row;
+      gap: 6px;
+    }
+    
+    .btn-icon {
+      margin-right: 6px;
+      margin-bottom: 0;
+    }
+    
+    .btn-text {
+      font-size: 13px;
+    }
+  }
+  
+  @include desktop {
+    .btn-content {
+      flex-direction: row;
+      gap: 8px;
+    }
+    
+    .btn-icon {
+      margin-right: 4px;
+      margin-bottom: 0;
+    }
+    
+    .btn-text {
+      font-size: 14px;
+    }
+  }
+}

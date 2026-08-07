@@ -1,0 +1,490 @@
+const common = {
+  systemSettings: '系统设置',
+  themeSettings: '主题设置',
+  gameMode: '游戏模式',
+  voiceMode: '语音模式',
+  conveyorSettings: '传送带设置',
+  cancel: '取消',
+  confirm: '确定',
+  close: '关闭',
+  save: '保存',
+  reset: '重置',
+  retry: '重试',
+  loading: '加载中...',
+  processing: '处理中...',
+  success: '成功',
+  failure: '失败',
+  prompt: '提示',
+  noData: '暂无数据',
+  search: '搜索',
+  clear: '清空',
+  delete: '删除',
+  edit: '编辑',
+  add: '添加',
+  enable: '启用',
+  disable: '禁用',
+  language: '系统文字语言',
+  chinese: '中文',
+  english: 'English',
+  japanese: '日本語',
+  callWaiter: '呼叫店员',
+  menu: '菜单',
+  orderHistory: '点餐记录',
+  checkout: '结账',
+  addToCart: '加入购物车',
+  placeOrder: '下单',
+  remove: '移除',
+  increase: '增加数量',
+  decrease: '减少数量',
+  emptySlot: '空位',
+  soldOut: '已售完',
+  imageLoadFailed: '图片加载失败',
+  character: '角色插画',
+  veryFast: '极速',
+  slow: '慢速',
+  medium: '中速',
+  fast: '快速',
+  version: '版本'
+  ,unknown: '未知', user: '用户', online: '在线', offline: '离线', profile: '个人信息', myOrders: '我的订单', admin: '管理后台', lightMode: '浅色模式', darkMode: '深色模式', logout: '退出登录', home: '首页', mine: '我的', userCenter: '个人中心', refresh: '刷新', themeChanged: '已切换到{mode}'
+  ,all: '全部', update: '更新'
+  ,back: '返回', loadMore: '加载更多', previousPage: '上一页', nextPage: '下一页', other: '其他'
+}
+
+const messages = {
+  'zh-CN': {
+    common,
+    app: {
+      networkRestored: '网络连接已恢复',
+      networkLost: '网络连接已断开',
+      systemError: '系统错误，请稍后重试'
+    },
+    assistant: {
+      name: '小餐',
+      greeting: '你好，我是小餐',
+      connecting: '正在连接语音服务',
+      listening: '请说出想找的菜品',
+      hearing: '正在听',
+      processing: '正在查找菜品',
+      matchesFound: '找到 {count} 道相关菜品',
+      noMatches: '暂时没有找到“{query}”',
+      startListening: '开始语音搜索',
+      stopListening: '停止语音搜索',
+      microphoneReady: '麦克风已开启，请说出想找的菜品',
+      voiceDetected: '已检测到你的声音，正在收听',
+      audioReceived: '录音已收到，正在识别',
+      heardTranscript: '我听到：“{transcript}”',
+      errors: {
+        unsupported: '当前浏览器不支持语音搜索',
+        permission_denied: '请允许使用麦克风后重试',
+        microphone_missing: '没有检测到可用麦克风',
+        microphone_busy: '麦克风正在被其他应用使用',
+        connection_timeout: '语音服务连接超时',
+        service_unavailable: '语音服务暂时不可用',
+        invalid_server_event: '语音服务返回了无效结果',
+        recognition_failed: '这句话没有识别成功，请重试',
+        speech_too_short: '录音太短，请完整说出菜品名称',
+        no_speech: '没有检测到有效语音，请靠近麦克风再说一次'
+      }
+    },
+    settings: {
+      themeBackground: '主题背景',
+      gameOne: '游戏一',
+      gameTwo: '游戏二',
+      pendingSetup: '待设置',
+      aiVoiceAssistant: 'AI 语音助手',
+      aiVoiceAssistantDescription: '控制右上角小餐助手、麦克风录音和语音识别服务',
+      ttsVoice: '语音播报',
+      ttsVoiceDescription: '控制后续接入的 TTS 文字转语音功能'
+    },
+    games: {
+      localOnly: '休闲模式 · 最高分仅保存在本机',
+      rewardNotice: '当前游戏仅记录本地最高分，不发放优惠券、扭蛋次数或其他真实奖励。后续奖励必须由后端校验并发放。',
+      score: '当前分数',
+      bestScore: '最高分',
+      time: '剩余时间',
+      tools: '道具',
+      lives: '生命',
+      combo: '连击',
+      difficulty: '难度',
+      controls: '游戏操作',
+      start: '开始游戏',
+      play: '进入游戏',
+      pause: '暂停',
+      resume: '继续',
+      restart: '重新开始',
+      end: '结束游戏',
+      finished: '本局结束',
+      paused: '游戏已暂停',
+      pauseHint: '进度已保留，点击继续返回游戏。',
+      finalScore: '本局得分：{score}',
+      left: '向左移动',
+      right: '向右移动',
+      status: { ready: '可开始', playing: '游戏中', finished: '已结束' },
+      goldenMiner: {
+        title: '黄金矿工',
+        description: '看准摆钩角度下钩，抓取黄金和钻石。炸药可清除岩石，回收时可快速收钩。',
+        dropHook: '按钮一：下钩',
+        useTool: '按钮二：炸药（{count}）',
+        quickRetract: '按钮二：快速收钩',
+        readyTitle: '准备开采',
+        readyHint: '钩子会自动左右摆动。看准方向下钩，用第二个按钮清障或加速回收。'
+      },
+      sushiCatch: {
+        title: '寿司接接乐',
+        description: '左右移动托盘接住寿司。稀有寿司提高连击，芥末和空盘会扣除生命。',
+        tray: '托盘',
+        moveControls: '托盘移动控制',
+        outOfLives: '生命耗尽',
+        readyTitle: '准备接寿司',
+        readyHint: '按住左、右按钮移动托盘。下落速度和生成频率会随时间逐渐提高。'
+      }
+    },
+    auth: {
+      employeeSystem: '回转寿司系统',
+      employeeLogin: '员工登录',
+      customerLogin: '顾客登录',
+      otherLogin: '其他登录方式',
+      username: '请输入用户名',
+      password: '请输入密码',
+      login: '登录',
+      loggingIn: '登录中...',
+      usernameLength: '用户名长度在 3 到 20 个字符',
+      passwordLength: '密码长度在 6 到 20 个字符',
+      welcome: '欢迎光临',
+      enterTable: '请输入您的桌号开始点餐',
+      tableNumber: '桌号',
+      startOrdering: '开始点餐',
+      tablePlaceholder: '请输入桌号',
+      clear: '清除',
+      serviceTip: '请输入您桌子上的桌号，如有疑问请联系服务员',
+      tableLimit: '桌号最多3位数字',
+      tableRequired: '请输入桌号',
+      tableRange: '桌号范围为 1-999',
+      bindTable: '绑定桌台',
+      binding: '绑定中...',
+      tableExample: '例如：A08',
+      tableFormat: '桌号格式不正确，请输入如 A08 的格式',
+      tableUnavailable: '桌号不存在或已被占用',
+      bindFailed: '绑定失败，请重试',
+      welcomeTable: '欢迎来到 {table} 桌！',
+      welcomeJourney: '请输入您的桌号开始美食之旅！',
+      bindSuccess: '绑定成功！',
+      redirecting: '正在为您跳转到菜单页面...',
+      findTable: '找不到桌号？请联系服务员协助',
+      openingHours: '营业时间：10:00 - 22:00',
+      hotline: '服务热线：400-888-8888',
+      employee: '员工登录'
+      ,loginSuccess: '登录成功', loginFailed: '登录失败', tableLoginSuccess: '桌号{table}登录成功', logoutSuccess: '已退出登录', loginRequired: '请先登录', employeeRequired: '需要员工权限', permissionDenied: '权限不足', roleDenied: '角色权限不足', sessionExpired: '登录状态已过期，请重新登录', loginAgain: '重新登录'
+    },
+    cart: {
+      title: '购物车',
+      empty: '购物车是空的',
+      emptyTip: '快去选择您喜欢的美食吧！',
+      startOrdering: '开始点餐',
+      table: '桌号',
+      kinds: '{count}种',
+      orderNote: '订单备注（可选）',
+      coupon: '使用优惠券',
+      selectCoupon: '选择优惠券',
+      selectedCoupon: '已选择优惠券',
+      productTotal: '商品总计',
+      subtotal: '商品总价',
+      deliveryFee: '配送费',
+      free: '免费',
+      discount: '优惠减免',
+      total: '合计',
+      payable: '实付金额',
+      confirmUse: '确认使用',
+      notUseCoupon: '不使用优惠券',
+      removeConfirm: '确定要移除这个商品吗？',
+      clearConfirm: '确定要清空购物车吗？',
+      removeSuccess: '商品已移除',
+      emptyWarning: '购物车为空',
+      couponApplied: '已选择优惠券：{name}',
+      couponNeed: '此优惠券需要满{amount}才能使用',
+      itemCount: '{count}件商品',
+      checkout: '立即结账',
+      discountApplied: '已优惠 ¥{amount}',
+      couponUnavailable: '不满足使用条件',
+      noCoupons: '暂无可用优惠券',
+      checkoutDeveloping: '结账功能开发中...',
+      invalidItem: '无效的菜品信息',
+      invalidQuantity: '数量必须大于0',
+      quantityUpdated: '{name} 数量已更新',
+      itemRemoved: '{name} 已从购物车移除',
+      updateFailed: '更新失败，请重试',
+      cleared: '购物车已清空',
+      tableRequired: '请设置桌号',
+      incompleteItem: '商品 {name} 信息不完整',
+      invalidItemQuantity: '商品 {name} 数量无效'
+    },
+    menu: {
+      searchDish: '搜索菜品名称...',
+      searchDishDetail: '搜索菜品名称、描述...',
+      searchSushi: '搜索寿司菜品...',
+      minPrice: '最低价',
+      maxPrice: '最高价',
+      selectCategory: '选择分类',
+      sort: '排序方式',
+      customTag: '输入自定义标签...',
+      new: '新品',
+      recommend: '推荐',
+      rating: '{count}评价',
+      nutrition: '营养信息',
+      calories: '热量',
+      protein: '蛋白质',
+      fat: '脂肪',
+      carbs: '碳水',
+      customization: '定制选项',
+      required: '必选',
+      specialRequest: '特殊要求',
+      specialRequestPlaceholder: '请输入特殊要求（如：少盐、不要芥末等）',
+      requiredSelection: '请完成必选项的选择',
+      quantity: '数量',
+      subtotal: '小计',
+      filterStatus: '状态筛选',
+      searchCategory: '搜索分类名称...',
+      sortValue: '排序值',
+      searchUsername: '搜索用户名',
+      roleFilter: '角色筛选',
+      chooseRole: '请选择角色',
+      username: '请输入用户名',
+      password: '请输入密码'
+      ,collapse: '收起', advancedSearch: '高级搜索', priceRange: '价格范围', category: '分类', applyFilter: '应用筛选', searchSuggestions: '搜索建议', searchHistory: '搜索历史', clearHistory: '清空历史', searchTimes: '{count}次', hotSearches: '热门搜索', searchFailed: '搜索失败，请重试', historyCleared: '搜索历史已清空'
+      ,brand: '回转寿司', searchDishes: '搜索菜品', searchResults: '搜索结果 ({count})', selectedItem: '选择了 {name}', dishList: '菜品列表', sortDefault: '默认排序', priceAsc: '价格升序', priceDesc: '价格降序', salesDesc: '销量最高', ratingDesc: '评分最高', noDishes: '暂无菜品', soldCount: '已售{count}', unavailable: '暂时缺货', discontinued: '已下架', comingSoon: '即将上线', notAvailable: '不可用', favoriteAdded: '已添加到收藏', favoriteRemoved: '已取消收藏',
+      hot: { sushi: '寿司', sashimi: '刺身', tempura: '天妇罗', ramen: '拉面', grilledFish: '烤鱼' }
+      ,addedToCart: '{name} 已加入购物车', addFailed: '添加失败，请重试', removeFailed: '移除失败，请重试', featuredToday: '今日特色推荐', popular: '热门', viewDetails: '查看 {name} 详情', backToConveyor: '返回传送带', preparingSushi: '正在准备美味寿司', loadingSelectedMenu: '请稍候，我们正在为您加载精选菜单...', noCategories: '暂无分类', menuTitle: '回转寿司菜单'
+    },
+    display: {
+      movementDirection: '移动方向',
+      moveLeft: '向左移动',
+      moveLeftDescription: '菜品从右向左滚动（默认）',
+      moveRight: '向右移动',
+      moveRightDescription: '菜品从左向右滚动',
+      speed: '速度设置',
+      plateProgress: '投盘进度',
+      remainingPlates: '还差 {count} 盘即可获得扭蛋机会！',
+      gachaEarned: '恭喜！您已获得扭蛋机会！',
+      openGacha: '开启扭蛋机',
+      gachaOpened: '扭蛋机已开启！',
+      gachaOpenFailed: '开启失败，请重试',
+      orderSuccess: '结账成功！感谢您的光临！',
+      orderSubmitted: '下单成功，订单号：{orderId}',
+      orderFailed: '下单失败，购物车已保留，请重试',
+      waiterCalled: '已呼叫店员，请稍候...',
+      confirmCallWaiter: '确认呼叫店员？', waiterComing: '店员将会立即前来为您服务', confirmCall: '确认呼叫'
+      ,plateOne: '第一盘！继续加油！',
+      plateTwo: '第二盘！越来越近了！',
+      plateThree: '第三盘！马上就要成功了！',
+      plateFour: '第四盘！最后一盘！',
+      plateComplete: '恭喜完成！获得扭蛋机会！',
+      plateMore: '第{count}盘！继续努力！'
+    },
+    gacha: {
+      chance: '恭喜获得扭蛋机会！',
+      startHint: '点击按钮开始扭蛋',
+      playing: '扭蛋中...',
+      start: '开始扭蛋',
+      reward: '恭喜获得奖励！',
+      useLater: '稍后使用',
+      useNow: '立即使用',
+      used: '已使用：{name}',
+      pointsReward: '积分奖励',
+      pointsDescription: '获得50积分',
+      couponReward: '优惠券',
+      couponDescription: '满100减20优惠券',
+      sushiReward: '免费寿司',
+      sushiDescription: '获得一份免费三文鱼寿司',
+      grandReward: '超级大奖',
+      grandDescription: '获得会员升级券'
+      ,pointsValue: '+{value}积分'
+    },
+    customer: { points: '积分', viewCart: '查看购物车', plateHint: '已投{current}盘，再投{remaining}盘获得扭蛋机会', rewardEarned: '恭喜获得：{name}' },
+    filter: { current: '当前筛选', clearAll: '清除全部', price: '价格', popularTags: '热门标签', viewAll: '查看全部({count})', customTag: '自定义标签', quickFilter: '快速筛选', resultCount: '找到 {count} 个相关菜品', discount: '特价' },
+    order: {
+      backTop: '回到顶部',
+      up: '向上',
+      down: '向下',
+      bottom: '到底部',
+      empty: '暂无订单记录'
+      ,index: '序号', productName: '商品名称', category: '商品分类', orderTime: '下单时间', deliveryStatus: '送餐状态', amount: '金额', delivered: '已送达', preparing: '制作中', pending: '待制作', historyTotal: '历史订单合计', goCheckout: '前往记账/确认记账', historyCheckout: '历史订单结账', historyAmount: '这是您的历史订单总金额', confirmCheckout: '确认结账'
+    },
+    admin: {
+      profileDeveloping: '个人资料功能开发中',
+      settingsDeveloping: '系统设置功能开发中',
+      logoutConfirm: '确定要退出登录吗？',
+      categories: '分类管理',
+      menuItems: '菜品管理',
+      users: '用户管理',
+      dashboard: '仪表盘',
+      addCategory: '添加分类',
+      editCategory: '编辑分类',
+      addUser: '添加用户',
+      editUser: '编辑用户'
+      ,sushiAdmin: '寿司管理', enterCategory: '请输入分类名称', enterDescription: '请输入分类描述', categoryStatus: '分类已{status}', statusUpdateFailed: '状态更新失败', deleteCategoryConfirm: '确定要删除分类“{name}”吗？此操作不可恢复。', categoryDeleted: '分类删除成功', deleteFailed: '删除失败', categoryUpdated: '分类更新成功', categoryAdded: '分类添加成功', fetchUsersFailed: '获取用户列表失败', deleteSuccess: '删除成功', updateSuccess: '更新成功', createSuccess: '创建成功', updateFailed: '更新失败', createFailed: '创建失败', addMenuItem: '添加菜品', menuItemsDeveloping: '菜品管理功能开发中...', comingSoon: '敬请期待', welcomeBack: '欢迎回来，{name}！', refreshData: '刷新数据', todayOrders: '今日订单', todayRevenue: '今日营业额', onlineCustomers: '在线顾客', totalDishes: '菜品总数', quickActions: '快捷操作', recentActivity: '最近活动', noActivity: '暂无活动记录', popularDishes: '热门菜品', salesCount: '销量: {count}份', categoryName: '分类名称', description: '描述', sort: '排序', dishCount: '菜品数量', status: '状态', createdAt: '创建时间', updatedAt: '更新时间', actions: '操作', categoryLength: '分类名称长度在 2 到 20 个字符', descriptionLength: '描述不能超过 200 个字符', enterSort: '请输入排序值', sortRange: '排序值范围 0-999', username: '用户名', password: '密码', role: '角色', manager: '管理员', cashier: '收银员', chef: '厨师', customer: '顾客'
+    },
+    errors: {
+      fetchProducts: '获取菜品列表失败',
+      fetchCategories: '获取分类列表失败',
+      fetchCategoryProducts: '获取分类菜品失败',
+      fetchData: '获取数据失败，请重试',
+      loadFailed: '页面加载失败，请刷新重试',
+      requestFailed: '请求失败，请稍后重试',
+      networkFailed: '网络连接失败，请检查网络'
+      ,resourceNotFound: '请求的资源不存在', serverError: '服务器内部错误', badRequest: '请求参数错误', endpointNotFound: '请求的接口不存在', timeout: '请求超时，请稍后重试', gatewayError: '网关错误', serviceUnavailable: '服务暂不可用', gatewayTimeout: '网关超时', requestStatus: '请求失败 ({status})', timeoutNetwork: '请求超时，请检查网络连接'
+    },
+    errorPage: { title: '页面不存在', description: '抱歉，您访问的页面不存在或已被移除。', suggestion: '请检查网址是否正确，或返回首页继续浏览。', maybeWant: '您可能想要：' }
+  }
+}
+
+messages['zh-CN'].games.runner = {
+  title: '寿司疾送',
+  description: '跃过餐车和调料箱，滑过垂帘，收集寿司并用护盾抵挡碰撞。',
+  loading: '赛道准备中',
+  loadFailed: '游戏加载失败，请重试',
+  outOfLives: '配送中断'
+}
+
+const en = JSON.parse(JSON.stringify(messages['zh-CN']))
+const ja = JSON.parse(JSON.stringify(messages['zh-CN']))
+
+const replaceMessages = (target, values) => {
+  Object.entries(values).forEach(([path, value]) => {
+    const parts = path.split('.')
+    let cursor = target
+    parts.slice(0, -1).forEach((part) => { cursor = cursor[part] })
+    cursor[parts.at(-1)] = value
+  })
+}
+
+replaceMessages(en, {
+  'assistant.name': 'Xiaocan', 'assistant.greeting': 'Hi, I am Xiaocan', 'assistant.connecting': 'Connecting to voice service', 'assistant.listening': 'Say the dish you want to find', 'assistant.hearing': 'Listening', 'assistant.processing': 'Finding dishes', 'assistant.matchesFound': 'Found {count} matching dishes', 'assistant.noMatches': 'No dishes found for “{query}”', 'assistant.startListening': 'Start voice search', 'assistant.stopListening': 'Stop voice search', 'assistant.errors.unsupported': 'Voice search is not supported in this browser', 'assistant.errors.permission_denied': 'Allow microphone access and try again', 'assistant.errors.microphone_missing': 'No microphone was detected', 'assistant.errors.microphone_busy': 'The microphone is being used by another app', 'assistant.errors.connection_timeout': 'Voice service connection timed out', 'assistant.errors.service_unavailable': 'Voice service is unavailable', 'assistant.errors.invalid_server_event': 'The voice service returned an invalid result', 'assistant.errors.recognition_failed': 'I could not recognize that. Please try again',
+  'display.orderSubmitted': 'Order submitted: {orderId}',
+  'display.orderFailed': 'Order failed. Your cart was kept; please try again',
+  'games.localOnly': 'Casual mode · Best scores stay on this device', 'games.rewardNotice': 'Games currently save local best scores only. They do not grant coupons, capsule chances, or other real rewards. Future rewards must be verified and issued by the backend.', 'games.score': 'Score', 'games.bestScore': 'Best', 'games.time': 'Time', 'games.tools': 'Tools', 'games.lives': 'Lives', 'games.combo': 'Combo', 'games.difficulty': 'Difficulty', 'games.controls': 'Game controls', 'games.start': 'Start game', 'games.play': 'Play', 'games.pause': 'Pause', 'games.resume': 'Resume', 'games.restart': 'Restart', 'games.end': 'End game', 'games.finished': 'Round complete', 'games.paused': 'Game paused', 'games.pauseHint': 'Your progress is saved. Resume when ready.', 'games.finalScore': 'Final score: {score}', 'games.left': 'Move left', 'games.right': 'Move right', 'games.status.ready': 'Ready', 'games.status.playing': 'Playing', 'games.status.finished': 'Finished',
+  'games.goldenMiner.title': 'Golden Miner', 'games.goldenMiner.description': 'Time the swinging hook to collect gold and diamonds. Use dynamite on rocks or speed up the return.', 'games.goldenMiner.dropHook': 'Button 1: Drop hook', 'games.goldenMiner.useTool': 'Button 2: Dynamite ({count})', 'games.goldenMiner.quickRetract': 'Button 2: Quick retract', 'games.goldenMiner.readyTitle': 'Ready to mine', 'games.goldenMiner.readyHint': 'The hook swings automatically. Drop at the right angle, then use the second button to clear a rock or retract faster.',
+  'games.sushiCatch.title': 'Sushi Catch', 'games.sushiCatch.description': 'Move the tray to catch sushi. Rare sushi builds combo; wasabi and empty plates cost a life.', 'games.sushiCatch.tray': 'Tray', 'games.sushiCatch.moveControls': 'Tray movement controls', 'games.sushiCatch.outOfLives': 'Out of lives', 'games.sushiCatch.readyTitle': 'Ready to catch', 'games.sushiCatch.readyHint': 'Hold the left or right button to move. Falling speed and spawn frequency increase over time.',
+  'common.other': 'Other', 'menu.menuTitle': 'Conveyor Sushi Menu', 'cart.checkoutDeveloping': 'Checkout is coming soon...', 'cart.invalidItem': 'Invalid dish information', 'cart.invalidQuantity': 'Quantity must be greater than 0', 'cart.quantityUpdated': '{name} quantity updated', 'cart.itemRemoved': '{name} removed from cart', 'cart.updateFailed': 'Update failed. Please try again', 'cart.cleared': 'Cart cleared', 'cart.tableRequired': 'Please set a table number', 'cart.incompleteItem': 'Item {name} has incomplete information', 'cart.invalidItemQuantity': 'Item {name} has an invalid quantity',
+  'admin.categoryName': 'Category name', 'admin.description': 'Description', 'admin.sort': 'Sort', 'admin.dishCount': 'Dish count', 'admin.status': 'Status', 'admin.createdAt': 'Created at', 'admin.updatedAt': 'Updated at', 'admin.actions': 'Actions', 'admin.categoryLength': 'Category name must be 2 to 20 characters', 'admin.descriptionLength': 'Description cannot exceed 200 characters', 'admin.enterSort': 'Enter a sort value', 'admin.sortRange': 'Sort value must be 0 to 999', 'admin.username': 'Username', 'admin.password': 'Password', 'admin.role': 'Role', 'admin.manager': 'Manager', 'admin.cashier': 'Cashier', 'admin.chef': 'Chef', 'admin.customer': 'Customer',
+  'filter.current': 'Active filters', 'filter.clearAll': 'Clear all', 'filter.price': 'Price', 'filter.popularTags': 'Popular tags', 'filter.viewAll': 'View all ({count})', 'filter.customTag': 'Custom tag', 'filter.quickFilter': 'Quick filters', 'filter.resultCount': '{count} matching dishes', 'filter.discount': 'Special offer',
+  'auth.loginSuccess': 'Signed in successfully', 'auth.loginFailed': 'Sign-in failed', 'auth.tableLoginSuccess': 'Table {table} signed in', 'auth.logoutSuccess': 'Signed out', 'auth.loginRequired': 'Please sign in first', 'auth.employeeRequired': 'Staff access required', 'auth.permissionDenied': 'You do not have permission', 'auth.roleDenied': 'Your role does not have access', 'auth.sessionExpired': 'Your session expired. Please sign in again', 'auth.loginAgain': 'Sign in again', 'errors.resourceNotFound': 'Requested resource not found', 'errors.serverError': 'Internal server error', 'errors.badRequest': 'Invalid request', 'errors.endpointNotFound': 'Endpoint not found', 'errors.timeout': 'Request timed out. Please try again later', 'errors.gatewayError': 'Gateway error', 'errors.serviceUnavailable': 'Service unavailable', 'errors.gatewayTimeout': 'Gateway timeout', 'errors.requestStatus': 'Request failed ({status})', 'errors.timeoutNetwork': 'Request timed out. Check your connection',
+  'errorPage.title': 'Page not found', 'errorPage.description': 'The page you requested does not exist or has been removed.', 'errorPage.suggestion': 'Check the address or return home to continue.', 'errorPage.maybeWant': 'You may want to:', 'admin.addMenuItem': 'Add dish', 'admin.menuItemsDeveloping': 'Menu item management is coming soon...', 'admin.comingSoon': 'Stay tuned', 'admin.welcomeBack': 'Welcome back, {name}!', 'admin.refreshData': 'Refresh data', 'admin.todayOrders': "Today's orders", 'admin.todayRevenue': "Today's revenue", 'admin.onlineCustomers': 'Online customers', 'admin.totalDishes': 'Total dishes', 'admin.quickActions': 'Quick actions', 'admin.recentActivity': 'Recent activity', 'admin.noActivity': 'No recent activity', 'admin.popularDishes': 'Popular dishes', 'admin.salesCount': 'Sales: {count}',
+  'common.loadMore': 'Load more', 'common.previousPage': 'Previous', 'common.nextPage': 'Next', 'menu.noCategories': 'No categories', 'customer.points': 'Points', 'customer.viewCart': 'View cart', 'customer.plateHint': '{current} plates submitted. {remaining} more for a capsule', 'customer.rewardEarned': 'Congratulations! You received: {name}', 'display.confirmCallWaiter': 'Call a staff member?', 'display.waiterComing': 'A staff member will come to assist you shortly', 'display.confirmCall': 'Call staff',
+  'common.back': 'Back',
+  'menu.addedToCart': '{name} added to cart', 'menu.addFailed': 'Could not add item. Please try again', 'menu.removeFailed': 'Could not remove item. Please try again', 'menu.featuredToday': "Today's Specials", 'menu.popular': 'Popular', 'menu.viewDetails': 'View {name} details', 'menu.backToConveyor': 'Back to conveyor', 'menu.preparingSushi': 'Preparing delicious sushi', 'menu.loadingSelectedMenu': 'Please wait while we load the selected menu...',
+  'order.index': 'No.', 'order.productName': 'Product', 'order.category': 'Category', 'order.orderTime': 'Order time', 'order.deliveryStatus': 'Status', 'order.amount': 'Amount', 'order.delivered': 'Delivered', 'order.preparing': 'Preparing', 'order.pending': 'Pending', 'order.historyTotal': 'Order history total', 'order.goCheckout': 'Review checkout', 'order.historyCheckout': 'Order history checkout', 'order.historyAmount': 'Your total order history amount', 'order.confirmCheckout': 'Confirm checkout',
+  'common.all': 'All', 'common.update': 'Update',
+  'admin.sushiAdmin': 'Sushi Admin', 'admin.enterCategory': 'Enter category name', 'admin.enterDescription': 'Enter category description', 'admin.categoryStatus': 'Category {status}', 'admin.statusUpdateFailed': 'Failed to update status', 'admin.deleteCategoryConfirm': 'Delete category “{name}”? This cannot be undone.', 'admin.categoryDeleted': 'Category deleted', 'admin.deleteFailed': 'Delete failed', 'admin.categoryUpdated': 'Category updated', 'admin.categoryAdded': 'Category added', 'admin.fetchUsersFailed': 'Failed to load users', 'admin.deleteSuccess': 'Deleted successfully', 'admin.updateSuccess': 'Updated successfully', 'admin.createSuccess': 'Created successfully', 'admin.updateFailed': 'Update failed', 'admin.createFailed': 'Create failed',
+  'common.unknown': 'Unknown', 'common.user': 'User', 'common.online': 'Online', 'common.offline': 'Offline', 'common.profile': 'Profile', 'common.myOrders': 'My Orders', 'common.admin': 'Admin', 'common.lightMode': 'Light mode', 'common.darkMode': 'Dark mode', 'common.logout': 'Log out', 'common.home': 'Home', 'common.mine': 'Me', 'common.userCenter': 'Account', 'common.refresh': 'Refresh', 'common.themeChanged': 'Switched to {mode}',
+  'menu.brand': 'Conveyor Sushi', 'menu.searchDishes': 'Search dishes', 'menu.searchResults': 'Search results ({count})', 'menu.selectedItem': 'Selected {name}', 'menu.dishList': 'Dish list', 'menu.sortDefault': 'Default', 'menu.priceAsc': 'Price: low to high', 'menu.priceDesc': 'Price: high to low', 'menu.salesDesc': 'Best selling', 'menu.ratingDesc': 'Highest rated', 'menu.noDishes': 'No dishes', 'menu.soldCount': '{count} sold', 'menu.unavailable': 'Temporarily unavailable', 'menu.discontinued': 'Discontinued', 'menu.comingSoon': 'Coming soon', 'menu.notAvailable': 'Unavailable', 'menu.favoriteAdded': 'Added to favorites', 'menu.favoriteRemoved': 'Removed from favorites', 'menu.hot.sushi': 'Sushi', 'menu.hot.sashimi': 'Sashimi', 'menu.hot.tempura': 'Tempura', 'menu.hot.ramen': 'Ramen', 'menu.hot.grilledFish': 'Grilled fish',
+  'menu.collapse': 'Collapse', 'menu.advancedSearch': 'Advanced search', 'menu.priceRange': 'Price range', 'menu.category': 'Category', 'menu.applyFilter': 'Apply filters', 'menu.searchSuggestions': 'Suggestions', 'menu.searchHistory': 'Search history', 'menu.clearHistory': 'Clear history', 'menu.searchTimes': '{count} times', 'menu.hotSearches': 'Popular searches', 'menu.searchFailed': 'Search failed. Please try again', 'menu.historyCleared': 'Search history cleared',
+  'settings.themeBackground': 'Theme background', 'settings.gameOne': 'Game 1', 'settings.gameTwo': 'Game 2', 'settings.pendingSetup': 'Not configured',
+  'gacha.pointsValue': '+{value} points',
+  'menu.requiredSelection': 'Complete all required selections',
+  'cart.couponUnavailable': 'Requirements not met',
+  'cart.noCoupons': 'No coupons available',
+  'common.version': 'Version',
+  'common.systemSettings': 'System Settings', 'common.themeSettings': 'Theme', 'common.gameMode': 'Game Mode', 'common.conveyorSettings': 'Conveyor', 'common.cancel': 'Cancel', 'common.confirm': 'Confirm', 'common.close': 'Close', 'common.save': 'Save', 'common.reset': 'Reset', 'common.retry': 'Retry', 'common.loading': 'Loading...', 'common.processing': 'Processing...', 'common.success': 'Success', 'common.failure': 'Failed', 'common.prompt': 'Notice', 'common.noData': 'No data', 'common.search': 'Search', 'common.clear': 'Clear', 'common.delete': 'Delete', 'common.edit': 'Edit', 'common.add': 'Add', 'common.enable': 'Enable', 'common.disable': 'Disable', 'common.language': 'System Language', 'common.chinese': '中文', 'common.english': 'English', 'common.japanese': '日本語', 'common.callWaiter': 'Call Staff', 'common.menu': 'Menu', 'common.orderHistory': 'Order History', 'common.checkout': 'Checkout', 'common.addToCart': 'Add to Cart', 'common.placeOrder': 'Place Order', 'common.remove': 'Remove', 'common.increase': 'Increase quantity', 'common.decrease': 'Decrease quantity', 'common.emptySlot': 'Empty', 'common.soldOut': 'Sold out', 'common.imageLoadFailed': 'Image failed to load', 'common.veryFast': 'Very fast', 'common.slow': 'Slow', 'common.medium': 'Medium', 'common.fast': 'Fast',
+  'app.networkRestored': 'Network connection restored', 'app.networkLost': 'Network connection lost', 'app.systemError': 'System error. Please try again later',
+  'auth.employeeSystem': 'Conveyor Sushi System', 'auth.employeeLogin': 'Staff Login', 'auth.customerLogin': 'Customer Login', 'auth.otherLogin': 'Other login methods', 'auth.username': 'Enter username', 'auth.password': 'Enter password', 'auth.login': 'Log in', 'auth.loggingIn': 'Signing in...', 'auth.usernameLength': 'Username must be 3 to 20 characters', 'auth.passwordLength': 'Password must be 6 to 20 characters', 'auth.welcome': 'Welcome', 'auth.enterTable': 'Enter your table number to start ordering', 'auth.tableNumber': 'Table', 'auth.startOrdering': 'Start ordering', 'auth.tablePlaceholder': 'Enter table number', 'auth.clear': 'Clear', 'auth.serviceTip': 'Enter the table number shown on your table. Ask staff if you need help', 'auth.tableLimit': 'Table number can be up to 3 digits', 'auth.tableRequired': 'Please enter a table number', 'auth.tableRange': 'Table number must be between 1 and 999', 'auth.bindTable': 'Bind table', 'auth.binding': 'Binding...', 'auth.tableExample': 'Example: A08', 'auth.tableFormat': 'Invalid table format. Use a format such as A08', 'auth.tableUnavailable': 'Table does not exist or is already occupied', 'auth.bindFailed': 'Binding failed. Please try again', 'auth.welcomeTable': 'Welcome to table {table}!', 'auth.welcomeJourney': 'Enter your table number to begin your dining journey!', 'auth.bindSuccess': 'Table bound successfully!', 'auth.redirecting': 'Taking you to the menu...', 'auth.findTable': 'Cannot find your table? Ask a staff member for help', 'auth.openingHours': 'Opening hours: 10:00 - 22:00', 'auth.hotline': 'Service line: 400-888-8888', 'auth.employee': 'Staff Login',
+  'cart.title': 'Cart', 'cart.empty': 'Your cart is empty', 'cart.emptyTip': 'Choose something delicious to get started!', 'cart.startOrdering': 'Start ordering', 'cart.table': 'Table', 'cart.kinds': '{count} kinds', 'cart.orderNote': 'Order note (optional)', 'cart.coupon': 'Use coupon', 'cart.selectCoupon': 'Select coupon', 'cart.selectedCoupon': 'Coupon selected', 'cart.productTotal': 'Items total', 'cart.subtotal': 'Subtotal', 'cart.deliveryFee': 'Delivery fee', 'cart.free': 'Free', 'cart.discount': 'Discount', 'cart.total': 'Total', 'cart.payable': 'Amount due', 'cart.confirmUse': 'Apply', 'cart.notUseCoupon': 'Do not use coupon', 'cart.removeConfirm': 'Remove this item?', 'cart.clearConfirm': 'Clear the cart?', 'cart.removeSuccess': 'Item removed', 'cart.emptyWarning': 'Your cart is empty', 'cart.couponApplied': 'Coupon selected: {name}', 'cart.couponNeed': 'This coupon requires a minimum of {amount}', 'cart.itemCount': '{count} items', 'cart.checkout': 'Checkout now', 'cart.discountApplied': 'Saved ¥{amount}',
+  'menu.searchDish': 'Search dish names...', 'menu.searchDishDetail': 'Search dish names or descriptions...', 'menu.searchSushi': 'Search sushi...', 'menu.minPrice': 'Minimum price', 'menu.maxPrice': 'Maximum price', 'menu.selectCategory': 'Select category', 'menu.sort': 'Sort by', 'menu.customTag': 'Enter a custom tag...', 'menu.new': 'New', 'menu.recommend': 'Recommended', 'menu.rating': '{count} reviews', 'menu.nutrition': 'Nutrition', 'menu.calories': 'Calories', 'menu.protein': 'Protein', 'menu.fat': 'Fat', 'menu.carbs': 'Carbohydrates', 'menu.customization': 'Customizations', 'menu.required': 'Required', 'menu.specialRequest': 'Special requests', 'menu.specialRequestPlaceholder': 'Enter special requests (e.g. less salt, no wasabi)', 'menu.quantity': 'Quantity', 'menu.subtotal': 'Subtotal', 'menu.filterStatus': 'Filter by status', 'menu.searchCategory': 'Search category names...', 'menu.sortValue': 'Sort order', 'menu.searchUsername': 'Search usernames', 'menu.roleFilter': 'Filter by role', 'menu.chooseRole': 'Select a role', 'menu.username': 'Enter username', 'menu.password': 'Enter password',
+  'common.character': 'Character illustration', 'display.movementDirection': 'Movement direction', 'display.moveLeft': 'Move left', 'display.moveLeftDescription': 'Dishes move from right to left (default)', 'display.moveRight': 'Move right', 'display.moveRightDescription': 'Dishes move from left to right', 'display.speed': 'Speed', 'display.plateProgress': 'Plate progress', 'display.remainingPlates': '{count} more plates to unlock a capsule!', 'display.gachaEarned': 'Congratulations! You unlocked a capsule!', 'display.openGacha': 'Open capsule machine', 'display.gachaOpened': 'Capsule machine opened!', 'display.gachaOpenFailed': 'Could not open it. Please try again', 'display.orderSuccess': 'Checkout complete! Thank you for visiting!', 'display.waiterCalled': 'Staff has been called. Please wait...', 'display.plateOne': 'First plate! Keep going!', 'display.plateTwo': 'Second plate! Almost there!', 'display.plateThree': 'Third plate! Nearly done!', 'display.plateFour': 'Fourth plate! One more!', 'display.plateComplete': 'Complete! You earned a capsule!', 'display.plateMore': 'Plate {count}! Keep going!',
+  'gacha.chance': 'You unlocked a capsule!', 'gacha.startHint': 'Click to start', 'gacha.playing': 'Playing...', 'gacha.start': 'Start', 'gacha.reward': 'Congratulations on your reward!', 'gacha.useLater': 'Use later', 'gacha.useNow': 'Use now', 'gacha.used': 'Used: {name}', 'gacha.pointsReward': 'Points reward', 'gacha.pointsDescription': 'Receive 50 points', 'gacha.couponReward': 'Coupon', 'gacha.couponDescription': '¥20 off orders over ¥100', 'gacha.sushiReward': 'Free sushi', 'gacha.sushiDescription': 'Receive one free salmon sushi', 'gacha.grandReward': 'Grand prize', 'gacha.grandDescription': 'Receive a membership upgrade coupon',
+  'order.backTop': 'Back to top', 'order.up': 'Up', 'order.down': 'Down', 'order.bottom': 'Bottom', 'order.empty': 'No order history',
+  'admin.profileDeveloping': 'Profile is coming soon', 'admin.settingsDeveloping': 'System settings are coming soon', 'admin.logoutConfirm': 'Log out?', 'admin.categories': 'Categories', 'admin.menuItems': 'Menu items', 'admin.users': 'Users', 'admin.dashboard': 'Dashboard', 'admin.addCategory': 'Add category', 'admin.editCategory': 'Edit category', 'admin.addUser': 'Add user', 'admin.editUser': 'Edit user',
+  'errors.fetchProducts': 'Failed to load dishes', 'errors.fetchCategories': 'Failed to load categories', 'errors.fetchCategoryProducts': 'Failed to load category dishes', 'errors.fetchData': 'Failed to load data. Please try again', 'errors.loadFailed': 'Page failed to load. Please refresh and try again', 'errors.requestFailed': 'Request failed. Please try again later', 'errors.networkFailed': 'Network error. Check your connection'
+})
+
+replaceMessages(ja, {
+  'assistant.name': '小餐', 'assistant.greeting': 'こんにちは、小餐です', 'assistant.connecting': '音声サービスに接続中', 'assistant.listening': '探したい料理を話してください', 'assistant.hearing': '聞き取っています', 'assistant.processing': '料理を検索中', 'assistant.matchesFound': '{count}件の料理が見つかりました', 'assistant.noMatches': '「{query}」に一致する料理がありません', 'assistant.startListening': '音声検索を開始', 'assistant.stopListening': '音声検索を停止', 'assistant.errors.unsupported': 'このブラウザは音声検索に対応していません', 'assistant.errors.permission_denied': 'マイクを許可して再試行してください', 'assistant.errors.microphone_missing': 'マイクが見つかりません', 'assistant.errors.microphone_busy': 'マイクが他のアプリで使用されています', 'assistant.errors.connection_timeout': '音声サービスがタイムアウトしました', 'assistant.errors.service_unavailable': '音声サービスを利用できません', 'assistant.errors.invalid_server_event': '音声サービスが無効な結果を返しました', 'assistant.errors.recognition_failed': '聞き取れませんでした。もう一度お話しください',
+  'display.orderSubmitted': '注文しました：{orderId}',
+  'display.orderFailed': '注文に失敗しました。カートは保持されています。再試行してください',
+  'games.localOnly': 'カジュアルモード · ベストスコアはこの端末に保存', 'games.rewardNotice': '現在は端末内のベストスコアのみ記録します。クーポン、カプセル回数、その他の実際の特典は付与しません。今後の特典はバックエンドで検証して付与します。', 'games.score': 'スコア', 'games.bestScore': 'ベスト', 'games.time': '残り時間', 'games.tools': 'アイテム', 'games.lives': 'ライフ', 'games.combo': 'コンボ', 'games.difficulty': '難易度', 'games.controls': 'ゲーム操作', 'games.start': 'ゲーム開始', 'games.play': 'プレイ', 'games.pause': '一時停止', 'games.resume': '再開', 'games.restart': 'やり直す', 'games.end': 'ゲーム終了', 'games.finished': 'ラウンド終了', 'games.paused': '一時停止中', 'games.pauseHint': '進行状況は保持されています。再開して続けられます。', 'games.finalScore': '今回のスコア：{score}', 'games.left': '左へ移動', 'games.right': '右へ移動', 'games.status.ready': '開始可能', 'games.status.playing': 'プレイ中', 'games.status.finished': '終了',
+  'games.goldenMiner.title': 'ゴールドマイナー', 'games.goldenMiner.description': '揺れるフックで金やダイヤを集めます。ダイナマイトで岩を消し、素早く巻き戻せます。', 'games.goldenMiner.dropHook': 'ボタン1：フックを下ろす', 'games.goldenMiner.useTool': 'ボタン2：ダイナマイト（{count}）', 'games.goldenMiner.quickRetract': 'ボタン2：高速巻き戻し', 'games.goldenMiner.readyTitle': '採掘準備', 'games.goldenMiner.readyHint': 'フックは自動で左右に揺れます。角度を合わせて下ろし、2つ目のボタンで障害物を除去するか高速で戻します。',
+  'games.sushiCatch.title': '寿司キャッチ', 'games.sushiCatch.description': 'トレーを左右に動かして寿司をキャッチ。レア寿司でコンボ、わさびと空皿でライフが減ります。', 'games.sushiCatch.tray': 'トレー', 'games.sushiCatch.moveControls': 'トレー移動操作', 'games.sushiCatch.outOfLives': 'ライフ切れ', 'games.sushiCatch.readyTitle': 'キャッチ準備', 'games.sushiCatch.readyHint': '左右のボタンを長押しして移動します。時間とともに落下速度と出現頻度が上がります。',
+  'gacha.chance': 'カプセル獲得チャンス！', 'gacha.startHint': 'ボタンを押して開始', 'gacha.playing': 'カプセル抽選中...', 'gacha.start': '抽選を開始', 'gacha.reward': 'おめでとうございます！', 'gacha.useLater': '後で使う', 'gacha.useNow': '今すぐ使う', 'gacha.pointsReward': 'ポイント', 'gacha.pointsDescription': '50ポイントを獲得', 'gacha.couponReward': 'クーポン', 'gacha.couponDescription': '100円以上で20円引き', 'gacha.sushiReward': '無料寿司', 'gacha.sushiDescription': 'サーモン寿司1皿をプレゼント', 'gacha.grandReward': '大賞', 'gacha.grandDescription': '会員ランクアップ券を獲得', 'gacha.used': '使用済み：{name}',
+  'menu.quantity': '個数', 'common.medium': '標準速度', 'admin.sushiAdmin': '寿司管理画面', 'admin.actions': 'アクション', 'common.update': '変更',
+  'common.other': 'その他', 'menu.menuTitle': '回転寿司メニュー', 'cart.checkoutDeveloping': '会計機能は準備中です...', 'cart.invalidItem': '料理情報が正しくありません', 'cart.invalidQuantity': '数量は1以上にしてください', 'cart.quantityUpdated': '{name}の数量を更新しました', 'cart.itemRemoved': '{name}をカートから削除しました', 'cart.updateFailed': '更新に失敗しました。再試行してください', 'cart.cleared': 'カートを空にしました', 'cart.tableRequired': 'テーブル番号を設定してください', 'cart.incompleteItem': '商品{name}の情報が不完全です', 'cart.invalidItemQuantity': '商品{name}の数量が正しくありません',
+  'admin.categoryName': 'カテゴリー名', 'admin.description': '説明', 'admin.sort': '並び順', 'admin.dishCount': '料理数', 'admin.status': '状態', 'admin.createdAt': '作成日時', 'admin.updatedAt': '更新日時', 'admin.actions': '操作', 'admin.categoryLength': 'カテゴリー名は2～20文字で入力してください', 'admin.descriptionLength': '説明は200文字以内で入力してください', 'admin.enterSort': '並び順を入力', 'admin.sortRange': '並び順は0～999です', 'admin.username': 'ユーザー名', 'admin.password': 'パスワード', 'admin.role': '役割', 'admin.manager': '管理者', 'admin.cashier': 'レジ担当', 'admin.chef': '調理担当', 'admin.customer': 'お客様',
+  'filter.current': '適用中の絞り込み', 'filter.clearAll': 'すべて解除', 'filter.price': '価格', 'filter.popularTags': '人気タグ', 'filter.viewAll': 'すべて表示 ({count})', 'filter.customTag': 'カスタムタグ', 'filter.quickFilter': 'クイック絞り込み', 'filter.resultCount': '{count}件の料理が見つかりました', 'filter.discount': '特価',
+  'auth.loginSuccess': 'ログインしました', 'auth.loginFailed': 'ログインに失敗しました', 'auth.tableLoginSuccess': '{table}番テーブルでログインしました', 'auth.logoutSuccess': 'ログアウトしました', 'auth.loginRequired': '先にログインしてください', 'auth.employeeRequired': 'スタッフ権限が必要です', 'auth.permissionDenied': '権限がありません', 'auth.roleDenied': 'この役割ではアクセスできません', 'auth.sessionExpired': 'セッションが切れました。再度ログインしてください', 'auth.loginAgain': '再ログイン', 'errors.resourceNotFound': 'リソースが見つかりません', 'errors.serverError': 'サーバー内部エラー', 'errors.badRequest': 'リクエストが正しくありません', 'errors.endpointNotFound': 'エンドポイントが見つかりません', 'errors.timeout': 'リクエストがタイムアウトしました', 'errors.gatewayError': 'ゲートウェイエラー', 'errors.serviceUnavailable': 'サービスを利用できません', 'errors.gatewayTimeout': 'ゲートウェイがタイムアウトしました', 'errors.requestStatus': 'リクエスト失敗 ({status})', 'errors.timeoutNetwork': 'タイムアウトしました。接続を確認してください',
+  'errorPage.title': 'ページが見つかりません', 'errorPage.description': 'お探しのページは存在しないか、削除されました。', 'errorPage.suggestion': 'URLを確認するか、ホームへ戻ってください。', 'errorPage.maybeWant': 'こちらもご利用いただけます：', 'admin.addMenuItem': '料理を追加', 'admin.menuItemsDeveloping': '料理管理機能は準備中です...', 'admin.comingSoon': '公開までお待ちください', 'admin.welcomeBack': 'おかえりなさい、{name}さん！', 'admin.refreshData': 'データを更新', 'admin.todayOrders': '本日の注文', 'admin.todayRevenue': '本日の売上', 'admin.onlineCustomers': 'オンラインのお客様', 'admin.totalDishes': '料理数', 'admin.quickActions': 'クイック操作', 'admin.recentActivity': '最近のアクティビティ', 'admin.noActivity': 'アクティビティはありません', 'admin.popularDishes': '人気料理', 'admin.salesCount': '販売数：{count}',
+  'common.loadMore': 'さらに読み込む', 'common.previousPage': '前のページ', 'common.nextPage': '次のページ', 'menu.noCategories': 'カテゴリーがありません', 'customer.points': 'ポイント', 'customer.viewCart': 'カートを見る', 'customer.plateHint': '{current}皿投入済み。あと{remaining}皿でカプセル獲得', 'customer.rewardEarned': 'おめでとうございます：{name}', 'display.confirmCallWaiter': 'スタッフを呼びますか？', 'display.waiterComing': 'スタッフがまもなく伺います', 'display.confirmCall': 'スタッフを呼ぶ',
+  'common.back': '戻る',
+  'menu.addedToCart': '{name}をカートに追加しました', 'menu.addFailed': '追加に失敗しました。再試行してください', 'menu.removeFailed': '削除に失敗しました。再試行してください', 'menu.featuredToday': '本日のおすすめ', 'menu.popular': '人気', 'menu.viewDetails': '{name}の詳細を見る', 'menu.backToConveyor': 'レーンに戻る', 'menu.preparingSushi': 'お寿司を準備しています', 'menu.loadingSelectedMenu': 'おすすめメニューを読み込んでいます...',
+  'order.index': '番号', 'order.productName': '商品名', 'order.category': 'カテゴリー', 'order.orderTime': '注文時刻', 'order.deliveryStatus': '提供状況', 'order.amount': '金額', 'order.delivered': '提供済み', 'order.preparing': '調理中', 'order.pending': '調理待ち', 'order.historyTotal': '注文履歴合計', 'order.goCheckout': '会計を確認', 'order.historyCheckout': '注文履歴の会計', 'order.historyAmount': '注文履歴の合計金額です', 'order.confirmCheckout': '会計を確定',
+  'common.all': 'すべて', 'common.update': '更新',
+  'admin.sushiAdmin': '寿司管理', 'admin.enterCategory': 'カテゴリー名を入力', 'admin.enterDescription': 'カテゴリーの説明を入力', 'admin.categoryStatus': 'カテゴリーを{status}にしました', 'admin.statusUpdateFailed': 'ステータスの更新に失敗しました', 'admin.deleteCategoryConfirm': 'カテゴリー「{name}」を削除しますか？元に戻せません。', 'admin.categoryDeleted': 'カテゴリーを削除しました', 'admin.deleteFailed': '削除に失敗しました', 'admin.categoryUpdated': 'カテゴリーを更新しました', 'admin.categoryAdded': 'カテゴリーを追加しました', 'admin.fetchUsersFailed': 'ユーザーの読み込みに失敗しました', 'admin.deleteSuccess': '削除しました', 'admin.updateSuccess': '更新しました', 'admin.createSuccess': '作成しました', 'admin.updateFailed': '更新に失敗しました', 'admin.createFailed': '作成に失敗しました',
+  'common.unknown': '不明', 'common.user': 'ユーザー', 'common.online': 'オンライン', 'common.offline': 'オフライン', 'common.profile': 'プロフィール', 'common.myOrders': '注文履歴', 'common.admin': '管理画面', 'common.lightMode': 'ライトモード', 'common.darkMode': 'ダークモード', 'common.logout': 'ログアウト', 'common.home': 'ホーム', 'common.mine': 'マイページ', 'common.userCenter': 'マイページ', 'common.refresh': '更新', 'common.themeChanged': '{mode}に切り替えました',
+  'menu.brand': '回転寿司', 'menu.searchDishes': '料理を検索', 'menu.searchResults': '検索結果 ({count})', 'menu.selectedItem': '{name}を選択しました', 'menu.dishList': '料理一覧', 'menu.sortDefault': '標準', 'menu.priceAsc': '価格の安い順', 'menu.priceDesc': '価格の高い順', 'menu.salesDesc': '売上順', 'menu.ratingDesc': '評価順', 'menu.noDishes': '料理がありません', 'menu.soldCount': '{count}点販売', 'menu.unavailable': '一時品切れ', 'menu.discontinued': '販売終了', 'menu.comingSoon': '近日公開', 'menu.notAvailable': '利用不可', 'menu.favoriteAdded': 'お気に入りに追加しました', 'menu.favoriteRemoved': 'お気に入りから削除しました', 'menu.hot.sushi': '寿司', 'menu.hot.sashimi': '刺身', 'menu.hot.tempura': '天ぷら', 'menu.hot.ramen': 'ラーメン', 'menu.hot.grilledFish': '焼き魚',
+  'menu.collapse': '閉じる', 'menu.advancedSearch': '詳細検索', 'menu.priceRange': '価格帯', 'menu.category': 'カテゴリー', 'menu.applyFilter': '絞り込みを適用', 'menu.searchSuggestions': '検索候補', 'menu.searchHistory': '検索履歴', 'menu.clearHistory': '履歴を消去', 'menu.searchTimes': '{count}回', 'menu.hotSearches': '人気の検索', 'menu.searchFailed': '検索に失敗しました。再試行してください', 'menu.historyCleared': '検索履歴を消去しました',
+  'settings.themeBackground': 'テーマ背景', 'settings.gameOne': 'ゲーム1', 'settings.gameTwo': 'ゲーム2', 'settings.pendingSetup': '未設定',
+  'gacha.pointsValue': '+{value}ポイント',
+  'menu.requiredSelection': '必須項目を選択してください',
+  'cart.couponUnavailable': '利用条件を満たしていません',
+  'cart.noCoupons': '利用できるクーポンはありません',
+  'common.version': 'バージョン',
+  'common.systemSettings': 'システム設定', 'common.themeSettings': 'テーマ設定', 'common.gameMode': 'ゲームモード', 'common.conveyorSettings': 'レーン設定', 'common.cancel': 'キャンセル', 'common.confirm': '確認', 'common.close': '閉じる', 'common.save': '保存', 'common.reset': 'リセット', 'common.retry': '再試行', 'common.loading': '読み込み中...', 'common.processing': '処理中...', 'common.success': '成功', 'common.failure': '失敗', 'common.prompt': 'お知らせ', 'common.noData': 'データがありません', 'common.search': '検索', 'common.clear': 'クリア', 'common.delete': '削除', 'common.edit': '編集', 'common.add': '追加', 'common.enable': '有効', 'common.disable': '無効', 'common.language': '表示言語', 'common.callWaiter': 'スタッフを呼ぶ', 'common.menu': 'メニュー', 'common.orderHistory': '注文履歴', 'common.checkout': '会計', 'common.addToCart': 'カートに追加', 'common.placeOrder': '注文する', 'common.remove': '削除', 'common.increase': '数量を増やす', 'common.decrease': '数量を減らす', 'common.emptySlot': '空き', 'common.soldOut': '売り切れ', 'common.imageLoadFailed': '画像を読み込めません', 'common.veryFast': '最高速', 'common.slow': '低速', 'common.medium': '中速', 'common.fast': '高速',
+  'app.networkRestored': 'ネットワーク接続が復旧しました', 'app.networkLost': 'ネットワーク接続が切断されました', 'app.systemError': 'システムエラーです。しばらくしてから再試行してください',
+  'auth.employeeSystem': '回転寿司システム', 'auth.employeeLogin': 'スタッフログイン', 'auth.customerLogin': 'お客様ログイン', 'auth.otherLogin': 'その他のログイン方法', 'auth.username': 'ユーザー名を入力', 'auth.password': 'パスワードを入力', 'auth.login': 'ログイン', 'auth.loggingIn': 'ログイン中...', 'auth.usernameLength': 'ユーザー名は3～20文字で入力してください', 'auth.passwordLength': 'パスワードは6～20文字で入力してください', 'auth.welcome': 'ようこそ', 'auth.enterTable': 'テーブル番号を入力して注文を開始', 'auth.tableNumber': 'テーブル', 'auth.startOrdering': '注文を始める', 'auth.tablePlaceholder': 'テーブル番号を入力', 'auth.clear': 'クリア', 'auth.serviceTip': 'テーブル番号を入力してください。ご不明な点はスタッフにお尋ねください', 'auth.tableLimit': 'テーブル番号は3桁までです', 'auth.tableRequired': 'テーブル番号を入力してください', 'auth.tableRange': 'テーブル番号は1～999です', 'auth.bindTable': 'テーブルを登録', 'auth.binding': '登録中...', 'auth.tableExample': '例：A08', 'auth.tableFormat': 'テーブル番号の形式が正しくありません（例：A08）', 'auth.tableUnavailable': 'テーブルが存在しないか、使用中です', 'auth.bindFailed': '登録に失敗しました。再試行してください', 'auth.welcomeTable': '{table}番テーブルへようこそ！', 'auth.welcomeJourney': 'テーブル番号を入力してお食事を始めましょう！', 'auth.bindSuccess': '登録しました！', 'auth.redirecting': 'メニューへ移動しています...', 'auth.findTable': 'テーブル番号が見つからない場合はスタッフにお尋ねください', 'auth.openingHours': '営業時間：10:00～22:00', 'auth.hotline': 'サービス電話：400-888-8888', 'auth.employee': 'スタッフログイン',
+  'cart.title': 'カート', 'cart.empty': 'カートは空です', 'cart.emptyTip': 'お好きな料理を選んでください！', 'cart.startOrdering': '注文を始める', 'cart.table': 'テーブル', 'cart.kinds': '{count}種類', 'cart.orderNote': '注文メモ（任意）', 'cart.coupon': 'クーポンを使う', 'cart.selectCoupon': 'クーポンを選択', 'cart.selectedCoupon': 'クーポン選択済み', 'cart.productTotal': '商品合計', 'cart.subtotal': '小計', 'cart.deliveryFee': '配送料', 'cart.free': '無料', 'cart.discount': '割引', 'cart.total': '合計', 'cart.payable': 'お支払い金額', 'cart.confirmUse': '適用', 'cart.notUseCoupon': 'クーポンを使わない', 'cart.removeConfirm': 'この商品を削除しますか？', 'cart.clearConfirm': 'カートを空にしますか？', 'cart.removeSuccess': '商品を削除しました', 'cart.emptyWarning': 'カートは空です', 'cart.couponApplied': 'クーポンを選択しました：{name}', 'cart.couponNeed': '{amount}以上で利用できます', 'cart.itemCount': '{count}点', 'cart.checkout': '会計へ進む', 'cart.discountApplied': '割引 ¥{amount}',
+  'menu.searchDish': '料理名を検索...', 'menu.searchDishDetail': '料理名や説明を検索...', 'menu.searchSushi': '寿司を検索...', 'menu.minPrice': '最低価格', 'menu.maxPrice': '最高価格', 'menu.selectCategory': 'カテゴリーを選択', 'menu.sort': '並び順', 'menu.customTag': 'タグを入力...', 'menu.new': '新着', 'menu.recommend': 'おすすめ', 'menu.rating': '{count}件の評価', 'menu.nutrition': '栄養情報', 'menu.calories': 'カロリー', 'menu.protein': 'たんぱく質', 'menu.fat': '脂質', 'menu.carbs': '炭水化物', 'menu.customization': 'カスタマイズ', 'menu.required': '必須', 'menu.specialRequest': 'ご要望', 'menu.specialRequestPlaceholder': 'ご要望を入力（減塩、わさび抜きなど）', 'menu.quantity': '数量', 'menu.subtotal': '小計', 'menu.filterStatus': 'ステータスで絞り込む', 'menu.searchCategory': 'カテゴリー名を検索...', 'menu.sortValue': '並び順の値', 'menu.searchUsername': 'ユーザー名を検索', 'menu.roleFilter': '役割で絞り込む', 'menu.chooseRole': '役割を選択', 'menu.username': 'ユーザー名を入力', 'menu.password': 'パスワードを入力',
+  'display.movementDirection': '移動方向', 'display.moveLeft': '左へ移動', 'display.moveLeftDescription': '料理は右から左へ移動します（標準）', 'display.moveRight': '右へ移動', 'display.moveRightDescription': '料理は左から右へ移動します', 'display.speed': '速度設定', 'display.plateProgress': '皿の進捗', 'display.remainingPlates': 'あと{count}皿でカプセルを獲得できます！', 'display.gachaEarned': 'おめでとうございます！カプセルを獲得しました！', 'display.openGacha': 'カプセルを開く', 'display.gachaOpened': 'カプセルマシンを開きました！', 'display.gachaOpenFailed': '開けませんでした。再試行してください', 'display.orderSuccess': '会計が完了しました！ご来店ありがとうございます！', 'display.waiterCalled': 'スタッフを呼びました。少々お待ちください...',
+  'common.character': 'キャラクター', 'display.movementDirection': '移動方向', 'display.moveLeft': '左へ移動', 'display.moveLeftDescription': '料理は右から左へ移動します（標準）', 'display.moveRight': '右へ移動', 'display.moveRightDescription': '料理は左から右へ移動します', 'display.speed': '速度設定', 'display.plateProgress': '皿の進捗', 'display.remainingPlates': 'あと{count}皿でカプセルを獲得できます！', 'display.gachaEarned': 'おめでとうございます！カプセルを獲得しました！', 'display.openGacha': 'カプセルを開く', 'display.gachaOpened': 'カプセルマシンを開きました！', 'display.gachaOpenFailed': '開けませんでした。再試行してください', 'display.orderSuccess': '会計が完了しました！ご来店ありがとうございます！', 'display.waiterCalled': 'スタッフを呼びました。少々お待ちください...', 'display.plateOne': '1皿目！頑張って！', 'display.plateTwo': '2皿目！もうすぐです！', 'display.plateThree': '3皿目！あと少し！', 'display.plateFour': '4皿目！あと1皿！', 'display.plateComplete': '完了！カプセルを獲得しました！', 'display.plateMore': '{count}皿目！頑張って！',
+  'order.backTop': '先頭へ', 'order.up': '上へ', 'order.down': '下へ', 'order.bottom': '末尾へ', 'order.empty': '注文履歴はありません',
+  'admin.profileDeveloping': 'プロフィール機能は準備中です', 'admin.settingsDeveloping': 'システム設定機能は準備中です', 'admin.logoutConfirm': 'ログアウトしますか？', 'admin.categories': 'カテゴリー管理', 'admin.menuItems': '料理管理', 'admin.users': 'ユーザー管理', 'admin.dashboard': 'ダッシュボード', 'admin.addCategory': 'カテゴリーを追加', 'admin.editCategory': 'カテゴリーを編集', 'admin.addUser': 'ユーザーを追加', 'admin.editUser': 'ユーザーを編集',
+  'errors.fetchProducts': '料理の読み込みに失敗しました', 'errors.fetchCategories': 'カテゴリーの読み込みに失敗しました', 'errors.fetchCategoryProducts': 'カテゴリー料理の読み込みに失敗しました', 'errors.fetchData': 'データの読み込みに失敗しました。再試行してください', 'errors.loadFailed': 'ページの読み込みに失敗しました。更新して再試行してください', 'errors.requestFailed': 'リクエストに失敗しました。後でもう一度お試しください', 'errors.networkFailed': 'ネットワークを確認してください'
+})
+
+replaceMessages(en, {
+  'games.runner.title': 'Sushi Dash',
+  'games.runner.description': 'Jump over carts and crates, slide under curtains, collect sushi, and use shields to absorb collisions.',
+  'games.runner.loading': 'Preparing the course',
+  'games.runner.loadFailed': 'The game failed to load. Please try again.',
+  'games.runner.outOfLives': 'Delivery interrupted'
+})
+
+replaceMessages(ja, {
+  'games.runner.title': '寿司ダッシュ',
+  'games.runner.description': 'カートや箱を飛び越え、のれんをくぐり、寿司とシールドを集めて走ります。',
+  'games.runner.loading': 'コースを準備中',
+  'games.runner.loadFailed': 'ゲームを読み込めませんでした。もう一度お試しください。',
+  'games.runner.outOfLives': '配達中断'
+})
+
+replaceMessages(en, {
+  'assistant.microphoneReady': 'Microphone is on. Say the dish you want to find',
+  'assistant.voiceDetected': 'Voice detected. Listening',
+  'assistant.audioReceived': 'Recording received. Recognizing',
+  'assistant.heardTranscript': 'I heard: “{transcript}”',
+  'assistant.errors.speech_too_short': 'The recording was too short. Say the dish name again',
+  'assistant.errors.no_speech': 'No clear speech was detected. Please try again'
+})
+
+replaceMessages(ja, {
+  'assistant.microphoneReady': 'マイクはオンです。探したい料理を話してください',
+  'assistant.voiceDetected': '声を検出しました。聞いています',
+  'assistant.audioReceived': '録音を受け取りました。認識中です',
+  'assistant.heardTranscript': '「{transcript}」と聞き取りました',
+  'assistant.errors.speech_too_short': '録音が短すぎます。料理名をもう一度話してください',
+  'assistant.errors.no_speech': '音声を検出できませんでした。もう一度お試しください'
+})
+
+replaceMessages(en, {
+  'common.voiceMode': 'Voice Mode',
+  'settings.aiVoiceAssistant': 'AI voice assistant',
+  'settings.aiVoiceAssistantDescription': 'Controls Xiaocan, microphone capture, and the voice recognition service',
+  'settings.ttsVoice': 'Voice playback',
+  'settings.ttsVoiceDescription': 'Controls the text-to-speech feature that will be added later'
+})
+
+replaceMessages(ja, {
+  'common.voiceMode': '音声モード',
+  'settings.aiVoiceAssistant': 'AI音声アシスタント',
+  'settings.aiVoiceAssistantDescription': '小餐、マイク録音、音声認識サービスを制御します',
+  'settings.ttsVoice': '音声読み上げ',
+  'settings.ttsVoiceDescription': '今後追加するテキスト読み上げ機能を制御します'
+})
+
+export default { 'zh-CN': messages['zh-CN'], 'en-US': en, 'ja-JP': ja }

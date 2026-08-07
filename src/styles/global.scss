@@ -1,0 +1,202 @@
+// 设置根字体大小为10px，便于rem计算
+html {
+  font-size: 10px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $text-primary;
+  background-color: $bg-secondary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 标题字体
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-title;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  color: $text-primary;
+}
+
+h1 { font-size: $font-size-3xl; }
+h2 { font-size: $font-size-2xl; }
+h3 { font-size: $font-size-xl; }
+h4 { font-size: $font-size-lg; }
+h5 { font-size: $font-size-base; }
+h6 { font-size: $font-size-sm; }
+
+// 重置默认样式
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+// 通用工具类
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: $primary-color; }
+.text-secondary { color: $secondary-color; }
+.text-success { color: $success-color; }
+.text-warning { color: $warning-color; }
+.text-error { color: $error-color; }
+
+.bg-primary { background-color: $primary-color; }
+.bg-secondary { background-color: $secondary-color; }
+.bg-white { background-color: $white; }
+.bg-light { background-color: $light-gray; }
+
+// 响应式工具类
+.hidden-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.hidden-tablet {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.visible-mobile {
+  display: none;
+  @include mobile {
+    display: block !important;
+  }
+}
+
+// 动画类
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $transition-base;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform $transition-base;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+}
+
+// 加载骨架屏
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// 触摸友好的按钮
+.touch-button {
+  min-height: 4.4rem; // 44px 最小触摸目标
+  min-width: 4.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $border-radius-button;
+  transition: all $transition-fast;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// 卡片样式
+.card {
+  background: $bg-primary;
+  border-radius: $border-radius-card;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: box-shadow $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// 主要按钮样式
+.btn-primary {
+  background: $primary-color;
+  color: $white;
+  border-radius: $border-radius-button;
+  padding: $spacing-sm $spacing-md;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba($primary-color, 0.92);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// 次要按钮样式
+.btn-secondary {
+  background: $secondary-color;
+  color: $white;
+  border-radius: $border-radius-button;
+  padding: $spacing-sm $spacing-md;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba($secondary-color, 0.92);
+  }
+}
+
+// 轮播指示器
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+  
+  .indicator {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: $medium-gray;
+    transition: background $transition-fast;
+    cursor: pointer;
+    
+    &.active {
+      background: $primary-color;
+    }
+  }
+}

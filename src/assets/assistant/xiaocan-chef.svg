@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="280" viewBox="0 0 240 280" fill="none">
+  <defs>
+    <linearGradient id="rice" x1="86" y1="101" x2="157" y2="245" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF7" stop-opacity="0.98"/>
+      <stop offset="0.58" stop-color="#FBF6EA" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#EEE3D3" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="salmon" x1="59" y1="62" x2="182" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFAD86"/>
+      <stop offset="0.56" stop-color="#F58D73"/>
+      <stop offset="1" stop-color="#E97867"/>
+    </linearGradient>
+    <linearGradient id="nori" x1="61" y1="185" x2="181" y2="207" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#234E43"/>
+      <stop offset="0.55" stop-color="#173E37"/>
+      <stop offset="1" stop-color="#286054"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="120" cy="266" rx="73" ry="9" fill="#563A32" opacity="0.15"/>
+
+  <!-- Short legs with soy-sauce soles -->
+  <path d="M87 232C80 241 80 253 87 260" stroke="#F1E6D7" stroke-width="17" stroke-linecap="round"/>
+  <path d="M153 232C160 241 160 253 153 260" stroke="#F1E6D7" stroke-width="17" stroke-linecap="round"/>
+  <path d="M77 262C82 258 89 258 96 262" stroke="#8A563D" stroke-width="9" stroke-linecap="round"/>
+  <path d="M144 262C151 258 158 258 163 262" stroke="#8A563D" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Soft rice silhouette -->
+  <path d="M53 126C54 100 80 84 120 84C160 84 186 100 187 126L183 218C182 238 158 250 120 250C82 250 58 238 57 218L53 126Z" fill="url(#rice)" stroke="#563A32" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Fine rice grains -->
+  <g fill="#FFFFFF" stroke="#DFD2C0" stroke-width="1.2" opacity="0.72">
+    <ellipse cx="73" cy="128" rx="7" ry="3.6" transform="rotate(-24 73 128)"/>
+    <ellipse cx="94" cy="112" rx="7" ry="3.6" transform="rotate(18 94 112)"/>
+    <ellipse cx="121" cy="106" rx="7" ry="3.6" transform="rotate(-9 121 106)"/>
+    <ellipse cx="150" cy="114" rx="7" ry="3.6" transform="rotate(21 150 114)"/>
+    <ellipse cx="170" cy="132" rx="7" ry="3.6" transform="rotate(-18 170 132)"/>
+    <ellipse cx="72" cy="177" rx="7" ry="3.6" transform="rotate(15 72 177)"/>
+    <ellipse cx="91" cy="220" rx="7" ry="3.6" transform="rotate(-19 91 220)"/>
+    <ellipse cx="122" cy="232" rx="7" ry="3.6" transform="rotate(8 122 232)"/>
+    <ellipse cx="153" cy="219" rx="7" ry="3.6" transform="rotate(22 153 219)"/>
+    <ellipse cx="170" cy="180" rx="7" ry="3.6" transform="rotate(-14 170 180)"/>
+  </g>
+
+  <!-- Salmon topping with a soft fringe -->
+  <path d="M47 105C50 76 76 55 112 52C147 48 178 62 192 87C198 99 195 111 187 119C182 124 177 129 174 139C166 135 161 128 161 119C146 126 130 130 112 130C91 130 71 124 54 114C49 112 46 109 47 105Z" fill="url(#salmon)" stroke="#563A32" stroke-width="4" stroke-linejoin="round"/>
+  <g fill="none" stroke="#FFD0C0" stroke-width="5.5" stroke-linecap="round" opacity="0.9">
+    <path d="M65 87C78 96 88 101 101 104"/>
+    <path d="M91 69C105 82 118 88 132 91"/>
+    <path d="M123 61C137 72 151 78 166 80"/>
+    <path d="M129 112C145 109 158 104 178 93"/>
+  </g>
+  <path d="M54 113C82 128 111 133 143 125" stroke="#CF665C" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+
+  <!-- Shiso leaf and three ikura silhouette markers -->
+  <path d="M155 57C153 37 165 23 185 22C191 40 182 55 160 63Z" fill="#82C76C" stroke="#563A32" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M160 57C169 46 177 35 184 23M166 48L158 39M174 39L181 42" stroke="#D9F2B7" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="166" cy="60" r="10" fill="#F47B45" stroke="#563A32" stroke-width="3"/>
+  <circle cx="185" cy="58" r="10" fill="#EF6840" stroke="#563A32" stroke-width="3"/>
+  <circle cx="178" cy="43" r="10" fill="#FF8A49" stroke="#563A32" stroke-width="3"/>
+  <circle cx="163" cy="57" r="3" fill="#FFC69A" opacity="0.9"/>
+  <circle cx="182" cy="55" r="3" fill="#FFC69A" opacity="0.9"/>
+  <circle cx="175" cy="40" r="3" fill="#FFD0A4" opacity="0.9"/>
+
+  <!-- Face on the rice -->
+  <path d="M84 137C90 133 96 133 101 136" stroke="#563A32" stroke-width="3" stroke-linecap="round"/>
+  <path d="M139 136C144 133 150 133 156 137" stroke="#563A32" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="94" cy="151" rx="12" ry="15" fill="#563A32"/>
+  <ellipse cx="146" cy="151" rx="12" ry="15" fill="#563A32"/>
+  <circle cx="90" cy="146" r="4.2" fill="#FFFFFF"/>
+  <circle cx="97" cy="154" r="2.4" fill="#FFFFFF"/>
+  <circle cx="142" cy="146" r="4.2" fill="#FFFFFF"/>
+  <circle cx="149" cy="154" r="2.4" fill="#FFFFFF"/>
+  <path d="M109 167C113 173 117 176 121 176C125 176 129 173 133 167" stroke="#563A32" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="72" cy="168" rx="12" ry="7" fill="#F5A5A5" opacity="0.68"/>
+  <ellipse cx="168" cy="168" rx="12" ry="7" fill="#F5A5A5" opacity="0.68"/>
+
+  <!-- Deep green nori belt and golden roe badge -->
+  <path d="M57 184C76 190 97 193 120 193C143 193 164 190 183 184L182 215C162 221 142 224 120 224C98 224 78 221 58 215L57 184Z" fill="url(#nori)" stroke="#563A32" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M72 194C88 199 103 201 120 201C137 201 152 199 168 194" stroke="#4B7A68" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+  <circle cx="120" cy="207" r="13" fill="#E9B84F" stroke="#563A32" stroke-width="3"/>
+  <circle cx="115" cy="204" r="4" fill="#FF8A49"/>
+  <circle cx="124" cy="204" r="4" fill="#F46D43"/>
+  <circle cx="120" cy="212" r="4" fill="#FF9A4D"/>
+
+  <!-- Mochi-like arms: one welcoming wave, one curious pose -->
+  <path d="M60 188C45 186 34 176 31 162C29 153 31 143 36 135" stroke="#563A32" stroke-width="17" stroke-linecap="round"/>
+  <path d="M60 188C45 186 34 176 31 162C29 153 31 143 36 135" stroke="#F7EDE0" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="36" cy="132" r="10" fill="#F7EDE0" stroke="#563A32" stroke-width="3.5"/>
+  <path d="M30 124L25 117M37 122V113M44 125L50 118" stroke="#563A32" stroke-width="3" stroke-linecap="round"/>
+  <path d="M180 188C194 185 202 176 204 164" stroke="#563A32" stroke-width="17" stroke-linecap="round"/>
+  <path d="M180 188C194 185 202 176 204 164" stroke="#F7EDE0" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="204" cy="161" r="9" fill="#F7EDE0" stroke="#563A32" stroke-width="3.5"/>
+</svg>
