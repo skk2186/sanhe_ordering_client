@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { setLocale } from '@/i18n'
+import { DEFAULT_ASSISTANT_VOLUME, normalizeAssistantVolume } from '@/utils/assistantSound'
 
 export const useGlobalStore = defineStore('global', () => {
   // 状态
@@ -10,6 +11,7 @@ export const useGlobalStore = defineStore('global', () => {
   const sidebarCollapsed = ref(false)
   const voiceAssistantEnabled = ref(true)
   const ttsEnabled = ref(false)
+  const assistantVolume = ref(DEFAULT_ASSISTANT_VOLUME)
   
   // 应用配置
   const appConfig = ref({
@@ -41,8 +43,9 @@ export const useGlobalStore = defineStore('global', () => {
     setLocale(lang)
   }
   
+  /** 应用启动时一次性恢复持久设置，并同步 i18n 的当前语言。 */
   const initApp = () => {
-    // 从本地存储恢复设置
+    // 每个键独立恢复，旧版本缺少新配置时仍可使用代码中的安全默认值。
     const savedTheme = localStorage.getItem('app-theme')
     if (savedTheme) {
       theme.value = savedTheme
@@ -68,6 +71,9 @@ export const useGlobalStore = defineStore('global', () => {
     if (savedTts !== null) {
       ttsEnabled.value = savedTts === 'true'
     }
+
+    const savedAssistantVolume = localStorage.getItem('assistant-volume')
+    assistantVolume.value = normalizeAssistantVolume(savedAssistantVolume)
   }
   
   // 监听主题变化并保存
@@ -92,6 +98,12 @@ export const useGlobalStore = defineStore('global', () => {
     ttsEnabled.value = Boolean(enabled)
     localStorage.setItem('tts-enabled', String(ttsEnabled.value))
   }
+
+  const setAssistantVolume = (volume) => {
+    // 以当前值作为非法输入的回退，拖动滑块时不会因瞬时空值跳回默认音量。
+    assistantVolume.value = normalizeAssistantVolume(volume, assistantVolume.value)
+    localStorage.setItem('assistant-volume', String(assistantVolume.value))
+  }
   
   return {
     // 状态
@@ -101,6 +113,7 @@ export const useGlobalStore = defineStore('global', () => {
     sidebarCollapsed,
     voiceAssistantEnabled,
     ttsEnabled,
+    assistantVolume,
     appConfig,
     
     // 计算属性
@@ -116,6 +129,7 @@ export const useGlobalStore = defineStore('global', () => {
     saveLanguage,
     saveSidebar,
     setVoiceAssistantEnabled,
-    setTtsEnabled
+    setTtsEnabled,
+    setAssistantVolume
   }
 })

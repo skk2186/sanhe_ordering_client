@@ -59,8 +59,8 @@ const messages = {
       systemError: '系统错误，请稍后重试'
     },
     assistant: {
-      name: '小餐',
-      greeting: '你好，我是小餐',
+      name: '小禾',
+      greeting: '你好，我是小禾',
       connecting: '正在连接语音服务',
       listening: '请说出想找的菜品',
       hearing: '正在听',
@@ -73,6 +73,42 @@ const messages = {
       voiceDetected: '已检测到你的声音，正在收听',
       audioReceived: '录音已收到，正在识别',
       heardTranscript: '我听到：“{transcript}”',
+      recommendations: '小禾推荐',
+      youSaid: '你说：“{transcript}”',
+      recommendationIdle: '小禾正在传送带上方待命',
+      recommendationListening: '正在听你想吃什么',
+      recommendationEmpty: '这一轮暂时没有合适的菜品',
+      addedToCart: '已把“{name}”放入{side}下单区',
+      addedQuantityToCart: '已把“{name}”×{quantity} 放入{side}下单区',
+      cartFull: '左右下单区都满了，请先下单或调整菜品',
+      notEnoughSpace: '单侧下单区放不下 {quantity} 份，请先调整菜品',
+      recommendationContextMissing: '请先让小禾推荐菜品，再告诉我是第几个',
+      recommendationIndexMissing: '当前推荐里没有第 {number} 个，请重新选择',
+      recommendationIndexesMissing: '当前推荐里没有第 {numbers} 个，请重新选择',
+      recommendationReady: '给你推荐了 {count} 道相关菜品',
+      recommendationReadyPaged: '找到 {total} 道相关菜品，先给你看 {count} 道，可以说“换一批”',
+      recommendationBatchChanged: '已换一批，为你展示接下来的 {count} 道菜',
+      recommendationBatchRestarted: '相关菜品已经看完了，从第一批重新开始',
+      recommendationSingleBatch: '符合你需求的菜品都在这一批了',
+      wakeAcknowledgement: '在呢',
+      waitingWakePhrase: '正在等你说“小禾小禾”',
+      checkingWakePhrase: '听到了，正在确认是不是在叫小禾',
+      commandListening: '在呢，请说你想吃什么',
+      speaking: '小禾正在回答',
+      startWakeMonitoring: '开启小禾唤醒',
+      stopWakeMonitoring: '停止小禾唤醒',
+      sessionTimeout: '我先等你，需要时再叫我',
+      sessionEnded: '好的，我先休息，需要时再叫我',
+      orderEmpty: '下单区还是空的，请先选择菜品',
+      orderSubmitting: '好的，正在为您下单，请稍候',
+      orderSuccess: '已经为您全部下单成功',
+      orderFailed: '有部分菜品下单失败，请稍后再试',
+      addFailed: '这道菜暂时不能加入下单区',
+      addedMultipleToCart: '已把 {count} 道菜、共 {quantity} 份放入左右下单区',
+      batchNotEnoughSpace: '下单区还剩 {remaining} 个位置，这次需要 {quantity} 个，请调整选择',
+      leftSide: '左侧',
+      rightSide: '右侧',
+      bothSides: '左右两侧',
       errors: {
         unsupported: '当前浏览器不支持语音搜索',
         permission_denied: '请允许使用麦克风后重试',
@@ -96,9 +132,11 @@ const messages = {
       gameTwo: '游戏二',
       pendingSetup: '待设置',
       aiVoiceAssistant: 'AI 语音助手',
-      aiVoiceAssistantDescription: '控制右上角小餐助手、麦克风录音和语音识别服务',
-      ttsVoice: '语音播报',
-      ttsVoiceDescription: '控制后续接入的 TTS 文字转语音功能'
+      aiVoiceAssistantDescription: '控制传送带上方的小禾助手、麦克风录音和语音识别服务',
+      ttsVoice: '助手声音',
+      ttsVoiceDescription: '统一控制小禾的唤醒提示、推荐、加购和错误提示声音',
+      assistantSoundEnabled: '播放声音',
+      assistantVolume: '音量'
     },
     games: {
       localOnly: '休闲模式 · 最高分仅保存在本机',
@@ -362,7 +400,7 @@ const replaceMessages = (target, values) => {
 }
 
 replaceMessages(en, {
-  'assistant.name': 'Xiaocan', 'assistant.greeting': 'Hi, I am Xiaocan', 'assistant.connecting': 'Connecting to voice service', 'assistant.listening': 'Say the dish you want to find', 'assistant.hearing': 'Listening', 'assistant.processing': 'Finding dishes', 'assistant.matchesFound': 'Found {count} matching dishes', 'assistant.noMatches': 'No dishes found for “{query}”', 'assistant.startListening': 'Start voice search', 'assistant.stopListening': 'Stop voice search', 'assistant.errors.unsupported': 'Voice search is not supported in this browser', 'assistant.errors.permission_denied': 'Allow microphone access and try again', 'assistant.errors.microphone_missing': 'No microphone was detected', 'assistant.errors.microphone_busy': 'The microphone is being used by another app', 'assistant.errors.connection_timeout': 'Voice service connection timed out', 'assistant.errors.service_unavailable': 'Voice service is unavailable', 'assistant.errors.invalid_server_event': 'The voice service returned an invalid result', 'assistant.errors.recognition_failed': 'I could not recognize that. Please try again',
+  'assistant.name': 'Xiaohe', 'assistant.greeting': 'Hi, I am Xiaohe', 'assistant.connecting': 'Connecting to voice service', 'assistant.listening': 'Say the dish you want to find', 'assistant.hearing': 'Listening', 'assistant.processing': 'Finding dishes', 'assistant.matchesFound': 'Found {count} matching dishes', 'assistant.noMatches': 'No dishes found for “{query}”', 'assistant.startListening': 'Start voice search', 'assistant.stopListening': 'Stop voice search', 'assistant.recommendations': 'Xiaohe recommendations', 'assistant.youSaid': 'You said: “{transcript}”', 'assistant.recommendationIdle': 'Xiaohe is ready above the conveyor', 'assistant.recommendationListening': 'Listening for what you would like', 'assistant.recommendationEmpty': 'No suitable dishes in this round', 'assistant.addedToCart': 'Added “{name}” to the {side} order area', 'assistant.cartFull': 'Both order areas are full. Place the order or adjust the dishes first', 'assistant.addFailed': 'This dish cannot be added right now', 'assistant.leftSide': 'left', 'assistant.rightSide': 'right', 'assistant.errors.unsupported': 'Voice search is not supported in this browser', 'assistant.errors.permission_denied': 'Allow microphone access and try again', 'assistant.errors.microphone_missing': 'No microphone was detected', 'assistant.errors.microphone_busy': 'The microphone is being used by another app', 'assistant.errors.connection_timeout': 'Voice service connection timed out', 'assistant.errors.service_unavailable': 'Voice service is unavailable', 'assistant.errors.invalid_server_event': 'The voice service returned an invalid result', 'assistant.errors.recognition_failed': 'I could not recognize that. Please try again',
   'display.orderSubmitted': 'Order submitted: {orderId}',
   'display.orderFailed': 'Order failed. Your cart was kept; please try again',
   'games.localOnly': 'Casual mode · Best scores stay on this device', 'games.rewardNotice': 'Games currently save local best scores only. They do not grant coupons, capsule chances, or other real rewards. Future rewards must be verified and issued by the backend.', 'games.score': 'Score', 'games.bestScore': 'Best', 'games.time': 'Time', 'games.tools': 'Tools', 'games.lives': 'Lives', 'games.combo': 'Combo', 'games.difficulty': 'Difficulty', 'games.controls': 'Game controls', 'games.start': 'Start game', 'games.play': 'Play', 'games.pause': 'Pause', 'games.resume': 'Resume', 'games.restart': 'Restart', 'games.end': 'End game', 'games.finished': 'Round complete', 'games.paused': 'Game paused', 'games.pauseHint': 'Your progress is saved. Resume when ready.', 'games.finalScore': 'Final score: {score}', 'games.left': 'Move left', 'games.right': 'Move right', 'games.status.ready': 'Ready', 'games.status.playing': 'Playing', 'games.status.finished': 'Finished',
@@ -401,7 +439,7 @@ replaceMessages(en, {
 })
 
 replaceMessages(ja, {
-  'assistant.name': '小餐', 'assistant.greeting': 'こんにちは、小餐です', 'assistant.connecting': '音声サービスに接続中', 'assistant.listening': '探したい料理を話してください', 'assistant.hearing': '聞き取っています', 'assistant.processing': '料理を検索中', 'assistant.matchesFound': '{count}件の料理が見つかりました', 'assistant.noMatches': '「{query}」に一致する料理がありません', 'assistant.startListening': '音声検索を開始', 'assistant.stopListening': '音声検索を停止', 'assistant.errors.unsupported': 'このブラウザは音声検索に対応していません', 'assistant.errors.permission_denied': 'マイクを許可して再試行してください', 'assistant.errors.microphone_missing': 'マイクが見つかりません', 'assistant.errors.microphone_busy': 'マイクが他のアプリで使用されています', 'assistant.errors.connection_timeout': '音声サービスがタイムアウトしました', 'assistant.errors.service_unavailable': '音声サービスを利用できません', 'assistant.errors.invalid_server_event': '音声サービスが無効な結果を返しました', 'assistant.errors.recognition_failed': '聞き取れませんでした。もう一度お話しください',
+  'assistant.name': '小禾', 'assistant.greeting': 'こんにちは、小禾です', 'assistant.connecting': '音声サービスに接続中', 'assistant.listening': '探したい料理を話してください', 'assistant.hearing': '聞き取っています', 'assistant.processing': '料理を検索中', 'assistant.matchesFound': '{count}件の料理が見つかりました', 'assistant.noMatches': '「{query}」に一致する料理がありません', 'assistant.startListening': '音声検索を開始', 'assistant.stopListening': '音声検索を停止', 'assistant.recommendations': '小禾のおすすめ', 'assistant.youSaid': 'あなた：「{transcript}」', 'assistant.recommendationIdle': '小禾はレーンの上で待機中です', 'assistant.recommendationListening': 'ご希望を聞いています', 'assistant.recommendationEmpty': '今回はおすすめできる料理がありません', 'assistant.addedToCart': '「{name}」を{side}の注文エリアに追加しました', 'assistant.cartFull': '左右の注文エリアがいっぱいです。先に注文または調整してください', 'assistant.addFailed': 'この料理は現在追加できません', 'assistant.leftSide': '左側', 'assistant.rightSide': '右側', 'assistant.errors.unsupported': 'このブラウザは音声検索に対応していません', 'assistant.errors.permission_denied': 'マイクを許可して再試行してください', 'assistant.errors.microphone_missing': 'マイクが見つかりません', 'assistant.errors.microphone_busy': 'マイクが他のアプリで使用されています', 'assistant.errors.connection_timeout': '音声サービスがタイムアウトしました', 'assistant.errors.service_unavailable': '音声サービスを利用できません', 'assistant.errors.invalid_server_event': '音声サービスが無効な結果を返しました', 'assistant.errors.recognition_failed': '聞き取れませんでした。もう一度お話しください',
   'display.orderSubmitted': '注文しました：{orderId}',
   'display.orderFailed': '注文に失敗しました。カートは保持されています。再試行してください',
   'games.localOnly': 'カジュアルモード · ベストスコアはこの端末に保存', 'games.rewardNotice': '現在は端末内のベストスコアのみ記録します。クーポン、カプセル回数、その他の実際の特典は付与しません。今後の特典はバックエンドで検証して付与します。', 'games.score': 'スコア', 'games.bestScore': 'ベスト', 'games.time': '残り時間', 'games.tools': 'アイテム', 'games.lives': 'ライフ', 'games.combo': 'コンボ', 'games.difficulty': '難易度', 'games.controls': 'ゲーム操作', 'games.start': 'ゲーム開始', 'games.play': 'プレイ', 'games.pause': '一時停止', 'games.resume': '再開', 'games.restart': 'やり直す', 'games.end': 'ゲーム終了', 'games.finished': 'ラウンド終了', 'games.paused': '一時停止中', 'games.pauseHint': '進行状況は保持されています。再開して続けられます。', 'games.finalScore': '今回のスコア：{score}', 'games.left': '左へ移動', 'games.right': '右へ移動', 'games.status.ready': '開始可能', 'games.status.playing': 'プレイ中', 'games.status.finished': '終了',
@@ -486,17 +524,79 @@ replaceMessages(ja, {
 replaceMessages(en, {
   'common.voiceMode': 'Voice Mode',
   'settings.aiVoiceAssistant': 'AI voice assistant',
-  'settings.aiVoiceAssistantDescription': 'Controls Xiaocan, microphone capture, and the voice recognition service',
-  'settings.ttsVoice': 'Voice playback',
-  'settings.ttsVoiceDescription': 'Controls the text-to-speech feature that will be added later'
+  'settings.aiVoiceAssistantDescription': 'Controls Xiaohe above the conveyor, microphone capture, and the voice recognition service',
+  'settings.ttsVoice': 'Assistant sound',
+  'settings.ttsVoiceDescription': 'Controls wake acknowledgements, recommendations, cart actions, and error audio together',
+  'settings.assistantSoundEnabled': 'Play sound',
+  'settings.assistantVolume': 'Volume'
 })
 
 replaceMessages(ja, {
   'common.voiceMode': '音声モード',
   'settings.aiVoiceAssistant': 'AI音声アシスタント',
-  'settings.aiVoiceAssistantDescription': '小餐、マイク録音、音声認識サービスを制御します',
-  'settings.ttsVoice': '音声読み上げ',
-  'settings.ttsVoiceDescription': '今後追加するテキスト読み上げ機能を制御します'
+  'settings.aiVoiceAssistantDescription': 'レーン上の小禾、マイク録音、音声認識サービスを制御します',
+  'settings.ttsVoice': 'アシスタント音声',
+  'settings.ttsVoiceDescription': '呼びかけへの返事、おすすめ、追加、エラー音声をまとめて制御します',
+  'settings.assistantSoundEnabled': '音声を再生',
+  'settings.assistantVolume': '音量'
+})
+
+replaceMessages(en, {
+  'assistant.addedQuantityToCart': 'Added “{name}” × {quantity} to the {side} order area',
+  'assistant.addedMultipleToCart': 'Added {count} dishes, {quantity} servings total, to both order areas',
+  'assistant.notEnoughSpace': 'One order area cannot fit {quantity} servings. Adjust the dishes first',
+  'assistant.batchNotEnoughSpace': 'Only {remaining} spaces remain, but this selection needs {quantity}. Adjust your selection',
+  'assistant.recommendationContextMissing': 'Ask Xiaohe for recommendations before choosing a number',
+  'assistant.recommendationIndexMissing': 'There is no item {number} in the current recommendations',
+  'assistant.recommendationIndexesMissing': 'Items {numbers} are not in the current recommendations',
+  'assistant.recommendationReady': 'I found {count} relevant dishes for you',
+  'assistant.recommendationReadyPaged': 'I found {total} relevant dishes. Here are the first {count}; say “another batch” for more',
+  'assistant.recommendationBatchChanged': 'Here is another batch with {count} dishes',
+  'assistant.recommendationBatchRestarted': 'You have seen all matching dishes, so I am showing the first batch again',
+  'assistant.recommendationSingleBatch': 'All matching dishes are already in this batch',
+  'assistant.wakeAcknowledgement': 'I am here',
+  'assistant.waitingWakePhrase': 'Waiting for “Xiaohe, Xiaohe”',
+  'assistant.checkingWakePhrase': 'I heard you and am checking the wake phrase',
+  'assistant.commandListening': 'I am here. Tell me what you would like',
+  'assistant.speaking': 'Xiaohe is responding',
+  'assistant.startWakeMonitoring': 'Start Xiaohe wake monitoring',
+  'assistant.stopWakeMonitoring': 'Stop Xiaohe wake monitoring',
+  'assistant.sessionTimeout': "I'll wait here. Call me when you need me",
+  'assistant.sessionEnded': "Okay, I'll rest. Call me when you need me",
+  'assistant.bothSides': 'left and right',
+  'assistant.orderEmpty': 'The order areas are empty. Please choose some dishes first',
+  'assistant.orderSubmitting': 'Submitting all selected dishes. Please wait',
+  'assistant.orderSuccess': 'All selected dishes were ordered successfully',
+  'assistant.orderFailed': 'Some dishes could not be ordered. Please try again'
+})
+
+replaceMessages(ja, {
+  'assistant.addedQuantityToCart': '「{name}」を{quantity}点、{side}の注文エリアに追加しました',
+  'assistant.addedMultipleToCart': '{count}品、合計{quantity}点を左右の注文エリアに追加しました',
+  'assistant.notEnoughSpace': '片側の注文エリアには{quantity}点入りません。先に料理を調整してください',
+  'assistant.batchNotEnoughSpace': '空きは{remaining}点ですが、今回の選択には{quantity}点必要です。選択を調整してください',
+  'assistant.recommendationContextMissing': '先に小禾へおすすめを聞いてから番号を選んでください',
+  'assistant.recommendationIndexMissing': '現在のおすすめに{number}番はありません',
+  'assistant.recommendationIndexesMissing': '現在のおすすめに{numbers}番はありません',
+  'assistant.recommendationReady': '{count}品をおすすめします',
+  'assistant.recommendationReadyPaged': '{total}品見つかりました。まず{count}品を表示します。「次の候補」と話してください',
+  'assistant.recommendationBatchChanged': '次の{count}品を表示します',
+  'assistant.recommendationBatchRestarted': 'すべて表示したため、最初の候補に戻ります',
+  'assistant.recommendationSingleBatch': '条件に合う料理はすべてこの一覧に表示されています',
+  'assistant.wakeAcknowledgement': 'はい',
+  'assistant.waitingWakePhrase': '「小禾、小禾」を待っています',
+  'assistant.checkingWakePhrase': '呼びかけを確認しています',
+  'assistant.commandListening': 'はい、ご希望をどうぞ',
+  'assistant.speaking': '小禾が回答しています',
+  'assistant.startWakeMonitoring': '小禾の呼びかけ待機を開始',
+  'assistant.stopWakeMonitoring': '小禾の呼びかけ待機を停止',
+  'assistant.sessionTimeout': 'ここで待っています。必要なときに呼んでください',
+  'assistant.sessionEnded': 'わかりました。休憩します。必要なときに呼んでください',
+  'assistant.bothSides': '左右',
+  'assistant.orderEmpty': '注文エリアは空です。先に料理を選んでください',
+  'assistant.orderSubmitting': '選択した料理をすべて注文しています。少々お待ちください',
+  'assistant.orderSuccess': '選択した料理をすべて注文しました',
+  'assistant.orderFailed': '一部の料理を注文できませんでした。もう一度お試しください'
 })
 
 export default { 'zh-CN': messages['zh-CN'], 'en-US': en, 'ja-JP': ja }

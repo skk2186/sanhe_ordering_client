@@ -63,6 +63,8 @@ const emit = defineEmits(['start', 'score-change', 'finish', 'close'])
 const { t } = useI18n()
 
 const GAME_DURATION = 45_000
+
+// Vue 负责渲染下落物数组；所有位置以 arena 实时尺寸换算，兼容横向大屏和移动端。
 const arenaRef = ref(null)
 const status = ref('idle')
 const score = ref(0)
@@ -78,6 +80,7 @@ let lastFrameTime = 0
 let spawnAccumulator = 0
 let itemSequence = 0
 let moveTimer = 0
+// Set 同时记录 A/B，可正确处理两键同时按下和不同顺序松开的情况。
 const pressedControls = new Set()
 
 const remainingSeconds = computed(() => Math.max(0, Math.ceil(remainingMs.value / 1000)))
@@ -104,6 +107,7 @@ const itemDefinitions = {
   plate: { type: 'plate', image: emptyPlateImage, value: 0 }
 }
 
+/** 根据局内难度创建一个下落物；x 使用百分比，y 和速度使用像素。 */
 const createFallingItem = () => {
   const random = Math.random()
   const definition = random < 0.12
@@ -135,6 +139,7 @@ const updateScore = (nextScore) => {
 }
 
 const resolveCatch = (item) => {
+  // 稀有寿司增加连击并获得额外分；普通寿司保留连击；坏物品重置连击并扣生命。
   if (item.type === 'rare') {
     combo.value += 1
     updateScore(score.value + item.value + combo.value * 5)
@@ -148,12 +153,17 @@ const resolveCatch = (item) => {
   lives.value = Math.max(0, lives.value - 1)
 }
 
+/**
+ * 推进所有下落物并用托盘中心的水平容差判断接住。
+ * 已接住和落出屏幕的物品都不会进入 remaining，避免数组随游戏时间持续增长。
+ */
 const updateItems = (deltaSeconds) => {
   const arena = arenaRef.value
   if (!arena) return
   const arenaScale = Math.max(0.75, arena.clientHeight / 420)
   const trayTop = arena.clientHeight - 62
   const trayCenterX = arena.clientWidth * trayX.value / 100
+  // 大屏按宽度放大有效接取范围，小屏保留至少 52px 的可操作宽度。
   const catchRange = Math.max(52, arena.clientWidth * 0.105)
   const remaining = []
 
@@ -174,12 +184,14 @@ const updateItems = (deltaSeconds) => {
 const gameLoop = (timestamp) => {
   if (status.value !== 'running') return
   if (!lastFrameTime) lastFrameTime = timestamp
+  // 页面从后台恢复时限制到 40ms，防止物品跨越托盘碰撞区。
   const deltaMs = Math.min(40, timestamp - lastFrameTime)
   lastFrameTime = timestamp
   remainingMs.value -= deltaMs
   spawnAccumulator += deltaMs
 
   const spawnInterval = 900 - elapsedRatio.value * 520
+  // 时间越接近结束，生成间隔越短；单帧最多生成一个，避免卡顿后突然堆积。
   if (spawnAccumulator >= spawnInterval) {
     spawnAccumulator = 0
     fallingItems.value.push(createFallingItem())
@@ -205,6 +217,7 @@ const startLoop = () => {
   frameId = requestAnimationFrame(gameLoop)
 }
 
+/** 完整重置一局并等待 DOM 尺寸稳定后启动动画帧。 */
 const startGame = async () => {
   cancelAnimationFrame(frameId)
   pressedControls.clear()
@@ -242,6 +255,7 @@ const closeGame = () => {
 
 const moveTray = (direction) => {
   if (status.value !== 'running') return
+  // 保留 8% 边界，确保托盘图像不会完全移出可视区。
   trayX.value = Math.max(8, Math.min(92, trayX.value + direction * 5))
 }
 
@@ -251,6 +265,7 @@ const stopMoving = () => {
 }
 
 const startMoving = (direction) => {
+  // 先移动一次减少按键反馈延迟，再用固定节奏支持外接按钮长按。
   stopMoving()
   moveTray(direction)
   moveTimer = window.setInterval(() => moveTray(direction), 70)
@@ -263,6 +278,7 @@ const syncKeyboardMovement = () => {
   }
   const movingLeft = pressedControls.has('KeyA')
   const movingRight = pressedControls.has('KeyB')
+  // 两键同时按下视为方向抵消，松开任意一键后恢复剩余方向。
   if (movingLeft === movingRight) stopMoving()
   else startMoving(movingLeft ? -1 : 1)
 }
@@ -307,6 +323,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  // 失焦和卸载都要清空长按计时器，防止托盘在用户切走页面后继续移动。
   releaseControls()
   cancelAnimationFrame(frameId)
   window.removeEventListener('keydown', handleKeydown)
@@ -317,8 +334,8 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .catch-game {
-  width: 94vw;
-  height: 94dvh;
+  width: min(2200px, 94vw);
+  height: min(940px, 94dvh);
   min-height: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);

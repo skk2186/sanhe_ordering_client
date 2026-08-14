@@ -2,6 +2,24 @@ import { request } from '@/utils/request'
 
 import service from '@/utils/request'
 
+const BACKEND_FILE_PATH_PREFIX = '/admin-api/infra/file/'
+const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
+
+export const normalizeProductImage = (value) => {
+  const imageUrl = String(value || '').trim()
+  if (!imageUrl) return ''
+
+  try {
+    const parsedUrl = new URL(imageUrl, 'http://local.invalid')
+    if (!parsedUrl.pathname.startsWith(BACKEND_FILE_PATH_PREFIX)) return imageUrl
+
+    const filePath = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`
+    return API_BASE_URL ? `${API_BASE_URL}${filePath}` : filePath
+  } catch {
+    return imageUrl
+  }
+}
+
 export const normalizeProduct = (product = {}) => {
   const productValues = product.productValue && typeof product.productValue === 'object'
     ? Object.entries(product.productValue)
@@ -10,6 +28,7 @@ export const normalizeProduct = (product = {}) => {
   const [skuKey, selectedValue = {}] = selectedEntry || []
   const sku = String(selectedValue.sku || skuKey || product.attrInfo?.sku || '默认')
   const stock = Number(selectedValue.stock ?? product.stock ?? 0)
+  const image = normalizeProductImage(selectedValue.image || product.image)
 
   return {
     ...product,
@@ -19,12 +38,15 @@ export const normalizeProduct = (product = {}) => {
     categoryId: Number(product.categoryId ?? product.cateId),
     cateId: Number(product.cateId ?? product.categoryId),
     price: Number(selectedValue.price ?? product.price ?? 0),
-    image: selectedValue.image || product.image || '',
+    image,
     sku,
     valueStr: sku,
     stock,
     available: stock > 0,
-    selectedProductValue: selectedValue
+    selectedProductValue: {
+      ...selectedValue,
+      image
+    }
   }
 }
 

@@ -165,6 +165,7 @@ import { useI18n } from '@/i18n'
 
 const { t } = useI18n()
 const DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
+const IMAGE_PRELOAD_TIMEOUT_MS = 3000
 
 // Props
 const props = defineProps({
@@ -513,10 +514,10 @@ const handlePlaceOrder = (side) => {
 // 预加载图片
 const preloadImages = async () => {
   const currentSequence = ++preloadSequence
-  const itemsWithImages = props.items.filter(item => item.image)
-  totalImages.value = itemsWithImages.length
+  const imageUrls = [...new Set(props.items.map(item => item.image).filter(Boolean))]
+  totalImages.value = imageUrls.length
   loadingProgress.value = 0
-  if (!itemsWithImages.length) {
+  if (!imageUrls.length) {
     isPreloading.value = false
     return
   }
@@ -524,9 +525,9 @@ const preloadImages = async () => {
   isPreloading.value = true
   let loadedCount = 0
 
-  const imagePromises = itemsWithImages.map(item => {
+  const imagePromises = imageUrls.map(imageUrl => {
     return new Promise((resolve) => {
-      if (loadedImages.value.has(item.image)) {
+      if (loadedImages.value.has(imageUrl)) {
         loadedCount++
         loadingProgress.value = (loadedCount / totalImages.value) * 100
         resolve()
@@ -534,18 +535,24 @@ const preloadImages = async () => {
       }
 
       const img = new Image()
-      img.onload = () => {
-        loadedImages.value.add(item.image)
+      let settled = false
+      let timeoutId
+      const finish = (loaded) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timeoutId)
+        img.onload = null
+        img.onerror = null
+        if (loaded) loadedImages.value.add(imageUrl)
         loadedCount++
         loadingProgress.value = (loadedCount / totalImages.value) * 100
         resolve()
       }
-      img.onerror = () => {
-        loadedCount++
-        loadingProgress.value = (loadedCount / totalImages.value) * 100
-        resolve() // 即使加载失败也继续
-      }
-      img.src = item.image
+
+      img.onload = () => finish(true)
+      img.onerror = () => finish(false)
+      timeoutId = setTimeout(() => finish(false), IMAGE_PRELOAD_TIMEOUT_MS)
+      img.src = imageUrl
     })
   })
 

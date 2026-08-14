@@ -82,5 +82,10 @@ const props = defineProps({
 .belt-items.momentum {
   transition: none !important;
 }
-</style>
 
+@media (max-width: 768px) {
+  .belt-container {
+    top: 114px;
+  }
+}
+</style>

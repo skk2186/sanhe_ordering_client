@@ -111,21 +111,27 @@
               <h3>{{ copy.ttsVoice }}</h3>
               <p>{{ copy.ttsVoiceDescription }}</p>
             </div>
-            <div class="voice-setting-row__actions" role="group" :aria-label="copy.ttsVoice">
-              <el-button
-                :type="globalStore.ttsEnabled ? 'primary' : 'default'"
-                :aria-pressed="globalStore.ttsEnabled"
-                @click="globalStore.setTtsEnabled(true)"
-              >
-                {{ copy.enable }}
-              </el-button>
-              <el-button
-                :type="!globalStore.ttsEnabled ? 'danger' : 'default'"
-                :aria-pressed="!globalStore.ttsEnabled"
-                @click="globalStore.setTtsEnabled(false)"
-              >
-                {{ copy.disable }}
-              </el-button>
+            <div class="voice-setting-row__actions voice-setting-row__actions--sound" role="group" :aria-label="copy.ttsVoice">
+              <div class="assistant-sound-toggle">
+                <span>{{ copy.assistantSoundEnabled }}</span>
+                <el-switch
+                  :model-value="globalStore.ttsEnabled"
+                  :aria-label="copy.assistantSoundEnabled"
+                  @change="globalStore.setTtsEnabled"
+                />
+              </div>
+              <div class="assistant-volume-control">
+                <span>{{ copy.assistantVolume }}</span>
+                <el-slider
+                  v-model="assistantVolumePercent"
+                  :min="0"
+                  :max="100"
+                  :step="5"
+                  :disabled="!globalStore.ttsEnabled"
+                  :aria-label="copy.assistantVolume"
+                />
+                <output>{{ assistantVolumePercent }}%</output>
+              </div>
             </div>
           </section>
         </div>
@@ -211,7 +217,7 @@
 
 <script setup>
 import { Check, Headset, Microphone, Trophy, VideoPlay } from '@element-plus/icons-vue'
-import { ElDialog, ElTabs, ElTabPane, ElSlider } from "element-plus";
+import { ElDialog, ElTabs, ElTabPane, ElSlider, ElSwitch } from "element-plus";
 import { computed, ref, watchEffect } from "vue";
 import { useGlobalStore } from '@/stores/global'
 import { useI18n } from '@/i18n'
@@ -252,6 +258,11 @@ const currentLanguage = computed(() => (
     : 'zh-CN'
 ))
 
+const assistantVolumePercent = computed({
+  get: () => Math.round(globalStore.assistantVolume * 100),
+  set: (value) => globalStore.setAssistantVolume(Number(value) / 100)
+})
+
 const copy = computed(() => ({
   systemSettings: t('common.systemSettings'),
   themeSettings: t('common.themeSettings'),
@@ -274,6 +285,8 @@ const copy = computed(() => ({
   aiVoiceAssistantDescription: t('settings.aiVoiceAssistantDescription'),
   ttsVoice: t('settings.ttsVoice'),
   ttsVoiceDescription: t('settings.ttsVoiceDescription'),
+  assistantSoundEnabled: t('settings.assistantSoundEnabled'),
+  assistantVolume: t('settings.assistantVolume'),
   enable: t('common.enable'),
   disable: t('common.disable'),
   cancel: t('common.cancel')
@@ -587,6 +600,34 @@ initBeltSettings()
       &:last-child { border-radius: 0 6px 6px 0; }
       & + .el-button { margin-left: -1px; }
     }
+
+    &--sound {
+      grid-template-columns: 280px;
+      gap: 12px;
+    }
+  }
+}
+
+.assistant-sound-toggle,
+.assistant-volume-control {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  color: #303133;
+  font-size: 14px;
+}
+
+.assistant-sound-toggle {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.assistant-volume-control {
+  grid-template-columns: 54px minmax(120px, 1fr) 42px;
+
+  output {
+    color: #606266;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -838,6 +879,10 @@ initBeltSettings()
       grid-column: 1 / -1;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       width: 100%;
+
+      &--sound {
+        grid-template-columns: 1fr;
+      }
     }
   }
 

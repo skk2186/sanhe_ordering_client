@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:assistant": "node --test tests/assistant-recommendations.test.mjs tests/assistant-sound.test.mjs",
     "test:voice": "node --test tests/voice-client.test.mjs",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"

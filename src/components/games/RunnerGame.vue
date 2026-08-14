@@ -33,6 +33,14 @@
         <template v-else>
           <h3>{{ stateTitle }}</h3>
           <p>{{ $t('games.finalScore', { score }) }}</p>
+          <div v-if="status === 'finished'" class="game-actions">
+            <button type="button" class="game-action game-action--primary" @click="restartGame">
+              {{ $t('games.restart') }}
+            </button>
+            <button type="button" class="game-action game-action--secondary" @click="closeGame">
+              {{ $t('common.close') }}
+            </button>
+          </div>
         </template>
       </div>
     </div>
@@ -61,6 +69,8 @@ const { t } = useI18n()
 const GAME_ID = 'sushi-runner'
 const STORAGE_KEY = 'game-best-sushi-runner'
 const GAME_DURATION = 45_000
+
+// Vue 保存界面可见状态；Phaser 实例和 Scene 保存逐帧更新的游戏对象。
 const arenaRef = ref(null)
 const gameHostRef = ref(null)
 const status = ref('loading')
@@ -74,6 +84,7 @@ let Phaser = null
 let phaserGame = null
 let runnerScene = null
 let resizeObserver = null
+// 动态 import 可能晚于组件卸载完成，disposed 防止异步回调重新创建 Canvas。
 let disposed = false
 
 const remainingSeconds = computed(() => Math.max(0, Math.ceil(remainingMs.value / 1000)))
@@ -90,6 +101,11 @@ const saveBestScore = () => {
   localStorage.setItem(STORAGE_KEY, String(score.value))
 }
 
+/**
+ * 按当前 Phaser 构造器生成 Scene 类。
+ * Scene 内部只通过少量 Vue ref/emit 向外同步分数和结束状态，避免让每帧移动
+ * 都触发 Vue 渲染；所有 display 对象仍由 Phaser 管理。
+ */
 const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   constructor() {
     super('runner-scene')
@@ -135,6 +151,10 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
     return this.scale.height * 0.72
   }
 
+  /**
+   * 画布缩放时重新铺满背景、地面并按宽度比例迁移已有实体。
+   * 碰撞尺寸统一由 unit 重新计算，避免超宽屏和低高度屏使用固定像素后失真。
+   */
   handleResize(width, height, previousWidth = width, previousHeight = height) {
     if (!this.background || width <= 0 || height <= 0) return
 
@@ -160,6 +180,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   }
 
   resetRound() {
+    // 销毁上一局实体后完整重置计时器和角色状态，确保重新开始不继承无敌或护盾。
     this.entities.forEach((entity) => entity.display.destroy())
     this.entities = []
     this.roundRunning = true
@@ -200,6 +221,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
     this.player.setTexture('runner-actions', frame)
   }
 
+  // 玩家视觉坐标以脚底 groundY 为基准，jumpOffset 始终表示向上的正距离。
   layoutPlayer() {
     if (!this.player) return
     const scale = Math.max(0.38, Math.min(0.72, this.scale.height / 820))
@@ -256,6 +278,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   }
 
   spawnEntity(type) {
+    // definition 同时描述显示尺寸和独立碰撞盒，透明图片边缘不会造成误碰撞。
     const definitions = {
       cart: { kind: 'obstacle', mode: 'ground', texture: 'service-cart', displayWidth: 150, displayHeight: 150, baseline: 0.82, colliderWidth: 108, colliderHeight: 96 },
       crate: { kind: 'obstacle', mode: 'ground', texture: 'sauce-crate', displayWidth: 145, displayHeight: 145, baseline: 0.73, colliderWidth: 122, colliderHeight: 72 },
@@ -275,6 +298,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   }
 
   chooseSpawnType() {
+    // 固定开场序列用于教学；之后按概率生成，并避免护盾已生效时继续刷护盾。
     const openingSequence = ['sushi-low', 'crate', 'sushi-high', 'noren', 'cart']
     if (this.spawnCount < openingSequence.length) return openingSequence[this.spawnCount]
 
@@ -295,6 +319,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
     return new Phaser.Geom.Rectangle(this.player.x - width / 2, bottom - height, width, height)
   }
 
+  /** 将不同锚点的地面、空中和头顶实体统一换算为世界坐标碰撞盒。 */
   getEntityRect(entity) {
     const unit = this.unit
     const definition = entity.definition
@@ -370,6 +395,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   }
 
   updatePlayer(now, deltaSeconds) {
+    // 使用简单竖直速度积分；落地和滑行动作由截止时间控制，不依赖动画回调。
     if (this.jumpOffset > 0 || this.jumpVelocity > 0) {
       this.jumpOffset += this.jumpVelocity * deltaSeconds
       this.jumpVelocity -= this.scale.height * 3.6 * deltaSeconds
@@ -417,11 +443,13 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
 
   update(now, delta) {
     if (!this.roundRunning) return
+    // 标签页恢复时 delta 可能很大，上限 40ms 可避免实体瞬移穿过碰撞区域。
     const deltaMs = Math.min(40, delta)
     const deltaSeconds = deltaMs / 1000
     remainingMs.value = Math.max(0, remainingMs.value - deltaMs)
 
     const progress = 1 - remainingMs.value / GAME_DURATION
+    // 随局内进度同时提高移动速度和生成频率，宽屏再适度增速以保持穿越时间。
     const widthScale = Math.max(0.78, Math.min(1.45, this.scale.width / 1200))
     const speed = (285 + progress * 235) * widthScale
     this.trackDistance += speed * deltaSeconds
@@ -448,6 +476,7 @@ const createRunnerScene = () => class RunnerScene extends Phaser.Scene {
   }
 }
 
+/** 创建唯一 Phaser 实例，并让 ResizeObserver 同步外部响应式布局变化。 */
 const createGame = () => {
   const host = gameHostRef.value
   if (!host || disposed) return
@@ -478,6 +507,7 @@ const createGame = () => {
   resizeObserver.observe(host)
 }
 
+// Phaser 体积较大，仅在用户打开跑酷游戏后动态加载，不进入主页面首包。
 const initializeGame = async () => {
   if (phaserGame || disposed) return
   status.value = 'loading'
@@ -497,6 +527,11 @@ const closeGame = () => {
   emit('close', { id: GAME_ID, score: score.value })
 }
 
+const restartGame = () => {
+  if (status.value !== 'finished') return
+  runnerScene?.resetRound()
+}
+
 const handleKeydown = (event) => {
   if (!['KeyA', 'KeyB', 'Escape'].includes(event.code)) return
   event.preventDefault()
@@ -509,11 +544,8 @@ const handleKeydown = (event) => {
     void initializeGame()
     return
   }
-  if (status.value === 'finished') {
-    runnerScene?.resetRound()
-    return
-  }
   if (status.value !== 'running') return
+  // 结束态故意忽略 A/B，只允许结果页明确按钮重新开始，防止外设余键误开新局。
   if (event.code === 'KeyA') runnerScene?.jump()
   if (event.code === 'KeyB') runnerScene?.slide()
 }
@@ -524,6 +556,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  // Phaser 必须显式 destroy 才会移除 Canvas、内部事件和渲染上下文。
   disposed = true
   window.removeEventListener('keydown', handleKeydown)
   resizeObserver?.disconnect()
@@ -536,8 +569,8 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .runner-game {
-  width: 94vw;
-  height: 94dvh;
+  width: min(2560px, 94vw);
+  height: min(900px, 94dvh);
   min-height: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
@@ -679,6 +712,46 @@ onBeforeUnmount(() => {
     max-width: 580px;
     margin: 0;
     line-height: 1.55;
+  }
+}
+
+.game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.game-action {
+  min-width: 160px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+
+  &:hover { transform: translateY(-1px); }
+  &:focus-visible { outline: 3px solid rgba(255, 212, 90, 0.9); outline-offset: 3px; }
+
+  &--primary {
+    border-color: #f2b84b;
+    background: #f2b84b;
+    color: #183d45;
+
+    &:hover { background: #ffd45a; }
+  }
+
+  &--secondary {
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+
+    &:hover { background: rgba(255, 255, 255, 0.22); }
   }
 }
 

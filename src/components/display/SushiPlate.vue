@@ -6,13 +6,7 @@
       'paused': isPaused,
       'dragging': isDragging
     }"
-    @mousedown="handleMouseDown"
-    @mousemove="handleMouseMove"
-    @mouseup="handleMouseUp"
-    @mouseleave="handleMouseLeave"
-    @touchstart.passive="handleTouchStart"
-    @touchmove.passive="handleTouchMove"
-    @touchend.passive="handleTouchEnd"
+    @pointerdown="handlePointerDown"
   >
     <!-- 圆形寿司显示区域 -->
     <div class="sushi-circle">
@@ -71,6 +65,7 @@ const startPos = ref({ x: 0, y: 0 })
 const currentPos = ref({ x: 0, y: 0 })
 const startTime = ref(0)
 const pauseTimer = ref(null)
+const activePointerId = ref(null)
 const dragThreshold = 10 // 拖动阈值（像素）
 const lastEmitTime = ref(0) // 新增：上次emit时间，用于节流
 
@@ -90,9 +85,11 @@ const resetState = () => {
   isClicked.value = false
   isInteracting.value = false
 
-  // 清理document事件监听器
-  document.removeEventListener('mousemove', handleDocumentMouseMove)
-  document.removeEventListener('mouseup', handleDocumentMouseUp)
+  // 清理当前指针的 document 事件监听器
+  document.removeEventListener('pointermove', handleDocumentPointerMove)
+  document.removeEventListener('pointerup', handleDocumentPointerUp)
+  document.removeEventListener('pointercancel', handleDocumentPointerCancel)
+  activePointerId.value = null
 }
 
 // 图片处理方法
@@ -228,76 +225,46 @@ const triggerClick = () => {
   resetState()
 }
 
-// 鼠标事件处理
-const handleMouseDown = (e) => {
-  e.preventDefault()
+// 使用同一套 Pointer Events 处理鼠标、触摸和触控笔，避免触摸后的兼容鼠标事件重复加购。
+const handlePointerDown = (event) => {
+  if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return
+  if (isInteracting.value) return
 
-  // 先清理可能存在的事件监听器
-  document.removeEventListener('mousemove', handleDocumentMouseMove)
-  document.removeEventListener('mouseup', handleDocumentMouseUp)
+  activePointerId.value = event.pointerId
+  startInteraction(event.clientX, event.clientY)
 
-  startInteraction(e.clientX, e.clientY)
-
-  // 在document上添加鼠标移动和释放事件监听
-  document.addEventListener('mousemove', handleDocumentMouseMove)
-  document.addEventListener('mouseup', handleDocumentMouseUp)
+  document.addEventListener('pointermove', handleDocumentPointerMove, { passive: false })
+  document.addEventListener('pointerup', handleDocumentPointerUp)
+  document.addEventListener('pointercancel', handleDocumentPointerCancel)
 }
 
-const handleDocumentMouseMove = (e) => {
-  moveInteraction(e.clientX, e.clientY)
+const isActivePointer = (event) => event.pointerId === activePointerId.value
+
+const handleDocumentPointerMove = (event) => {
+  if (!isActivePointer(event)) return
+  if (event.cancelable) event.preventDefault()
+  moveInteraction(event.clientX, event.clientY)
 }
 
-const handleDocumentMouseUp = () => {
+const handleDocumentPointerUp = (event) => {
+  if (!isActivePointer(event)) return
   endInteraction()
-  // 移除document事件监听
-  document.removeEventListener('mousemove', handleDocumentMouseMove)
-  document.removeEventListener('mouseup', handleDocumentMouseUp)
 }
 
-const handleMouseMove = () => {
-  // 这个方法保留但不使用，因为我们使用document监听
-}
-
-const handleMouseUp = () => {
-  // 这个方法保留但不使用，因为我们使用document监听
-}
-
-const handleMouseLeave = () => {
-  // 鼠标离开时不立即结束交互，因为可能在拖动
-}
-
-// 触摸事件处理
-const handleTouchStart = (e) => {
-  // 移除preventDefault以支持被动事件监听器
-  // e.preventDefault()
-  const touch = e.touches[0]
-  startInteraction(touch.clientX, touch.clientY)
-}
-
-const handleTouchMove = (e) => {
-  // 移除preventDefault以支持被动事件监听器
-  // e.preventDefault()
-  const touch = e.touches[0]
-  moveInteraction(touch.clientX, touch.clientY)
-}
-
-const handleTouchEnd = (e) => {
-  // 移除preventDefault以支持被动事件监听器
-  // e.preventDefault()
-  endInteraction()
+const handleDocumentPointerCancel = (event) => {
+  if (!isActivePointer(event)) return
+  resetState()
 }
 
 // 组件卸载时清理
 onUnmounted(() => {
-  clearPauseTimer()
-  // 清理可能残留的事件监听器
-  document.removeEventListener('mousemove', handleDocumentMouseMove)
-  document.removeEventListener('mouseup', handleDocumentMouseUp)
+  resetState()
 })
 </script>
 
 <style lang="scss" scoped>
 .sushi-plate-container {
+  --dish-display-size: 220px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -333,8 +300,8 @@ onUnmounted(() => {
 }
 .sushi-circle {
   position: relative;
-  width: 380px;
-  height: 380px;
+  width: var(--dish-display-size);
+  height: var(--dish-display-size);
 
   display: flex;
   //align-items: center;
@@ -360,7 +327,8 @@ onUnmounted(() => {
 }
 
 .sushi-info {
-  width: 70%;
+  box-sizing: border-box;
+  width: var(--dish-display-size);
   padding: 10px 0;
   margin-top: -8px;
   border-radius: 8px;
@@ -474,6 +442,12 @@ onUnmounted(() => {
     border-top: 2px solid rgba(255, 122, 0, 0.8);
     border-radius: 50%;
     animation: pauseProgress 1s linear;
+  }
+}
+
+@media (max-width: 768px) {
+  .sushi-plate-container {
+    --dish-display-size: 150px;
   }
 }
 </style>

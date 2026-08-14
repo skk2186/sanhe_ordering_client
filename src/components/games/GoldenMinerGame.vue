@@ -65,6 +65,8 @@ const { t } = useI18n()
 
 const GAME_DURATION = 45_000
 const BASE_HOOK_LENGTH = 34
+
+// hookMode 是核心状态机：swinging -> extending -> retracting -> swinging。
 const arenaRef = ref(null)
 const status = ref('idle')
 const score = ref(0)
@@ -101,6 +103,7 @@ const stateDescription = computed(() => {
 })
 
 const targetTypes = [
+  // weight 只影响携带目标时的回收速度，value 和碰撞半径彼此独立。
   { type: 'gold-small', image: goldSmallImage, value: 15, radius: 18, weight: 1 },
   { type: 'gold-large', image: goldLargeImage, value: 35, radius: 27, weight: 1.7 },
   { type: 'diamond', image: diamondImage, value: 60, radius: 18, weight: 0.8 },
@@ -108,6 +111,7 @@ const targetTypes = [
 ]
 
 const createTarget = (index) => {
+  // 稀有度由随机阈值决定，列/行网格加少量抖动可减少目标互相遮挡。
   const random = Math.random()
   const type = random > 0.9 ? targetTypes[2] : random > 0.65 ? targetTypes[1] : random > 0.28 ? targetTypes[0] : targetTypes[3]
   const column = index % 5
@@ -133,6 +137,10 @@ const targetStyle = (target) => ({
 
 const getMaxHookLength = () => Math.max(180, (arenaRef.value?.clientHeight || 420) * 0.82)
 
+/**
+ * 把角度和绳长换算成钩尖的像素坐标，再与百分比定位的目标做圆形碰撞检测。
+ * 计算始终基于实时 arena 尺寸，因此同一套规则可用于大屏和移动端。
+ */
 const findCollision = () => {
   const arena = arenaRef.value
   if (!arena) return null
@@ -155,6 +163,7 @@ const collectTarget = () => {
   caughtTarget.value = null
 }
 
+/** 按 hookMode 推进摆动、伸出和回收，并在一次完整回收后结算目标。 */
 const updateHook = (deltaSeconds) => {
   const arenaScale = Math.max(0.75, (arenaRef.value?.clientHeight || 420) / 420)
   if (hookMode.value === 'swinging') {
@@ -180,6 +189,7 @@ const updateHook = (deltaSeconds) => {
   }
 
   const weight = caughtTarget.value?.weight || 1
+  // 重物回收更慢；B 键快速回收覆盖重量速度，但仍走同一结算路径。
   const retractSpeed = (fastRetract.value ? 680 : 360 / weight) * arenaScale
   hookLength.value -= deltaSeconds * retractSpeed
   if (hookLength.value <= BASE_HOOK_LENGTH) {
@@ -193,6 +203,7 @@ const updateHook = (deltaSeconds) => {
 const gameLoop = (timestamp) => {
   if (status.value !== 'running') return
   if (!lastFrameTime) lastFrameTime = timestamp
+  // 限制单帧最大时间，避免页面切回前台后一次性扣完时间或钩子跳过目标。
   const deltaMs = Math.min(40, timestamp - lastFrameTime)
   lastFrameTime = timestamp
   remainingMs.value -= deltaMs
@@ -211,6 +222,7 @@ const saveBestScore = () => {
 }
 
 const startLoop = () => {
+  // 每次启动前取消旧帧并清空时间基准，保证重开不会计算上一局的时间差。
   cancelAnimationFrame(frameId)
   lastFrameTime = 0
   frameId = requestAnimationFrame(gameLoop)
@@ -230,6 +242,7 @@ const startGame = async () => {
   status.value = 'running'
   emit('start', { id: 'golden-miner' })
   emit('score-change', { id: 'golden-miner', score: 0 })
+  // 等 Vue 提交 arena 尺寸后再启动首帧，碰撞坐标才能使用真实容器大小。
   await nextTick()
   startLoop()
 }
@@ -255,6 +268,7 @@ const dropHook = () => {
 const useToolOrRetract = () => {
   if (status.value !== 'running') return
   if (hookMode.value !== 'swinging') {
+    // 钩子在途时 B 是紧急回收；空闲时 B 才消耗一次工具清除石块。
     hookMode.value = 'retracting'
     fastRetract.value = true
     return
@@ -278,6 +292,7 @@ const handleKeydown = (event) => {
   }
   if (event.repeat) return
   if (status.value === 'idle' || status.value === 'finished') {
+    // 结果态任意 A/B 可开始新局；Escape 已在上方优先处理为退出。
     void startGame()
     return
   }
@@ -292,6 +307,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  // requestAnimationFrame 和全局键盘监听都不随 Vue ref 自动释放。
   cancelAnimationFrame(frameId)
   window.removeEventListener('keydown', handleKeydown)
 })

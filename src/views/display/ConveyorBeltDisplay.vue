@@ -5,6 +5,23 @@
       <TopPlateProgress :progress="plateProgress" :formatted="formattedProgress" />
     </div>
 
+    <VirtualDiningAssistant
+      v-if="globalStore.voiceAssistantEnabled"
+      :hotwords="assistantHotwords"
+      :match-count="voiceMatchCount"
+      :recommendations="assistantRecommendations"
+      :feedback-message="assistantActionMessage"
+      :feedback-revision="assistantFeedbackRevision"
+      :feedback-audio-key="assistantFeedbackAudioKey"
+      :selected-item-id="assistantSelectedItemId"
+      :sound-enabled="globalStore.ttsEnabled"
+      :volume="globalStore.assistantVolume"
+      :continue-listening="assistantContinueListening"
+      :action-busy="assistantOrdering"
+      @transcript="handleVoiceTranscript"
+      @select-recommendation="handleAssistantRecommendationSelect"
+    />
+
     <!-- 中间传送带区域 -->
     <div class="middle-section">
       <!-- 传送带（组件化） -->
@@ -151,13 +168,6 @@
         @belt-speed-changed="handleBeltSpeedChanged"
     ></SettingDialog>
 
-    <VirtualDiningAssistant
-      v-if="globalStore.voiceAssistantEnabled"
-      :hotwords="assistantHotwords"
-      :match-count="voiceMatchCount"
-      @session-start="resetVoiceSearch"
-      @transcript="handleVoiceTranscript"
-    />
   </div>
 </template>
 
@@ -185,6 +195,14 @@ import { menuApi } from '@/api/menu.js';
 import { orderApi } from '@/api/order.js'
 import { useI18n } from '@/i18n'
 import { useGlobalStore } from '@/stores/global'
+import {
+  ASSISTANT_RECOMMENDATION_BATCH_SIZE,
+  findAssistantRecommendations,
+  getAssistantRecommendationBatch,
+  parseAssistantCommand,
+  planAssistantCartAdditions
+} from '@/utils/assistantRecommendations'
+import { ASSISTANT_AUDIO } from '@/utils/assistantAudio'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -201,70 +219,267 @@ const displayCategories = ref([])
 const productsLoading = ref(false)
 const productsError = ref('')
 const submittingSide = ref(null)
-const voiceSearchKeyword = ref('')
-const voiceMatchCount = ref(null)
 
+// 小禾会话状态由父页面保存：组件只负责录音和播报，页面负责商品、购物车与订单业务。
+const voiceSearchKeyword = ref('')
+const assistantRecommendationBatchIndex = ref(0)
+const voiceMatchCount = ref(null)
+const assistantActionMessage = ref('')
+const assistantFeedbackRevision = ref(0)
+const assistantFeedbackAudioKey = ref('')
+const assistantSelectedItemId = ref(null)
+const assistantContinueListening = ref(false)
+const assistantOrdering = ref(false)
+let assistantFeedbackTimer = null
+
+// 商品名同时作为 ASR 热词传给服务端；去重和数量上限避免启动报文过大。
 const assistantHotwords = computed(() => [...new Set(displaySushiData.value
   .flatMap((item) => [item.name, item.storeName])
   .filter((name) => typeof name === 'string' && name.trim())
   .map((name) => name.trim()))]
   .slice(0, 100))
 
-const normalizeVoiceText = (value) => String(value || '')
-  .toLowerCase()
-  .replace(/[\s，。！？、,.!?；;：“”‘’'"\-]/g, '')
-
 const findVoiceMatches = (items, transcript) => {
-  const query = normalizeVoiceText(transcript)
-  if (query.length < 2) return []
-
-  const searchableItems = items.filter((item) => item.available !== false)
-  const directMatches = searchableItems.filter((item) => {
-    const name = normalizeVoiceText(item.name || item.storeName)
-    return name && (query.includes(name) || name.includes(query))
-  })
-  if (directMatches.length) return directMatches
-
-  const intentWords = query
-    .replace(/我想吃|我想要|帮我找|帮我搜|查一下|搜索一下|有没有|想吃|找一下|给我来/g, '')
-    .match(/[\u4e00-\u9fa5a-z0-9]{2,}/g) || []
-  return searchableItems.filter((item) => {
-    const searchable = normalizeVoiceText([
-      item.name,
-      item.storeName,
-      item.description,
-      item.introduction,
-      ...(Array.isArray(item.tags) ? item.tags.map((tag) => tag.name || tag) : [])
-    ].filter(Boolean).join(' '))
-    return intentWords.some((word) => searchable.includes(word))
+  return findAssistantRecommendations({
+    items,
+    categories: displayCategories.value,
+    transcript
   })
 }
 
-const navigationItems = computed(() => {
-  if (!voiceSearchKeyword.value) return displaySushiData.value
+const navigationItems = computed(() => displaySushiData.value)
+
+// 推荐池保存完整排序结果，recommendations 只暴露当前最多六项的可见批次。
+const assistantRecommendationPool = computed(() => {
+  if (!voiceSearchKeyword.value) return []
   return findVoiceMatches(displaySushiData.value, voiceSearchKeyword.value)
 })
 
-const resetVoiceSearch = () => {
-  voiceSearchKeyword.value = ''
-  voiceMatchCount.value = null
+const assistantRecommendationBatchCount = computed(() => Math.max(
+  1,
+  Math.ceil(assistantRecommendationPool.value.length / ASSISTANT_RECOMMENDATION_BATCH_SIZE)
+))
+
+const assistantRecommendations = computed(() => {
+  return getAssistantRecommendationBatch(
+    assistantRecommendationPool.value,
+    assistantRecommendationBatchIndex.value
+  )
+})
+
+/**
+ * 发布一次业务反馈。revision 让相同文案也能触发子组件重新播报；定时清理只影响
+ * 提示状态，不清除推荐池，因此用户在连续会话超时后仍可继续查看当前菜品。
+ */
+const setAssistantFeedback = (message, audioKey = '') => {
+  assistantActionMessage.value = message
+  assistantFeedbackAudioKey.value = audioKey
+  assistantFeedbackRevision.value += 1
+  if (assistantFeedbackTimer) clearTimeout(assistantFeedbackTimer)
+  assistantFeedbackTimer = setTimeout(() => {
+    assistantActionMessage.value = ''
+    assistantFeedbackAudioKey.value = ''
+    assistantSelectedItemId.value = null
+    assistantFeedbackTimer = null
+  }, 3600)
 }
 
+/** 关闭助手时清空完整语音上下文，避免下次开启沿用旧批次或旧高亮。 */
+const resetVoiceSearch = () => {
+  voiceSearchKeyword.value = ''
+  assistantRecommendationBatchIndex.value = 0
+  voiceMatchCount.value = null
+  assistantActionMessage.value = ''
+  assistantFeedbackAudioKey.value = ''
+  assistantSelectedItemId.value = null
+  assistantContinueListening.value = false
+}
+
+watch(() => globalStore.voiceAssistantEnabled, (enabled) => {
+  if (!enabled) resetVoiceSearch()
+})
+
+/**
+ * 语音命令的页面级分派入口。
+ * 解析器只返回无副作用的命令对象；本函数再结合当前推荐批次、购物车和下单状态
+ * 做上下文校验，确保序号不会引用已经换掉的推荐列表。
+ */
 const handleVoiceTranscript = (text) => {
   const query = String(text || '').trim()
-  if (!query) return
+  if (!query || assistantOrdering.value) return
 
-  const matches = findVoiceMatches(displaySushiData.value, query)
-  voiceSearchKeyword.value = query
-  voiceMatchCount.value = matches.length
+  const command = parseAssistantCommand({
+    transcript: query,
+    recommendations: assistantRecommendations.value,
+    items: displaySushiData.value
+  })
 
-  if (!matches.length) {
-    ElMessage.info(t('assistant.noMatches', { query }))
+  if (command.type === 'order_all') {
+    void placeAllAssistantOrders()
     return
   }
 
-  showSushiNavigation.value = true
+  if (command.type === 'end_session') {
+    assistantContinueListening.value = false
+    setAssistantFeedback(t('assistant.sessionEnded'), ASSISTANT_AUDIO.SESSION_ENDED)
+    return
+  }
+
+  if (command.type === 'next_batch') {
+    if (!assistantRecommendationPool.value.length) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationContextMissing'), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+
+    if (assistantRecommendationBatchCount.value <= 1) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationSingleBatch'), ASSISTANT_AUDIO.SINGLE_BATCH)
+      return
+    }
+
+    const nextIndex = (assistantRecommendationBatchIndex.value + 1)
+      % assistantRecommendationBatchCount.value
+    assistantRecommendationBatchIndex.value = nextIndex
+    assistantSelectedItemId.value = null
+    assistantContinueListening.value = true
+    setAssistantFeedback(t(nextIndex === 0
+      ? 'assistant.recommendationBatchRestarted'
+      : 'assistant.recommendationBatchChanged', {
+      count: assistantRecommendations.value.length
+    }), nextIndex === 0 ? ASSISTANT_AUDIO.BATCH_RESTARTED : ASSISTANT_AUDIO.NEXT_BATCH)
+    return
+  }
+
+  if (command.type === 'select_many') {
+    if (!assistantRecommendations.value.length) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationContextMissing'), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+
+    const missing = command.selections.filter((selection) => !selection.item)
+    if (missing.length) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationIndexesMissing', {
+        numbers: missing.map((selection) => selection.index + 1).join('、')
+      }), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+
+    addAssistantItems(command.selections)
+    return
+  }
+
+  if (command.type === 'select') {
+    if (command.source === 'ordinal' && !assistantRecommendations.value.length) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationContextMissing'), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+    if (!command.item) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.recommendationIndexMissing', {
+        number: (command.index ?? 0) + 1
+      }), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+
+    addAssistantItem(command.item, command.quantity)
+    return
+  }
+
+  const matches = findVoiceMatches(displaySushiData.value, query)
+  voiceMatchCount.value = matches.length
+
+  if (!matches.length) {
+    assistantContinueListening.value = true
+    const message = t('assistant.noMatches', { query })
+    setAssistantFeedback(message, ASSISTANT_AUDIO.NO_MATCH)
+    ElMessage.info(message)
+    return
+  }
+
+  voiceSearchKeyword.value = query
+  assistantRecommendationBatchIndex.value = 0
+  assistantContinueListening.value = true
+  setAssistantFeedback(t(matches.length > ASSISTANT_RECOMMENDATION_BATCH_SIZE
+    ? 'assistant.recommendationReadyPaged'
+    : 'assistant.recommendationReady', {
+    count: Math.min(matches.length, ASSISTANT_RECOMMENDATION_BATCH_SIZE),
+    total: matches.length
+  }), matches.length > ASSISTANT_RECOMMENDATION_BATCH_SIZE
+    ? ASSISTANT_AUDIO.RESULTS_PAGED
+    : ASSISTANT_AUDIO.RESULTS_READY)
+
 }
+
+/**
+ * 原子执行一条或多条语音加购指令。
+ * 先用 planAssistantCartAdditions 对两侧购物车做完整容量规划；只有整批都能放下时
+ * 才逐项调用既有 addToCart，从而避免“第一件成功、第二件失败”的半完成状态。
+ */
+const addAssistantItems = (selections) => {
+  const normalizedSelections = selections.map((selection) => ({
+    ...selection,
+    quantity: Math.min(4, Math.max(1, Number(selection.quantity) || 1))
+  }))
+  const requestedQuantity = normalizedSelections
+    .reduce((total, selection) => total + selection.quantity, 0)
+  const totalRemaining = (4 - getCartCount('left')) + (4 - getCartCount('right'))
+  const additions = planAssistantCartAdditions({
+    selections: normalizedSelections,
+    carts: { left: cartOf('left'), right: cartOf('right') }
+  })
+
+  if (!additions) {
+    assistantContinueListening.value = true
+    setAssistantFeedback(t(totalRemaining === 0 ? 'assistant.cartFull' : 'assistant.batchNotEnoughSpace', {
+      quantity: requestedQuantity,
+      remaining: totalRemaining
+    }), totalRemaining === 0
+      ? ASSISTANT_AUDIO.CART_FULL
+      : ASSISTANT_AUDIO.CART_SPACE_INSUFFICIENT)
+    return false
+  }
+
+  for (const addition of additions) {
+    const result = addToCart(addition.item, addition.side)
+    if (!result?.ok) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.addFailed'), ASSISTANT_AUDIO.ADD_FAILED)
+      return false
+    }
+  }
+
+  const lastSelection = normalizedSelections.at(-1)
+  assistantSelectedItemId.value = lastSelection.item.id
+  assistantContinueListening.value = true
+  if (normalizedSelections.length === 1) {
+    const [selection] = normalizedSelections
+    const sides = [...new Set(additions.map((addition) => addition.side))]
+    const sideLabel = sides.length === 1
+      ? t(sides[0] === 'left' ? 'assistant.leftSide' : 'assistant.rightSide')
+      : t('assistant.bothSides')
+    setAssistantFeedback(t(selection.quantity > 1
+      ? 'assistant.addedQuantityToCart'
+      : 'assistant.addedToCart', {
+      name: selection.item.name || selection.item.storeName,
+      side: sideLabel,
+      quantity: selection.quantity
+    }), ASSISTANT_AUDIO.ADDED)
+  } else {
+    setAssistantFeedback(t('assistant.addedMultipleToCart', {
+      count: normalizedSelections.length,
+      quantity: requestedQuantity
+    }), ASSISTANT_AUDIO.ADDED)
+  }
+  return true
+}
+
+const addAssistantItem = (item, quantity = 1) => addAssistantItems([{ item, quantity }])
+
+const handleAssistantRecommendationSelect = (item) => addAssistantItem(item, 1)
 
 // 从服务器获取商品数据
 const fetchSushiData = async () => {
@@ -467,6 +682,7 @@ const addToCart = (item, side) => {
   } else if (result.reason === 'max_quantity') {
     // 静默处理数量超限
   }
+  return result
 }
 
 // 添加到指定侧的购物车 - 暂未使用
@@ -542,22 +758,27 @@ const openOrderHistory = () => {
   orderHistoryVisible.value = true
 }
 
-const placeOrder = async (side) => {
-  if (submittingSide.value) return
+const placeOrder = async (side, options = {}) => {
+  const { notify = true, allowWhileAssistantOrdering = false } = options
+  if (submittingSide.value || (assistantOrdering.value && !allowWhileAssistantOrdering)) {
+    return { status: 'busy' }
+  }
 
   const cart = cartOf(side)
   const cartItems = cart.filter(item => item !== null)
   if (cartItems.length === 0) {
     // 静默处理空购物车，不显示提醒
-    return
+    return { status: 'empty' }
   }
 
   const invalidItem = cartItems.find(item => !Number.isFinite(Number(item.id)) || !item.sku)
   if (invalidItem) {
-    ElMessage.error(t('cart.incompleteItem', {
-      name: invalidItem.name || invalidItem.storeName || t('common.unknown')
-    }))
-    return
+    if (notify) {
+      ElMessage.error(t('cart.incompleteItem', {
+        name: invalidItem.name || invalidItem.storeName || t('common.unknown')
+      }))
+    }
+    return { status: 'invalid', item: invalidItem }
   }
 
   const orderItems = cartItems.map(item => ({
@@ -651,13 +872,61 @@ const placeOrder = async (side) => {
       resetLater(2000)
     }
 
-    ElMessage.success(t('display.orderSubmitted', { orderId: backendOrderId }))
+    if (notify) ElMessage.success(t('display.orderSubmitted', { orderId: backendOrderId }))
+    return { status: 'success', orderId: backendOrderId }
   } catch (error) {
     console.error('提交订单失败:', error)
-    ElMessage.error(t('display.orderFailed'))
+    if (notify) ElMessage.error(t('display.orderFailed'))
+    return { status: 'failed', error }
   } finally {
     submittingSide.value = null
   }
+}
+
+/**
+ * 按左、右顺序提交所有非空购物车。
+ * 后端接口一次只接受一侧购物车，因此这里串行调用 placeOrder，避免共享桌台订单
+ * 初始化和 submittingSide 状态产生竞争；任一侧失败都会保留失败提示供用户重试。
+ */
+const placeAllAssistantOrders = async () => {
+  if (assistantOrdering.value) return
+  if (submittingSide.value) {
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.orderSubmitting'), ASSISTANT_AUDIO.ORDER_SUBMITTING)
+    return
+  }
+
+  const sides = ['left', 'right'].filter((side) => cartOf(side).some((item) => item !== null))
+  assistantSelectedItemId.value = null
+
+  if (!sides.length) {
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.orderEmpty'), ASSISTANT_AUDIO.ORDER_EMPTY)
+    return
+  }
+
+  assistantOrdering.value = true
+  assistantContinueListening.value = false
+  setAssistantFeedback(t('assistant.orderSubmitting'), ASSISTANT_AUDIO.ORDER_SUBMITTING)
+
+  const results = []
+  try {
+    for (const side of sides) {
+      results.push(await placeOrder(side, {
+        notify: false,
+        allowWhileAssistantOrdering: true
+      }))
+    }
+  } finally {
+    assistantOrdering.value = false
+  }
+
+  const allSucceeded = results.every((result) => result.status === 'success')
+  assistantContinueListening.value = !allSucceeded
+  setAssistantFeedback(
+    t(allSucceeded ? 'assistant.orderSuccess' : 'assistant.orderFailed'),
+    allSucceeded ? ASSISTANT_AUDIO.ORDER_SUCCESS : ASSISTANT_AUDIO.ORDER_FAILED
+  )
 }
 
 // 点餐记录弹窗状态
@@ -873,6 +1142,7 @@ onUnmounted(() => {
   if (dragState.longPressTimer) {
     clearTimeout(dragState.longPressTimer)
   }
+  if (assistantFeedbackTimer) clearTimeout(assistantFeedbackTimer)
 })
 </script>
 
