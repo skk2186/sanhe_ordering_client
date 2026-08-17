@@ -638,7 +638,7 @@ watch([phase, errorCode], ([currentPhase, currentErrorCode]) => {
   const fallbackMessage = translatedMessage === messageKey
     ? t('assistant.errors.service_unavailable')
     : translatedMessage
-  const retryable = ['recognition_failed', 'speech_too_short', 'no_speech', 'processing_timeout', 'audio_too_long']
+  const retryable = ['recognition_failed', 'speech_too_short', 'no_speech', 'processing_timeout', 'audio_too_long', 'service_busy']
     .includes(currentErrorCode)
 
   handlingErrorPrompt = true

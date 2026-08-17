@@ -230,6 +230,7 @@ const assistantFeedbackAudioKey = ref('')
 const assistantSelectedItemId = ref(null)
 const assistantContinueListening = ref(false)
 const assistantOrdering = ref(false)
+const lastAssistantOrderedItem = ref(null)
 let assistantFeedbackTimer = null
 
 // 商品名同时作为 ASR 热词传给服务端；去重和数量上限避免启动报文过大。
@@ -293,6 +294,7 @@ const resetVoiceSearch = () => {
   assistantFeedbackAudioKey.value = ''
   assistantSelectedItemId.value = null
   assistantContinueListening.value = false
+  lastAssistantOrderedItem.value = null
 }
 
 watch(() => globalStore.voiceAssistantEnabled, (enabled) => {
@@ -316,6 +318,17 @@ const handleVoiceTranscript = (text) => {
 
   if (command.type === 'order_all') {
     void placeAllAssistantOrders()
+    return
+  }
+
+  if (command.type === 'repeat_last') {
+    if (!lastAssistantOrderedItem.value) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.repeatContextMissing'), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+
+    addAssistantItem(lastAssistantOrderedItem.value, command.quantity)
     return
   }
 
@@ -454,6 +467,7 @@ const addAssistantItems = (selections) => {
 
   const lastSelection = normalizedSelections.at(-1)
   assistantSelectedItemId.value = lastSelection.item.id
+  lastAssistantOrderedItem.value = lastSelection.item
   assistantContinueListening.value = true
   if (normalizedSelections.length === 1) {
     const [selection] = normalizedSelections

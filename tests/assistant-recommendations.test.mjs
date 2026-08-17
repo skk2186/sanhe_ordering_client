@@ -9,6 +9,7 @@ import {
   getAssistantRecommendationListWidth,
   isAssistantEndSessionCommand,
   isAssistantPlaceOrderCommand,
+  isAssistantRepeatLastCommand,
   isXiaoheWakePhrase,
   parseAssistantCommand,
   planAssistantCartAdditions
@@ -34,8 +35,32 @@ const broadIntentItems = [
   { id: 102, name: '海鲜乌冬面', categoryId: 70, keyword: '海鲜乌冬,乌冬面,主食', sales: 63, available: true },
   { id: 103, name: '肥牛乌冬面', categoryId: 70, keyword: '牛肉乌冬,肥牛,主食', sales: 58, available: true },
   { id: 104, name: '鳗鱼炒饭', categoryId: 70, keyword: '鳗鱼炒饭,米饭,主食', sales: 67, available: true },
-  { id: 105, name: '天妇罗拼盘', categoryId: 80, keyword: '天妇罗,炸物', description: '轻薄面衣现点现炸', sales: 76, available: true }
+  { id: 105, name: '天妇罗拼盘', categoryId: 80, keyword: '天妇罗,炸物', description: '轻薄面衣现点现炸', sales: 76, available: true },
+  { id: 106, name: '黄瓜细卷', categoryId: 21, keyword: '黄瓜卷,素食', description: '爽脆黄瓜与芝麻醋饭，清淡解腻', sales: 35, available: true }
 ]
+
+test('recognizes a context-only request to add one more of the last dish', () => {
+  for (const transcript of ['再来一份', '小禾再来一个吧', '刚才点的再来一盘', '那个又给我来一份']) {
+    assert.equal(isAssistantRepeatLastCommand(transcript), true, transcript)
+    assert.deepEqual(parseAssistantCommand({ transcript, items }), {
+      type: 'repeat_last',
+      quantity: 1
+    })
+  }
+})
+
+test('does not treat a named dish or a different quantity as repeating the last dish', () => {
+  for (const transcript of ['再来一份三文鱼握寿司', '三文鱼握寿司再来一份', '再来两份', '不要再来一份']) {
+    assert.equal(isAssistantRepeatLastCommand(transcript), false, transcript)
+  }
+
+  assert.deepEqual(parseAssistantCommand({ transcript: '再来一份三文鱼握寿司', items }), {
+    type: 'select',
+    source: 'menu_name',
+    item: items[0],
+    quantity: 1
+  })
+})
 
 test('recommends drink-category items without replacing the conveyor menu', () => {
   const result = findAssistantRecommendations({ items, categories, transcript: '我想喝点饮品' })
@@ -62,6 +87,27 @@ test('expands other stable food-category aliases without mixing adjacent staple 
 
   assert.deepEqual(rice.map((item) => item.id), [104])
   assert.deepEqual(fried.map((item) => item.id), [105])
+})
+
+test('grounds vague rich and light preferences in real menu wording', () => {
+  for (const transcript of ['想吃点油腻的', '来点重口的', '有没有浓郁一点的']) {
+    const result = findAssistantRecommendations({ items: broadIntentItems, categories, transcript })
+    assert.deepEqual(result.slice(0, 4).map((item) => item.id), [105, 101, 104, 103], transcript)
+    assert.equal(result.some((item) => item.id === 106), false, transcript)
+  }
+
+  for (const transcript of ['想吃清淡一点的', '来点解腻的', '不要太油腻']) {
+    const result = findAssistantRecommendations({ items: broadIntentItems, categories, transcript })
+    assert.equal(result[0]?.id, 106, transcript)
+    assert.equal(result.some((item) => item.id === 105), false, transcript)
+  }
+})
+
+test('falls back to best sellers for genuinely open-ended recommendations', () => {
+  for (const transcript of ['随便推荐几个', '有什么好吃的', '来点店里热门的']) {
+    const result = findAssistantRecommendations({ items: broadIntentItems, categories, transcript })
+    assert.deepEqual(result.slice(0, 3).map((item) => item.id), [101, 105, 104], transcript)
+  }
 })
 
 test('selects the second recommendation and keeps the requested quantity', () => {
@@ -268,7 +314,9 @@ test('provides fixed order phrases as recognition hotwords', () => {
     '下单',
     '帮我下单',
     '全部下单',
-    '提交订单'
+    '提交订单',
+    '再来一份',
+    '再来一个'
   ])
 })
 

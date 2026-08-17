@@ -33,5 +33,6 @@ test('maps assistant errors to the matching recorded prompt', () => {
   assert.equal(getAssistantErrorAudioKey('permission_denied'), ASSISTANT_AUDIO.MIC_PERMISSION)
   assert.equal(getAssistantErrorAudioKey('speech_too_short'), ASSISTANT_AUDIO.REPEAT)
   assert.equal(getAssistantErrorAudioKey('service_unavailable'), ASSISTANT_AUDIO.SERVICE_UNAVAILABLE)
+  assert.equal(getAssistantErrorAudioKey('service_busy'), '')
   assert.equal(getAssistantErrorAudioKey('microphone_busy'), '')
 })

@@ -13,7 +13,9 @@ export const ASSISTANT_ORDER_HOTWORDS = Object.freeze([
   '下单',
   '帮我下单',
   '全部下单',
-  '提交订单'
+  '提交订单',
+  '再来一份',
+  '再来一个'
 ])
 
 export const ASSISTANT_END_SESSION_HOTWORDS = Object.freeze([
@@ -40,16 +42,33 @@ export const getAssistantRecommendationListWidth = (
   return (safeCount * cardWidth) + ((safeCount - 1) * gap)
 }
 
-// 把顾客常用的宽泛说法映射到菜单中更常见的名称、分类和标签词。
-// 这里只维护稳定的餐饮同类词，不推断“清淡”“适合儿童”等依赖门店标注的属性。
+// 把顾客常用的宽泛说法映射到菜单中更常见的名称、分类、标签和描述词。
+// 口味偏好只使用菜品已有文案能够支撑的稳定特征，不推断过敏原或健康功效。
 const ASSISTANT_FOOD_CONCEPTS = Object.freeze([
   { aliases: ['面', '面食', '面条', '汤面'], targets: ['拉面', '乌冬', '荞麦', '炒面', '面'] },
   { aliases: ['饭', '米饭', '饭类'], targets: ['炒饭', '盖饭', '丼', '米饭', '饭'] },
   { aliases: ['喝的', '饮料', '饮品'], targets: ['饮品', '茶', '果汁', '苏打', '气泡饮', '酒'] },
   { aliases: ['炸', '炸物', '油炸', '炸的'], targets: ['炸物', '油炸', '天妇罗', '炸'] },
   { aliases: ['生鱼片'], targets: ['刺身', '生鱼片'] },
-  { aliases: ['甜点', '甜食'], targets: ['甜品', '甜点', '蛋糕', '冰淇淋', '布丁'] }
+  { aliases: ['甜点', '甜食'], targets: ['甜品', '甜点', '蛋糕', '冰淇淋', '布丁'] },
+  {
+    aliases: ['油腻', '油一点', '油香', '重口', '口味重', '浓郁', '浓厚', '香一点'],
+    rejectAliases: ['不油', '少油', '别太油', '不要油', '不要太油', '不想吃油', '不想太油', '清淡', '解腻'],
+    targets: ['炸物', '油炸', '天妇罗', '炸', '唐扬', '可乐饼', '芝士', '蛋黄酱', '豚骨', '肥牛', '炒饭', '蒲烧', '炙烤', '油脂', '浓郁', '浓厚', '外酥']
+  },
+  {
+    aliases: ['清淡', '清爽', '解腻', '少油', '不油腻', '别太油', '不要太油', '不想太油'],
+    targets: ['清淡', '清爽', '解腻', '黄瓜', '毛豆', '素食', '刺身', '茶', '苏打', '海盐']
+  },
+  { aliases: ['酥脆', '脆一点', '脆的'], targets: ['酥脆', '外酥', '天妇罗', '炸物', '炸', '唐扬', '可乐饼'] },
+  { aliases: ['热乎', '热一点', '暖和', '热的'], targets: ['热菜', '拉面', '乌冬', '汤', '炙烤', '烤', '炸物'] },
+  { aliases: ['顶饱', '饱腹', '管饱', '主食'], targets: ['主食', '拉面', '乌冬', '炒饭', '米饭', '饭', '面'] }
 ])
+
+const isAssistantPopularFallback = (value) => {
+  const query = normalizeAssistantText(value)
+  return /随便|都可以|都行|看着来|看着推荐|招牌|人气|热门|卖得好|推荐一下|推荐几个|有什么好吃/.test(query)
+}
 
 /**
  * 获取循环分页后的推荐批次。
@@ -159,9 +178,10 @@ const findAssistantFoodConcepts = (value) => {
   const subject = extractAssistantSubject(value)
   if (!subject) return []
 
-  return ASSISTANT_FOOD_CONCEPTS.filter(({ aliases }) => aliases.some((alias) => (
-    alias.length === 1 ? subject === alias : subject.includes(alias)
-  )))
+  return ASSISTANT_FOOD_CONCEPTS.filter(({ aliases, rejectAliases = [] }) => (
+    !rejectAliases.some((alias) => subject.includes(alias))
+    && aliases.some((alias) => alias.length === 1 ? subject === alias : subject.includes(alias))
+  ))
 }
 
 /**
@@ -174,7 +194,8 @@ export const findAssistantRecommendations = ({ items = [], categories = [], tran
 
   const intentWords = extractAssistantTerms(query)
   const foodConcepts = findAssistantFoodConcepts(query)
-  if (!intentWords.length && !foodConcepts.length) return []
+  const popularFallback = isAssistantPopularFallback(query)
+  if (!intentWords.length && !foodConcepts.length && !popularFallback) return []
   const categoryNames = new Map(categories.map((category) => [
     Number(category.id),
     normalizeAssistantText(category.name || '')
@@ -195,7 +216,9 @@ export const findAssistantRecommendations = ({ items = [], categories = [], tran
         item.introduction
       ].filter(Boolean).join(' '))
 
-      let score = 0
+      // 宽泛的“随便推荐”给所有可售菜品一个很低的基础分，再由销量稳定排序。
+      // 一旦同时说出具体分类或口味，其语义分会远高于这个兜底分。
+      let score = popularFallback ? 1 : 0
       // 名称匹配必须明显高于普通关键词命中，避免描述较长的商品反超直呼菜名。
       if (name && query === name) score += 200
       else if (name && query.includes(name)) score += 120
@@ -307,6 +330,20 @@ export const isAssistantNextBatchCommand = (value) => {
 }
 
 /**
+ * 判断用户是否只要求把最近一次选择的菜再加一份。
+ * 这里刻意使用完整句式匹配，带有具体菜名的“再来一份三文鱼”应继续走菜名选择，
+ * 不能错误引用上一道菜。
+ */
+export const isAssistantRepeatLastCommand = (value) => {
+  const query = normalizeAssistantText(value).replace(/^小禾(?:小禾)?/, '')
+  const quantityUnit = '(?:一|1)(?:份|个|盘|杯|碗|盒|瓶)'
+  const previousItem = '(?:刚才|刚刚|上次|上一道|上一个|上一份|那个|这个)(?:点的|选的|那道|那份)?'
+
+  return new RegExp(`^(?:再|还|又)(?:给我)?来${quantityUnit}(?:吧|啊|呀|哦)?$`).test(query)
+    || new RegExp(`^${previousItem}(?:再|还|又)(?:给我)?来${quantityUnit}(?:吧|啊|呀|哦)?$`).test(query)
+}
+
+/**
  * 判断是否是明确的“提交现有购物车”指令。
  * 先修正“下订单/下载”等常见同音结果，再排除否定句和询问句，避免误下单。
  */
@@ -345,7 +382,7 @@ export const isAssistantEndSessionCommand = (value) => {
 
 /**
  * 将一条识别文本归类为页面可以执行的稳定命令对象。
- * 优先级依次为：提交订单、换批、结束会话、序号选择、菜名选择、重新推荐。
+ * 优先级依次为：提交订单、重复上一道菜、换批、结束会话、序号选择、菜名选择、重新推荐。
  * 先处理高风险的完整指令，可避免“全部下单”被普通商品搜索吞掉。
  */
 export const parseAssistantCommand = ({ transcript = '', recommendations = [], items = [] }) => {
@@ -355,6 +392,10 @@ export const parseAssistantCommand = ({ transcript = '', recommendations = [], i
 
   if (isAssistantPlaceOrderCommand(query)) {
     return { type: 'order_all' }
+  }
+
+  if (isAssistantRepeatLastCommand(query)) {
+    return { type: 'repeat_last', quantity: 1 }
   }
 
   if (isAssistantNextBatchCommand(query)) {

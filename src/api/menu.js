@@ -1,4 +1,5 @@
 import { request } from '@/utils/request'
+import { replaceSeededMenuImage } from '@/utils/menuImageReplacements'
 
 import service from '@/utils/request'
 
@@ -6,7 +7,7 @@ const BACKEND_FILE_PATH_PREFIX = '/admin-api/infra/file/'
 const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
 
 export const normalizeProductImage = (value) => {
-  const imageUrl = String(value || '').trim()
+  const imageUrl = replaceSeededMenuImage(value)
   if (!imageUrl) return ''
 
   try {
