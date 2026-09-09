@@ -47,7 +47,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/app-api': {
-        target: 'http://127.0.0.1:48081',
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:48081',
         changeOrigin: true,
         ws: true,
         secure: false,
