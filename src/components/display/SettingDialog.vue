@@ -3,21 +3,45 @@
       v-model="visible"
       :title="copy.systemSettings"
       width="min(1300px, 94vw)"
+      class="luxury-settings-dialog"
+      :style="{ '--settings-theme-bg': `url(${selectedThemePreview.img})` }"
       center
-      :close-on-click-modal="!selectedGame"
-      :close-on-press-escape="!selectedGame"
   >
+    <section
+      class="settings-hero"
+      :style="{ backgroundImage: `url(${selectedThemePreview.img})` }"
+      aria-labelledby="settings-hero-title"
+    >
+      <div class="settings-hero__veil"></div>
+      <div class="settings-hero__content">
+        <span class="settings-hero__eyebrow">AI DINING TABLE</span>
+        <h2 id="settings-hero-title">{{ copy.systemSettings }}</h2>
+        <p>{{ selectedThemePreview.title }}</p>
+      </div>
+      <div class="settings-hero__badge">
+        <span class="settings-hero__dot"></span>
+        <span>{{ copy.themeSettings }}</span>
+      </div>
+    </section>
+
     <!-- 设置选项卡 -->
     <el-tabs v-model="activeTab" class="setting-tabs">
       <!-- 主题设置选项卡 -->
-      <el-tab-pane :label="copy.themeSettings" name="theme">
+      <el-tab-pane name="theme">
+        <template #label>
+          <span class="setting-tab-label"><el-icon><Picture /></el-icon>{{ copy.themeSettings }}</span>
+        </template>
         <div class="theme-item">
           <div
               class="theme-card"
-              v-for="(item, index) in themeItem"
+              v-for="item in themeItem"
               :key="item.key"
               @click="selectTheme(item)"
-              :class="{ 'theme-card--active': selectedThemeKey === item.key }"
+              :class="{
+                'theme-card--active': selectedThemeKey === item.key,
+                'theme-card--disabled': themeChanging
+              }"
+              :aria-disabled="themeChanging"
           >
             <!-- 选中状态标识 -->
             <div class="theme-card__check" v-if="selectedThemeKey === item.key">
@@ -47,35 +71,11 @@
         </section>
       </el-tab-pane>
 
-      <!-- 游戏模式 -->
-      <el-tab-pane :label="copy.gameMode" name="games">
-        <div class="game-slots">
-          <article v-for="game in gameConfigs" :key="game.id" class="game-slot">
-            <div class="game-slot__cover">
-              <img :src="game.cover" :alt="t(game.titleKey)">
-              <span class="game-slot__status">{{ t(`games.status.${game.status}`) }}</span>
-            </div>
-            <div class="game-slot__content">
-              <div>
-                <h3 class="game-slot__name">{{ t(game.titleKey) }}</h3>
-                <p class="game-slot__description">{{ t(game.descriptionKey) }}</p>
-              </div>
-              <div class="game-slot__score">
-                <el-icon><Trophy /></el-icon>
-                <span>{{ $t('games.bestScore') }}: {{ game.bestScore }}</span>
-              </div>
-              <el-button class="game-slot__play" type="primary" size="large" @click="openGame(game)">
-                <el-icon><VideoPlay /></el-icon>
-                {{ $t('games.play') }}
-              </el-button>
-            </div>
-          </article>
-        </div>
-        <p class="game-reward-note">{{ $t('games.rewardNotice') }}</p>
-      </el-tab-pane>
-
       <!-- 传送带设置选项卡 -->
-      <el-tab-pane :label="copy.voiceMode" name="voice">
+      <el-tab-pane name="voice">
+        <template #label>
+          <span class="setting-tab-label"><el-icon><Microphone /></el-icon>{{ copy.voiceMode }}</span>
+        </template>
         <div class="voice-settings">
           <section class="voice-setting-row">
             <div class="voice-setting-row__icon" aria-hidden="true">
@@ -137,7 +137,10 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane :label="copy.conveyorSettings" name="conveyor">
+      <el-tab-pane name="conveyor">
+        <template #label>
+          <span class="setting-tab-label"><el-icon><VideoPlay /></el-icon>{{ copy.conveyorSettings }}</span>
+        </template>
         <div class="conveyor-settings">
           <div class="setting-section">
             <h3 class="section-title">{{ copy.movementDirection }}</h3>
@@ -195,40 +198,27 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="handleCancel" size="large">{{ copy.cancel }}</el-button>
+        <el-button class="settings-close" @click="handleCancel" size="large">{{ copy.close }}</el-button>
       </div>
     </template>
   </el-dialog>
 
-  <Teleport to="body">
-    <div v-if="selectedGame" class="game-stage-overlay" role="dialog" aria-modal="true">
-      <component
-        :is="selectedGame.component"
-        :key="selectedGame.id"
-        :best-score="selectedGame.bestScore"
-        @start="handleGameStart"
-        @score-change="handleGameScoreChange"
-        @finish="handleGameFinish"
-        @close="handleGameClose"
-      />
-    </div>
-  </Teleport>
 </template>
 
 <script setup>
-import { Check, Headset, Microphone, Trophy, VideoPlay } from '@element-plus/icons-vue'
+import { Check, Headset, Microphone, Picture } from '@element-plus/icons-vue'
 import { ElDialog, ElTabs, ElTabPane, ElSlider, ElSwitch } from "element-plus";
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { useGlobalStore } from '@/stores/global'
 import { useI18n } from '@/i18n'
-import { createGameConfigs } from '@/config/games'
 
 // 定义Props和Emits
 const emit = defineEmits(['update:modelValue', 'theme-changed', 'belt-direction-changed', 'belt-speed-changed', 'language-changed'])
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   // 支持父组件传入默认主题key
-  defaultThemeKey: { type: String, default: "zhenxian" }
+  defaultThemeKey: { type: String, default: "zhenxian" },
+  themeChanging: { type: Boolean, default: false }
 })
 
 // 弹窗显示状态（双向绑定）
@@ -248,9 +238,6 @@ const languageOptions = [
   { code: 'en-US', label: 'English' },
   { code: 'ja-JP', label: '日本語' }
 ]
-
-const gameConfigs = ref(createGameConfigs())
-const selectedGame = ref(null)
 
 const currentLanguage = computed(() => (
   languageOptions.some(language => language.code === globalStore.language)
@@ -289,37 +276,29 @@ const copy = computed(() => ({
   assistantVolume: t('settings.assistantVolume'),
   enable: t('common.enable'),
   disable: t('common.disable'),
-  cancel: t('common.cancel')
+  cancel: t('common.cancel'),
+  close: t('common.close')
 }))
 
-// 主题数据（包含key）
+// 展示版只开放主题 B、C；主题 A 的旧缓存会在初始化时回退到主题 B。
 const themeItem = [
-  { title: "AI老头", img: "/images/background22.jpg", key: "ailaotou" },
-  { title: "争鲜经典", img: "/images/background1.jpg", key: 'zhenxian'},
-  { title: "蜡笔小新", img: "/images/background2.jpg", key: 'xiaoxin' }
+  { title: "蜡笔小新·海滩", img: "/images/ui/b/background.png", key: 'zhenxian'},
+  { title: "海底贝壳", img: "/images/ui/c/background.png", key: 'xiaoxin' }
 ]
+const availableThemeKeys = new Set(themeItem.map(item => item.key))
+const fallbackThemeKey = 'zhenxian'
 
-
-// 2. 选中主题key：直接初始化为 "ailaotou"
-const selectedThemeKey = ref("xiaoxin");
+// 当前样板默认进入主题 B，用户仍可在设置中切换并保存其他主题。
+const selectedThemeKey = ref(
+  availableThemeKeys.has(props.defaultThemeKey) ? props.defaultThemeKey : fallbackThemeKey
+)
+const selectedThemePreview = computed(() => (
+  themeItem.find(item => item.key === selectedThemeKey.value) || themeItem[0]
+))
 
 // 传送带设置状态
 const beltDirection = ref('left') // 'left' 或 'right'
 const beltSpeed = ref(1) // 0.2-3 之间的速度值
-
-// 3. 初始化函数：直接设置 data-theme 和传送带设置
-const initTheme = () => {
-  // 获取HTML根元素（<html>标签）
-  const htmlRoot = document.documentElement;
-  // 强制设置 data-theme 为 "ailaotou"
-  htmlRoot.setAttribute("data-theme", selectedThemeKey.value);
-
-  // （可选）同步初始化全局CSS变量（如背景图）
-  const defaultTheme = themeItem.find(item => item.key === "xiaoxin");
-  if (defaultTheme) {
-    htmlRoot.style.setProperty("--theme-bg", `url(${defaultTheme.img})`);
-  }
-};
 
 // 初始化传送带设置
 const initBeltSettings = () => {
@@ -342,7 +321,8 @@ const initBeltSettings = () => {
 
 // 选中主题逻辑
 const selectTheme = (item) => {
-  selectedThemeKey.value = item.key;
+  if (props.themeChanging || item.key === selectedThemeKey.value) return
+  selectedThemeKey.value = item.key
   emit('theme-changed', item); // 向父组件发送完整主题信息
 }
 
@@ -351,42 +331,6 @@ const selectLanguage = (language) => {
   globalStore.saveLanguage()
   document.documentElement.lang = language
   emit('language-changed', language)
-}
-
-const findGame = (id) => gameConfigs.value.find(game => game.id === id)
-
-const openGame = (game) => {
-  game.status = 'playing'
-  selectedGame.value = game
-  visible.value = false
-}
-
-const handleGameStart = ({ id }) => {
-  const game = findGame(id)
-  if (game) game.status = 'playing'
-}
-
-const handleGameScoreChange = ({ id, score }) => {
-  const game = findGame(id)
-  if (game && score > game.bestScore) game.bestScore = score
-}
-
-const handleGameFinish = ({ id, bestScore }) => {
-  const game = findGame(id)
-  if (!game) return
-  game.status = 'finished'
-  game.bestScore = Math.max(game.bestScore, Number(bestScore) || 0)
-}
-
-const handleGameClose = ({ id }) => {
-  const game = findGame(id)
-  if (game) {
-    game.bestScore = Math.max(game.bestScore, Number(localStorage.getItem(game.storageKey)) || 0)
-    game.status = 'ready'
-  }
-  selectedGame.value = null
-  activeTab.value = 'games'
-  visible.value = true
 }
 
 // 设置传送带移动方向
@@ -411,23 +355,19 @@ const formatSpeedTooltip = (value) => {
   return copy.value.ultraFast
 }
 
-// 监听主题变化，更新全局状态
-watchEffect(() => {
-  document.documentElement.lang = currentLanguage.value
+watch(currentLanguage, (language) => {
+  document.documentElement.lang = language
+}, { immediate: true })
 
-  if (selectedThemeKey.value) {
-    // 找到当前选中的主题完整信息
-    const selectedTheme = themeItem.find(item => item.key === selectedThemeKey.value);
+watch(() => props.defaultThemeKey, (themeKey) => {
+  selectedThemeKey.value = availableThemeKeys.has(themeKey) ? themeKey : fallbackThemeKey
+})
 
-    if (selectedTheme) {
-      // 设置全局CSS变量（包含key和背景图）
-      document.documentElement.style.setProperty('--theme-key', selectedThemeKey.value);
-      document.documentElement.style.setProperty('--theme-bg', `url(${selectedTheme.img})`);
-      document.documentElement.setAttribute("data-theme", selectedThemeKey.value);
-      // 存储主题key到本地存储
-      localStorage.setItem('selectedThemeKey', selectedThemeKey.value);
-    }
-  }
+watch(() => props.modelValue, (isVisible) => {
+  if (!isVisible) return
+  selectedThemeKey.value = availableThemeKeys.has(props.defaultThemeKey)
+    ? props.defaultThemeKey
+    : fallbackThemeKey
 })
 
 // 取消按钮逻辑
@@ -435,8 +375,6 @@ const handleCancel = () => {
   visible.value = false
 }
 
-// 组件初始化时加载设置
-initTheme()
 initBeltSettings()
 </script>
 
@@ -481,62 +419,6 @@ initBeltSettings()
     margin-left: 0;
   }
 }
-
-.game-slots {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  padding: 20px 0;
-}
-
-.game-slot {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid #dcdfe6;
-  border-radius: 8px;
-  background: #fff;
-  color: #606266;
-  box-shadow: 0 5px 16px rgba(31, 45, 61, 0.08);
-
-  &__cover {
-    position: relative;
-    height: 180px;
-    overflow: hidden;
-    background: #1f2933;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-
-  &__content { display: grid; gap: 14px; padding: 18px; }
-
-  &__name {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #303133;
-  }
-
-  &__status {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 5px 9px;
-    border-radius: 4px;
-    background: rgba(20, 31, 41, 0.86);
-    color: #fff;
-    font-size: 12px;
-  }
-
-  &__description { min-height: 44px; margin: 7px 0 0; color: #606266; line-height: 1.55; }
-  &__score { display: flex; align-items: center; gap: 8px; color: #996b00; font-weight: 600; }
-  &__play { width: 100%; min-height: 46px; margin: 0; }
-}
-
-.game-reward-note { margin: 0; color: #606266; font-size: 13px; line-height: 1.6; }
 
 .voice-settings {
   max-width: 920px;
@@ -631,19 +513,6 @@ initBeltSettings()
   }
 }
 
-.game-stage-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 4000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  box-sizing: border-box;
-  overflow: auto;
-  background: rgba(18, 23, 28, 0.86);
-}
-
 // 主题卡片样式
 .theme-card {
   position: relative;
@@ -720,6 +589,12 @@ initBeltSettings()
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
+}
+
+.theme-card--disabled {
+  cursor: wait;
+  pointer-events: none;
+  opacity: 0.72;
 }
 
 // 传送带设置样式
@@ -855,6 +730,206 @@ initBeltSettings()
   }
 }
 
+/* Scene-console skin: reuse the beach and underwater artwork while keeping
+   controls dense enough for repeated use at the table. */
+.luxury-settings-dialog {
+  --settings-ink: #173944;
+  --settings-muted: #65808a;
+  --settings-sea: #0f7897;
+  --settings-sea-soft: #eaf7f8;
+  --settings-coral: #ef765f;
+  --settings-gold: #d6a94c;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(75, 142, 155, 0.22);
+  border-radius: 18px;
+  background: rgba(247, 252, 252, .34);
+  box-shadow: 0 24px 70px rgba(7, 53, 68, 0.28);
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    content: '';
+    background-image: var(--settings-theme-bg);
+    background-position: center;
+    background-size: cover;
+    opacity: .24;
+    pointer-events: none;
+  }
+
+  .el-dialog__header {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 22px 28px 12px;
+    background: rgba(247, 252, 252, .42);
+
+    .el-dialog__title {
+      color: var(--settings-ink);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+  }
+
+  .el-dialog__headerbtn { top: 20px; right: 22px; }
+  .el-dialog__headerbtn .el-dialog__close { color: #6c8b93; }
+
+  .el-dialog__body {
+    position: relative;
+    z-index: 1;
+    padding: 12px 28px 24px;
+    background: rgba(247, 252, 252, .24);
+  }
+
+  .el-dialog__footer {
+    position: relative;
+    z-index: 1;
+    padding: 14px 28px 22px;
+    border-top: 1px solid rgba(90, 146, 156, .16);
+    background: rgba(247, 252, 252, .44);
+  }
+}
+
+.settings-hero {
+  position: relative;
+  min-height: 142px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  overflow: hidden;
+  margin-bottom: 20px;
+  padding: 24px 26px;
+  border: 1px solid rgba(255, 255, 255, .45);
+  border-radius: 14px;
+  background-color: #14566e;
+  background-position: center 56%;
+  background-size: cover;
+  box-shadow: inset 0 -20px 36px rgba(1, 35, 47, .2), 0 10px 26px rgba(7, 74, 92, .12);
+
+  &__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(3, 39, 57, .88), rgba(3, 39, 57, .48) 58%, rgba(3, 39, 57, .16));
+  }
+
+  &__content,
+  &__badge { position: relative; z-index: 1; }
+
+  &__content { color: #f5ffff; }
+  &__eyebrow { display: block; margin-bottom: 8px; color: #bcebf0; font-size: 10px; font-weight: 800; letter-spacing: .18em; }
+  h2 { margin: 0; color: #fff; font-size: clamp(23px, 2.2vw, 32px); line-height: 1.1; }
+  p { margin: 8px 0 0; color: #d9f3f4; font-size: 14px; font-weight: 700; }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, .32);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(9, 55, 70, .42);
+    font-size: 12px;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+  }
+
+  &__dot { width: 7px; height: 7px; border-radius: 50%; background: #f4c85f; box-shadow: 0 0 0 4px rgba(244, 200, 95, .18); }
+}
+
+.setting-tab-label { display: inline-flex; align-items: center; gap: 7px; }
+.setting-tab-label .el-icon { font-size: 16px; }
+
+.luxury-settings-dialog .setting-tabs {
+  .el-tabs__header { margin: 0 0 22px; }
+  .el-tabs__nav-wrap::after { display: none; }
+  .el-tabs__nav { gap: 5px; padding: 4px; border: 1px solid rgba(89, 148, 158, .2); border-radius: 12px; background: rgba(234, 246, 247, .5); }
+  .el-tabs__item {
+    height: 42px;
+    padding: 0 15px;
+    border-radius: 9px;
+    color: #66818a;
+    font-size: 13px;
+    font-weight: 700;
+    transition: color .2s ease, background .2s ease, box-shadow .2s ease;
+
+    &.is-active {
+      color: var(--settings-coral);
+      background: rgba(255, 255, 255, .64);
+      box-shadow: 0 3px 12px rgba(21, 96, 111, .12);
+    }
+  }
+  .el-tabs__active-bar { display: none; }
+}
+
+.luxury-settings-dialog .theme-item {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 0;
+}
+
+.luxury-settings-dialog .theme-card {
+  width: auto;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid rgba(75, 142, 155, .17);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .52);
+  box-shadow: 0 7px 20px rgba(11, 74, 89, .07);
+
+  &__img { height: 170px; border: 0; border-radius: 10px; }
+  &__title { margin-top: 12px; color: var(--settings-ink); font-size: 16px; font-weight: 800; }
+  &__key { display: none; }
+  &__check { top: 18px; right: 18px; width: 28px; height: 28px; background: var(--settings-coral); box-shadow: 0 5px 12px rgba(239, 118, 95, .32); }
+
+  &--active {
+    border-color: rgba(239, 118, 95, .8);
+    background: rgba(255, 250, 248, .62);
+    box-shadow: 0 10px 28px rgba(239, 118, 95, .16);
+    .theme-card__img { box-shadow: inset 0 0 0 3px rgba(239, 118, 95, .35); }
+    .theme-card__title { color: var(--settings-coral); }
+  }
+
+  &:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11, 74, 89, .13); }
+}
+
+.luxury-settings-dialog .language-settings,
+.luxury-settings-dialog .conveyor-settings,
+.luxury-settings-dialog .voice-settings {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid rgba(75, 142, 155, .14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .48);
+  box-shadow: 0 7px 20px rgba(11, 74, 89, .05);
+}
+
+.luxury-settings-dialog .el-button:not(.el-button--primary):not(.settings-close) {
+  background: rgba(255, 255, 255, .5);
+}
+
+.luxury-settings-dialog .language-settings { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(75, 142, 155, .14); }
+.luxury-settings-dialog .language-settings .section-title,
+.luxury-settings-dialog .conveyor-settings .section-title { color: var(--settings-ink); font-size: 15px; }
+.luxury-settings-dialog .language-button { min-height: 42px; border-color: #d6e8ea; color: #55747d; font-weight: 700; }
+.luxury-settings-dialog .language-button.el-button--primary { border-color: var(--settings-coral); color: #fff; background: var(--settings-coral); }
+
+.luxury-settings-dialog .voice-setting-row { border-color: rgba(75, 142, 155, .14); }
+.luxury-settings-dialog .voice-setting-row__icon { color: var(--settings-sea); background: var(--settings-sea-soft); border-color: #b9dfe3; }
+.luxury-settings-dialog .voice-setting-row__content h3 { color: var(--settings-ink); font-weight: 800; }
+.luxury-settings-dialog .voice-setting-row__content p { color: var(--settings-muted); }
+.luxury-settings-dialog .direction-options { gap: 12px; margin-top: 10px; }
+.luxury-settings-dialog .direction-card { max-width: none; padding: 18px; border-color: #d6e8ea; border-radius: 11px; background: rgba(251, 254, 254, .54); }
+.luxury-settings-dialog .direction-card--active { border-color: var(--settings-coral); background: rgba(255, 250, 248, .66); }
+.luxury-settings-dialog .direction-card .direction-icon { color: var(--settings-sea); font-size: 38px; }
+.luxury-settings-dialog .direction-card--active .direction-icon,
+.luxury-settings-dialog .direction-card--active .direction-label { color: var(--settings-coral); }
+.luxury-settings-dialog .speed-control .speed-slider { margin: 20px 0 12px; }
+.luxury-settings-dialog .settings-close { min-width: 108px; border: 0; color: #fff; background: var(--settings-sea); box-shadow: 0 6px 14px rgba(15, 120, 151, .2); }
+
 @media (max-width: 768px) {
   .theme-item,
   .direction-options {
@@ -866,8 +941,7 @@ initBeltSettings()
     box-sizing: border-box;
   }
 
-  .language-options,
-  .game-slots {
+  .language-options {
     grid-template-columns: 1fr;
   }
 
@@ -894,11 +968,24 @@ initBeltSettings()
     max-width: none;
   }
 
-  .game-slot {
-    &__cover { height: 140px; }
-    &__content { padding: 14px; }
+  .luxury-settings-dialog {
+    border-radius: 14px;
+    .el-dialog__header { padding: 18px 18px 10px; }
+    .el-dialog__body { padding: 10px 18px 18px; }
+    .el-dialog__footer { padding: 10px 18px 16px; }
+    .setting-tabs .el-tabs__item { padding: 0 9px; font-size: 12px; }
   }
 
-  .game-stage-overlay { padding: 0; }
+  .settings-hero { min-height: 126px; margin-bottom: 14px; padding: 18px; }
+  .settings-hero__badge { display: none; }
+  .settings-hero h2 { font-size: 24px; }
+  .settings-hero p { font-size: 13px; }
+
+  .luxury-settings-dialog .theme-item { grid-template-columns: 1fr; }
+  .luxury-settings-dialog .theme-card { width: 100%; }
+  .luxury-settings-dialog .theme-card__img { height: 148px; }
+  .luxury-settings-dialog .language-settings,
+  .luxury-settings-dialog .conveyor-settings,
+  .luxury-settings-dialog .voice-settings { padding: 14px; }
 }
 </style>

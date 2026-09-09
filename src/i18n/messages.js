@@ -96,6 +96,7 @@ const messages = {
       checkingWakePhrase: '听到了，正在确认是不是在叫小禾',
       commandListening: '在呢，请说你想吃什么',
       speaking: '小禾正在回答',
+      watchingPromo: '正在安静陪你看热门视频',
       startWakeMonitoring: '开启小禾唤醒',
       stopWakeMonitoring: '停止小禾唤醒',
       sessionTimeout: '我先等你，需要时再叫我',
@@ -110,6 +111,25 @@ const messages = {
       leftSide: '左侧',
       rightSide: '右侧',
       bothSides: '左右两侧',
+      menuOpened: '已为你打开完整菜单',
+      navigationOpened: '已为你打开菜品导航',
+      leftMenuOpened: '已打开左侧菜单',
+      rightMenuOpened: '已打开右侧菜单',
+      historyOpened: '已打开点餐记录',
+      settingsOpened: '已打开系统设置',
+      callWaiterConfirm: '需要我现在呼叫店员吗？请说“确认”或“取消”',
+      callWaiterSent: '已经为你呼叫店员，请稍候',
+      orderConfirm: '确认提交左右两侧的全部菜品吗？请说“确认”或“取消”',
+      actionCancelled: '好的，已取消这次操作',
+      noPendingAction: '当前没有需要确认或取消的操作',
+      streamPaused: '菜品传送已经暂停',
+      streamResumed: '菜品传送已经继续',
+      streamSlower: '已经把菜品传送速度调慢',
+      streamFaster: '已经把菜品传送速度调快',
+      popularIntro: '为你推荐 {count} 道当前热门菜品',
+      featuredIntro: '为你推荐 {count} 道门店精选菜品',
+      comboIntro: '为两位顾客搭配了 {count} 道不同类型的菜品',
+      recommendationPresetEmpty: '当前没有可推荐的菜品，请稍后再试',
       errors: {
         unsupported: '当前浏览器不支持语音搜索',
         permission_denied: '请允许使用麦克风后重试',
@@ -164,6 +184,16 @@ const messages = {
       left: '向左移动',
       right: '向右移动',
       status: { ready: '可开始', playing: '游戏中', finished: '已结束' },
+      invitation: {
+        kicker: '游戏时间',
+        title: '要不要玩个小游戏？',
+        message: '投盘进度已完成，选择一个游戏放松一下吧。',
+        available: '当前可玩 {count} 次',
+        yes: '开始游戏',
+        no: '暂时不要',
+        chooseTitle: '选择一个游戏',
+        reminder: '还有 {count} 次游戏机会'
+      },
       goldenMiner: {
         title: '黄金矿工',
         description: '看准摆钩角度下钩，抓取黄金和钻石。炸药可清除岩石，回收时可快速收钩。',
@@ -323,6 +353,10 @@ const messages = {
       plateFour: '第四盘！最后一盘！',
       plateComplete: '恭喜完成！获得扭蛋机会！',
       plateMore: '第{count}盘！继续努力！'
+      ,promoBadge: '招牌',
+      promoTriggerLabel: '招牌食材',
+      promoTriggerAria: '查看{name}的食材介绍',
+      featuredIntroMessage: '为您介绍本店招牌菜：{name}'
     },
     gacha: {
       chance: '恭喜获得扭蛋机会！',
@@ -386,7 +420,10 @@ messages['zh-CN'].games.runner = {
   description: '跃过餐车和调料箱，滑过垂帘，收集寿司并用护盾抵挡碰撞。',
   loading: '赛道准备中',
   loadFailed: '游戏加载失败，请重试',
-  outOfLives: '配送中断'
+  outOfLives: '配送中断',
+  moveControls: '赛道操作',
+  jump: '跳跃',
+  slide: '下滑'
 }
 
 const en = JSON.parse(JSON.stringify(messages['zh-CN']))
@@ -405,7 +442,9 @@ replaceMessages(en, {
   'assistant.name': 'Xiaohe', 'assistant.greeting': 'Hi, I am Xiaohe', 'assistant.connecting': 'Connecting to voice service', 'assistant.listening': 'Say the dish you want to find', 'assistant.hearing': 'Listening', 'assistant.processing': 'Finding dishes', 'assistant.matchesFound': 'Found {count} matching dishes', 'assistant.noMatches': 'No dishes found for “{query}”', 'assistant.startListening': 'Start voice search', 'assistant.stopListening': 'Stop voice search', 'assistant.recommendations': 'Xiaohe recommendations', 'assistant.youSaid': 'You said: “{transcript}”', 'assistant.recommendationIdle': 'Xiaohe is ready above the conveyor', 'assistant.recommendationListening': 'Listening for what you would like', 'assistant.recommendationEmpty': 'No suitable dishes in this round', 'assistant.addedToCart': 'Added “{name}” to the {side} order area', 'assistant.cartFull': 'Both order areas are full. Place the order or adjust the dishes first', 'assistant.addFailed': 'This dish cannot be added right now', 'assistant.leftSide': 'left', 'assistant.rightSide': 'right', 'assistant.errors.unsupported': 'Voice search is not supported in this browser', 'assistant.errors.permission_denied': 'Allow microphone access and try again', 'assistant.errors.microphone_missing': 'No microphone was detected', 'assistant.errors.microphone_busy': 'The microphone is being used by another app', 'assistant.errors.connection_timeout': 'Voice service connection timed out', 'assistant.errors.service_unavailable': 'Voice service is unavailable', 'assistant.errors.service_busy': 'Voice requests are busy right now. Please try again shortly', 'assistant.errors.invalid_server_event': 'The voice service returned an invalid result', 'assistant.errors.recognition_failed': 'I could not recognize that. Please try again',
   'display.orderSubmitted': 'Order submitted: {orderId}',
   'display.orderFailed': 'Order failed. Your cart was kept; please try again',
+  'display.promoBadge': 'Signature', 'display.promoTriggerLabel': 'Signature story', 'display.promoTriggerAria': 'Watch the ingredient story of {name}', 'display.featuredIntroMessage': 'Introducing our signature dish: {name}',
   'games.localOnly': 'Casual mode · Best scores stay on this device', 'games.rewardNotice': 'Games currently save local best scores only. They do not grant coupons, capsule chances, or other real rewards. Future rewards must be verified and issued by the backend.', 'games.score': 'Score', 'games.bestScore': 'Best', 'games.time': 'Time', 'games.tools': 'Tools', 'games.lives': 'Lives', 'games.combo': 'Combo', 'games.difficulty': 'Difficulty', 'games.controls': 'Game controls', 'games.start': 'Start game', 'games.play': 'Play', 'games.pause': 'Pause', 'games.resume': 'Resume', 'games.restart': 'Restart', 'games.end': 'End game', 'games.finished': 'Round complete', 'games.paused': 'Game paused', 'games.pauseHint': 'Your progress is saved. Resume when ready.', 'games.finalScore': 'Final score: {score}', 'games.left': 'Move left', 'games.right': 'Move right', 'games.status.ready': 'Ready', 'games.status.playing': 'Playing', 'games.status.finished': 'Finished',
+  'games.invitation.kicker': 'Game time', 'games.invitation.title': 'Want to play a mini game?', 'games.invitation.message': 'Your plate progress is complete. Choose a game and take a short break.', 'games.invitation.available': '{count} game chance(s) available', 'games.invitation.yes': 'Start game', 'games.invitation.no': 'Not now', 'games.invitation.chooseTitle': 'Choose a game', 'games.invitation.reminder': '{count} game chance(s) available',
   'games.goldenMiner.title': 'Golden Miner', 'games.goldenMiner.description': 'Time the swinging hook to collect gold and diamonds. Use dynamite on rocks or speed up the return.', 'games.goldenMiner.dropHook': 'Button 1: Drop hook', 'games.goldenMiner.useTool': 'Button 2: Dynamite ({count})', 'games.goldenMiner.quickRetract': 'Button 2: Quick retract', 'games.goldenMiner.readyTitle': 'Ready to mine', 'games.goldenMiner.readyHint': 'The hook swings automatically. Drop at the right angle, then use the second button to clear a rock or retract faster.',
   'games.sushiCatch.title': 'Sushi Catch', 'games.sushiCatch.description': 'Move the tray to catch sushi. Rare sushi builds combo; wasabi and empty plates cost a life.', 'games.sushiCatch.tray': 'Tray', 'games.sushiCatch.moveControls': 'Tray movement controls', 'games.sushiCatch.outOfLives': 'Out of lives', 'games.sushiCatch.readyTitle': 'Ready to catch', 'games.sushiCatch.readyHint': 'Hold the left or right button to move. Falling speed and spawn frequency increase over time.',
   'common.other': 'Other', 'menu.menuTitle': 'Conveyor Sushi Menu', 'cart.checkoutDeveloping': 'Checkout is coming soon...', 'cart.invalidItem': 'Invalid dish information', 'cart.invalidQuantity': 'Quantity must be greater than 0', 'cart.quantityUpdated': '{name} quantity updated', 'cart.itemRemoved': '{name} removed from cart', 'cart.updateFailed': 'Update failed. Please try again', 'cart.cleared': 'Cart cleared', 'cart.tableRequired': 'Please set a table number', 'cart.incompleteItem': 'Item {name} has incomplete information', 'cart.invalidItemQuantity': 'Item {name} has an invalid quantity',
@@ -444,6 +483,7 @@ replaceMessages(ja, {
   'assistant.name': '小禾', 'assistant.greeting': 'こんにちは、小禾です', 'assistant.connecting': '音声サービスに接続中', 'assistant.listening': '探したい料理を話してください', 'assistant.hearing': '聞き取っています', 'assistant.processing': '料理を検索中', 'assistant.matchesFound': '{count}件の料理が見つかりました', 'assistant.noMatches': '「{query}」に一致する料理がありません', 'assistant.startListening': '音声検索を開始', 'assistant.stopListening': '音声検索を停止', 'assistant.recommendations': '小禾のおすすめ', 'assistant.youSaid': 'あなた：「{transcript}」', 'assistant.recommendationIdle': '小禾はレーンの上で待機中です', 'assistant.recommendationListening': 'ご希望を聞いています', 'assistant.recommendationEmpty': '今回はおすすめできる料理がありません', 'assistant.addedToCart': '「{name}」を{side}の注文エリアに追加しました', 'assistant.cartFull': '左右の注文エリアがいっぱいです。先に注文または調整してください', 'assistant.addFailed': 'この料理は現在追加できません', 'assistant.leftSide': '左側', 'assistant.rightSide': '右側', 'assistant.errors.unsupported': 'このブラウザは音声検索に対応していません', 'assistant.errors.permission_denied': 'マイクを許可して再試行してください', 'assistant.errors.microphone_missing': 'マイクが見つかりません', 'assistant.errors.microphone_busy': 'マイクが他のアプリで使用されています', 'assistant.errors.connection_timeout': '音声サービスがタイムアウトしました', 'assistant.errors.service_unavailable': '音声サービスを利用できません', 'assistant.errors.service_busy': '音声リクエストが混み合っています。少し待ってからもう一度お話しください', 'assistant.errors.invalid_server_event': '音声サービスが無効な結果を返しました', 'assistant.errors.recognition_failed': '聞き取れませんでした。もう一度お話しください',
   'display.orderSubmitted': '注文しました：{orderId}',
   'display.orderFailed': '注文に失敗しました。カートは保持されています。再試行してください',
+  'display.promoBadge': '看板', 'display.promoTriggerLabel': '看板の食材', 'display.promoTriggerAria': '{name}の食材ストーリーを見る', 'display.featuredIntroMessage': '看板メニューをご紹介：{name}',
   'games.localOnly': 'カジュアルモード · ベストスコアはこの端末に保存', 'games.rewardNotice': '現在は端末内のベストスコアのみ記録します。クーポン、カプセル回数、その他の実際の特典は付与しません。今後の特典はバックエンドで検証して付与します。', 'games.score': 'スコア', 'games.bestScore': 'ベスト', 'games.time': '残り時間', 'games.tools': 'アイテム', 'games.lives': 'ライフ', 'games.combo': 'コンボ', 'games.difficulty': '難易度', 'games.controls': 'ゲーム操作', 'games.start': 'ゲーム開始', 'games.play': 'プレイ', 'games.pause': '一時停止', 'games.resume': '再開', 'games.restart': 'やり直す', 'games.end': 'ゲーム終了', 'games.finished': 'ラウンド終了', 'games.paused': '一時停止中', 'games.pauseHint': '進行状況は保持されています。再開して続けられます。', 'games.finalScore': '今回のスコア：{score}', 'games.left': '左へ移動', 'games.right': '右へ移動', 'games.status.ready': '開始可能', 'games.status.playing': 'プレイ中', 'games.status.finished': '終了',
   'games.goldenMiner.title': 'ゴールドマイナー', 'games.goldenMiner.description': '揺れるフックで金やダイヤを集めます。ダイナマイトで岩を消し、素早く巻き戻せます。', 'games.goldenMiner.dropHook': 'ボタン1：フックを下ろす', 'games.goldenMiner.useTool': 'ボタン2：ダイナマイト（{count}）', 'games.goldenMiner.quickRetract': 'ボタン2：高速巻き戻し', 'games.goldenMiner.readyTitle': '採掘準備', 'games.goldenMiner.readyHint': 'フックは自動で左右に揺れます。角度を合わせて下ろし、2つ目のボタンで障害物を除去するか高速で戻します。',
   'games.sushiCatch.title': '寿司キャッチ', 'games.sushiCatch.description': 'トレーを左右に動かして寿司をキャッチ。レア寿司でコンボ、わさびと空皿でライフが減ります。', 'games.sushiCatch.tray': 'トレー', 'games.sushiCatch.moveControls': 'トレー移動操作', 'games.sushiCatch.outOfLives': 'ライフ切れ', 'games.sushiCatch.readyTitle': 'キャッチ準備', 'games.sushiCatch.readyHint': '左右のボタンを長押しして移動します。時間とともに落下速度と出現頻度が上がります。',
@@ -486,15 +526,22 @@ replaceMessages(en, {
   'games.runner.description': 'Jump over carts and crates, slide under curtains, collect sushi, and use shields to absorb collisions.',
   'games.runner.loading': 'Preparing the course',
   'games.runner.loadFailed': 'The game failed to load. Please try again.',
-  'games.runner.outOfLives': 'Delivery interrupted'
+  'games.runner.outOfLives': 'Delivery interrupted',
+  'games.runner.moveControls': 'Course controls',
+  'games.runner.jump': 'Jump',
+  'games.runner.slide': 'Slide'
 })
 
 replaceMessages(ja, {
+  'games.invitation.kicker': 'ゲームタイム', 'games.invitation.title': 'ミニゲームで遊びますか？', 'games.invitation.message': '皿の進捗が完了しました。ゲームを選んで少し休憩しましょう。', 'games.invitation.available': 'あと {count} 回プレイできます', 'games.invitation.yes': 'ゲームを始める', 'games.invitation.no': '今はしない', 'games.invitation.chooseTitle': 'ゲームを選択', 'games.invitation.reminder': 'あと {count} 回プレイできます',
   'games.runner.title': '寿司ダッシュ',
   'games.runner.description': 'カートや箱を飛び越え、のれんをくぐり、寿司とシールドを集めて走ります。',
   'games.runner.loading': 'コースを準備中',
   'games.runner.loadFailed': 'ゲームを読み込めませんでした。もう一度お試しください。',
-  'games.runner.outOfLives': '配達中断'
+  'games.runner.outOfLives': '配達中断',
+  'games.runner.moveControls': 'コース操作',
+  'games.runner.jump': 'ジャンプ',
+  'games.runner.slide': 'スライド'
 })
 
 replaceMessages(en, {
@@ -602,5 +649,52 @@ replaceMessages(ja, {
   'assistant.orderSuccess': '選択した料理をすべて注文しました',
   'assistant.orderFailed': '一部の料理を注文できませんでした。もう一度お試しください'
 })
+
+replaceMessages(en, {
+  'assistant.menuOpened': 'The full menu is open',
+  'assistant.navigationOpened': 'Dish navigation is open',
+  'assistant.leftMenuOpened': 'The left menu is open',
+  'assistant.rightMenuOpened': 'The right menu is open',
+  'assistant.historyOpened': 'Order history is open',
+  'assistant.settingsOpened': 'Settings are open',
+  'assistant.callWaiterConfirm': 'Should I call a staff member now? Say confirm or cancel',
+  'assistant.callWaiterSent': 'A staff member has been called. Please wait',
+  'assistant.orderConfirm': 'Submit all dishes from both sides? Say confirm or cancel',
+  'assistant.actionCancelled': 'The action has been cancelled',
+  'assistant.noPendingAction': 'There is no action waiting for confirmation',
+  'assistant.streamPaused': 'Dish movement is paused',
+  'assistant.streamResumed': 'Dish movement has resumed',
+  'assistant.streamSlower': 'Dish movement is now slower',
+  'assistant.streamFaster': 'Dish movement is now faster',
+  'assistant.popularIntro': 'Here are {count} popular dishes',
+  'assistant.featuredIntro': 'Here are {count} restaurant picks',
+  'assistant.comboIntro': 'Here are {count} varied dishes for two guests',
+  'assistant.recommendationPresetEmpty': 'There are no available dishes to recommend right now'
+})
+
+replaceMessages(ja, {
+  'assistant.menuOpened': 'メニューを開きました',
+  'assistant.navigationOpened': '料理ナビを開きました',
+  'assistant.leftMenuOpened': '左側のメニューを開きました',
+  'assistant.rightMenuOpened': '右側のメニューを開きました',
+  'assistant.historyOpened': '注文履歴を開きました',
+  'assistant.settingsOpened': '設定を開きました',
+  'assistant.callWaiterConfirm': 'スタッフを呼びますか？「確認」または「キャンセル」と話してください',
+  'assistant.callWaiterSent': 'スタッフを呼びました。少々お待ちください',
+  'assistant.orderConfirm': '左右の料理をすべて注文しますか？「確認」または「キャンセル」と話してください',
+  'assistant.actionCancelled': '操作をキャンセルしました',
+  'assistant.noPendingAction': '確認待ちの操作はありません',
+  'assistant.streamPaused': '料理の移動を一時停止しました',
+  'assistant.streamResumed': '料理の移動を再開しました',
+  'assistant.streamSlower': '料理の移動を遅くしました',
+  'assistant.streamFaster': '料理の移動を速くしました',
+  'assistant.popularIntro': '人気料理を{count}品おすすめします',
+  'assistant.featuredIntro': 'お店のおすすめを{count}品ご案内します',
+  'assistant.comboIntro': 'お二人向けに異なる種類の料理を{count}品選びました',
+  'assistant.recommendationPresetEmpty': '現在おすすめできる料理がありません'
+})
+
+replaceMessages(en, { 'assistant.watchingPromo': 'Quietly watching the featured video with you' })
+replaceMessages(ja, { 'assistant.watchingPromo': '人気動画を静かに一緒に見ています' })
 
 export default { 'zh-CN': messages['zh-CN'], 'en-US': en, 'ja-JP': ja }

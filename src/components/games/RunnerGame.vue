@@ -5,6 +5,15 @@
         <p class="game-kicker">{{ $t('games.localOnly') }}</p>
         <h2 id="runner-title">{{ $t('games.runner.title') }}</h2>
       </div>
+      <button
+        type="button"
+        class="game-close-button"
+        :aria-label="$t('common.close')"
+        :title="$t('common.close')"
+        @click="closeGame"
+      >
+        <el-icon><Close /></el-icon>
+      </button>
     </header>
 
     <div class="score-strip" aria-live="polite">
@@ -44,11 +53,31 @@
         </template>
       </div>
     </div>
+
+    <div v-if="status === 'running'" class="runner-controls" role="group" :aria-label="$t('games.runner.moveControls')">
+      <button
+        type="button"
+        class="runner-control runner-control--jump"
+        @click="jumpPlayer"
+      >
+        <el-icon><ArrowUp /></el-icon>
+        <span>{{ $t('games.runner.jump') }}</span>
+      </button>
+      <button
+        type="button"
+        class="runner-control runner-control--slide"
+        @click="slidePlayer"
+      >
+        <el-icon><ArrowDown /></el-icon>
+        <span>{{ $t('games.runner.slide') }}</span>
+      </button>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ArrowDown, ArrowUp, Close } from '@element-plus/icons-vue'
 import { useI18n } from '@/i18n'
 import backgroundImage from '@/assets/games/runner/background.webp'
 import groundImage from '@/assets/games/runner/ground.webp'
@@ -84,6 +113,7 @@ let Phaser = null
 let phaserGame = null
 let runnerScene = null
 let resizeObserver = null
+let fullscreenElement = null
 // 动态 import 可能晚于组件卸载完成，disposed 防止异步回调重新创建 Canvas。
 let disposed = false
 
@@ -527,6 +557,33 @@ const closeGame = () => {
   emit('close', { id: GAME_ID, score: score.value })
 }
 
+const enterFullscreen = async () => {
+  const element = document.querySelector('.game-stage-overlay .runner-game')
+  if (!element || !element.requestFullscreen || document.fullscreenElement) return
+  fullscreenElement = element
+  try {
+    await element.requestFullscreen({ navigationUI: 'hide' })
+  } catch {
+    // CSS keeps the game viewport-sized when browser fullscreen is denied.
+    fullscreenElement = null
+  }
+}
+
+const exitFullscreen = async () => {
+  if (document.fullscreenElement && document.exitFullscreen) {
+    try { await document.exitFullscreen() } catch {}
+  }
+  fullscreenElement = null
+}
+
+const jumpPlayer = () => {
+  if (status.value === 'running') runnerScene?.jump()
+}
+
+const slidePlayer = () => {
+  if (status.value === 'running') runnerScene?.slide()
+}
+
 const restartGame = () => {
   if (status.value !== 'finished') return
   runnerScene?.resetRound()
@@ -546,13 +603,14 @@ const handleKeydown = (event) => {
   }
   if (status.value !== 'running') return
   // 结束态故意忽略 A/B，只允许结果页明确按钮重新开始，防止外设余键误开新局。
-  if (event.code === 'KeyA') runnerScene?.jump()
-  if (event.code === 'KeyB') runnerScene?.slide()
+  if (event.code === 'KeyA') jumpPlayer()
+  if (event.code === 'KeyB') slidePlayer()
 }
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   void initializeGame()
+  void enterFullscreen()
 })
 
 onBeforeUnmount(() => {
@@ -564,23 +622,24 @@ onBeforeUnmount(() => {
   runnerScene = null
   phaserGame?.destroy(true)
   phaserGame = null
+  if (document.fullscreenElement === fullscreenElement) void exitFullscreen()
 })
 </script>
 
 <style lang="scss" scoped>
 .runner-game {
-  width: min(2560px, 94vw);
-  height: min(900px, 94dvh);
+  width: 100vw;
+  height: 100dvh;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 12px;
-  padding: 18px;
+  padding: clamp(12px, 1.8vw, 28px);
   box-sizing: border-box;
-  border-radius: 8px;
-  background: #f5f7f5;
-  color: #222a28;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  border-radius: 0;
+  background: #102f3b;
+  color: #f7fbf8;
+  box-shadow: none;
 }
 
 .game-header {
@@ -598,9 +657,26 @@ onBeforeUnmount(() => {
 
 .game-kicker {
   margin: 0;
-  color: #8a4c24;
+  color: #a9d7d5;
   font-size: 13px;
 }
+
+.game-close-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 50%;
+  background: rgba(5, 38, 56, .58);
+  color: #fff;
+  cursor: pointer;
+  font-size: 21px;
+}
+
+.game-close-button:hover { background: rgba(233, 117, 95, .88); }
+.game-close-button:focus-visible { outline: 3px solid rgba(255, 214, 90, .8); outline-offset: 3px; }
 
 .score-strip {
   display: grid;
@@ -647,6 +723,56 @@ onBeforeUnmount(() => {
   background: #183d45;
   isolation: isolate;
   touch-action: none;
+  box-shadow: inset 0 0 80px rgba(4, 19, 26, .44), 0 14px 34px rgba(3, 20, 25, .34);
+}
+
+.runner-arena::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 5px);
+  content: '';
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.runner-controls {
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 24px);
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.runner-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: clamp(60px, 8vh, 88px);
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 10px;
+  background: #1e6a72;
+  box-shadow: 0 8px 18px rgba(12, 45, 48, .2), inset 0 1px 0 rgba(255, 255, 255, .16);
+  color: #fff;
+  cursor: pointer;
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 800;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+}
+
+.runner-control .el-icon { font-size: clamp(24px, 2.2vw, 34px); }
+.runner-control:active { transform: translateY(2px); background: #e9755f; }
+.runner-control:focus-visible { outline: 3px solid rgba(255, 214, 90, .8); outline-offset: 3px; }
+
+@media (max-width: 700px) {
+  .runner-controls { gap: 8px; }
+  .runner-control { min-height: 68px; padding-inline: 8px; }
 }
 
 .game-canvas-host {
@@ -759,7 +885,7 @@ onBeforeUnmount(() => {
   .runner-game {
     width: 100vw;
     height: 100dvh;
-    padding: 10px;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
     gap: 8px;
     border-radius: 0;
   }

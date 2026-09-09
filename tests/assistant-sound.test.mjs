@@ -21,8 +21,8 @@ test('normalizes persisted assistant volume to the supported range', () => {
 
 test('maps assistant errors to the matching recorded prompt', () => {
   const audioKeys = Object.values(ASSISTANT_AUDIO)
-  assert.equal(audioKeys.length, 22)
-  assert.equal(new Set(audioKeys).size, 22)
+  assert.equal(audioKeys.length, 44)
+  assert.equal(new Set(audioKeys).size, 44)
   assert.equal(ASSISTANT_AUDIO.SINGLE_BATCH, 'single-batch')
   assert.equal(ASSISTANT_AUDIO.CART_SPACE_INSUFFICIENT, 'cart-space-insufficient')
   assert.equal(ASSISTANT_AUDIO.ORDER_EMPTY, 'order-empty')

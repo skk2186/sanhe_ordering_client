@@ -19,7 +19,11 @@
   background: url('/images/ui/a/background.png') center/cover;
 }
 [data-theme="zhenxian"] .conveyor-display {
-  background: url('/images/ui/b/background.png') center/cover;
+  background-image: url('/images/ui/b/background.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 [data-theme="xiaoxin"] .conveyor-display {
   background: url('/images/ui/c/background.png') center/cover;

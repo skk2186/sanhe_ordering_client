@@ -1,49 +1,66 @@
 <template>
-  <div class="conveyor-display">
-    <!-- 顶部投碟进度区域（组件化） -->
+  <div
+    class="conveyor-display"
+    :class="{
+      'is-scene-changing': sceneTransitionBusy,
+      'is-scene-revealing': sceneTransitionPhase === 'revealing'
+    }"
+  >
+    <!-- 顶部工作区：单条主题横幅三区（品牌 / 投碟进度 / 小禾），背景透明透出页面背景。 -->
     <div class="top-section">
-      <TopPlateProgress :progress="plateProgress" :formatted="formattedProgress" />
+      <div class="top-scene-banner">
+        <div class="brand-lockup">
+          <span class="brand-kicker">AI DINING TABLE</span>
+          <strong>{{ $t('menu.brand') }}</strong>
+          <span class="brand-table">TABLE {{ deskNumber }} · {{ deskPeople }} SEATS</span>
+        </div>
+
+        <div class="top-progress">
+          <TopPlateProgress
+            :progress="plateProgress"
+            :formatted="formattedProgress"
+            :theme-key="activeSceneKey"
+          />
+        </div>
+
+        <div v-if="globalStore.voiceAssistantEnabled" class="assistant-slot">
+          <VirtualDiningAssistant
+            :hotwords="assistantHotwords"
+            :match-count="voiceMatchCount"
+            :recommendations="assistantRecommendations"
+            :feedback-message="assistantActionMessage"
+            :feedback-revision="assistantFeedbackRevision"
+            :feedback-audio-key="assistantFeedbackAudioKey"
+            :selected-item-id="assistantSelectedItemId"
+            :sound-enabled="globalStore.ttsEnabled"
+            :volume="globalStore.assistantVolume"
+            :continue-listening="assistantContinueListening"
+            :action-busy="assistantOrdering"
+            :watching-promo="featuredPromoVisible"
+            @transcript="handleVoiceTranscript"
+            @select-recommendation="handleAssistantRecommendationSelect"
+            @interrupt-promo="closeFeaturedPromo"
+          />
+        </div>
+      </div>
     </div>
 
-    <VirtualDiningAssistant
-      v-if="globalStore.voiceAssistantEnabled"
-      :hotwords="assistantHotwords"
-      :match-count="voiceMatchCount"
-      :recommendations="assistantRecommendations"
-      :feedback-message="assistantActionMessage"
-      :feedback-revision="assistantFeedbackRevision"
-      :feedback-audio-key="assistantFeedbackAudioKey"
-      :selected-item-id="assistantSelectedItemId"
-      :sound-enabled="globalStore.ttsEnabled"
-      :volume="globalStore.assistantVolume"
-      :continue-listening="assistantContinueListening"
-      :action-busy="assistantOrdering"
-      @transcript="handleVoiceTranscript"
-      @select-recommendation="handleAssistantRecommendationSelect"
-    />
-
-    <!-- 中间传送带区域 -->
+    <!-- 主题 B 浪花送餐场景：浏览、左右加购和语音推荐继续使用原有业务链路。 -->
     <div class="middle-section">
-      <!-- 传送带（组件化） -->
-      <ConveyorBeltContainer
-        v-model:beltTrack="beltTrack"
-        v-model:beltItems="beltItems"
-        :is-dragging="isDragging"
-        :is-momentum="isMomentum"
-        :display-offset="displayOffset"
-        :belt-track-ref="beltTrack"
-        :belt-items-ref="beltItems"
-        @drag-start="startDrag"
-      >
-        <ConveyorPlates
-          :items="displayItems"
-          :item-width="beltConfig.itemWidth"
-          @click="(item, event) => handleSushiClick(item, event)"
-          @drag-start="handleSushiDragStart"
-          @drag-move="handleSushiDragMove"
-          @drag-end="handleSushiDragEnd"
-        />
-      </ConveyorBeltContainer>
+      <ScenicDishStage
+        :scene-key="activeSceneKey"
+        :entry-revision="sceneRevision"
+        :items="displaySushiData"
+        :categories="displayCategories"
+        :recommendations="assistantRecommendations"
+        :selected-item-id="assistantSelectedItemId"
+        :direction="beltDirection"
+        :speed="beltSpeed"
+        :paused="assistantStreamPaused || gameModePaused"
+        @dish-click="handleSushiClick"
+        @paused-change="assistantStreamPaused = $event"
+        @featured-promo="handleFeaturedPromo"
+      />
       <div v-if="productsLoading || productsError || !displaySushiData.length" class="product-state" role="status">
         <el-icon v-if="productsLoading" class="product-state-icon is-loading"><Loading /></el-icon>
         <template v-else-if="productsError">
@@ -54,6 +71,14 @@
         </template>
         <p v-else>{{ $t('menu.noDishes') }}</p>
       </div>
+
+      <!-- 招牌菜介绍吊屏：只覆盖舞台区，播完一次自动收回 -->
+      <FeaturedDishScreen
+        :item="featuredPromoItem"
+        :visible="featuredPromoVisible"
+        :theme-key="activeSceneKey"
+        @close="closeFeaturedPromo"
+      />
     </div>
 
     <!-- 底部功能区 -->
@@ -164,31 +189,43 @@
 
     <SettingDialog
         v-model="settingVisible"
+        :default-theme-key="activeSceneKey"
+        :theme-changing="sceneTransitionBusy"
+        @theme-changed="handleThemeChange"
         @belt-direction-changed="handleBeltDirectionChanged"
         @belt-speed-changed="handleBeltSpeedChanged"
     ></SettingDialog>
+
+    <SceneTransitionOverlay
+      :phase="sceneTransitionPhase"
+      :scene-key="pendingSceneKey || activeSceneKey"
+    />
+
+    <GameInvitationFlow
+      ref="gameFlowRef"
+      @blocking-change="gameModePaused = $event"
+    />
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Loading, Refresh } from '@element-plus/icons-vue'
 
 import MenuView from '@/views/customer/MenuView.vue'
 import SushiNavigation from '@/components/menu/SushiNavigation.vue'
 import OrderHistoryDialog from '@/components/order/OrderHistoryDialog.vue'
-import ConveyorBeltContainer from '@/components/display/ConveyorBeltContainer.vue'
-import ConveyorPlates from '@/components/display/ConveyorPlates.vue'
+import ScenicDishStage from '@/components/display/ScenicDishStage.vue'
+import SceneTransitionOverlay from '@/components/display/SceneTransitionOverlay.vue'
+import FeaturedDishScreen from '@/components/display/FeaturedDishScreen.vue'
+import GameInvitationFlow from '@/components/display/GameInvitationFlow.vue'
 import TopPlateProgress from '@/components/display/TopPlateProgress.vue'
 import CartPanel from '@/components/display/CartPanel.vue'
 import CenterFunctionPanel from '@/components/display/CenterFunctionPanel.vue'
 import { useCart } from '@/composables/useCart'
 import { useOrderProgress } from '@/composables/useOrderProgress'
-import { useConveyorBelt } from '@/composables/useConveyorBelt'
-import { useVirtualPlates } from '@/composables/useVirtualPlates'
-import { useConveyorLifecycle } from '@/composables/useConveyorLifecycle'
 import SettingDialog from "@components/display/SettingDialog.vue";
 import VirtualDiningAssistant from '@/components/display/VirtualDiningAssistant.vue'
 import { menuApi } from '@/api/menu.js';
@@ -198,14 +235,135 @@ import { useGlobalStore } from '@/stores/global'
 import {
   ASSISTANT_RECOMMENDATION_BATCH_SIZE,
   findAssistantRecommendations,
+  findAssistantPresetRecommendations,
   getAssistantRecommendationBatch,
   parseAssistantCommand,
   planAssistantCartAdditions
 } from '@/utils/assistantRecommendations'
 import { ASSISTANT_AUDIO } from '@/utils/assistantAudio'
+import { findPromoForItem } from '@/config/promoContent'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
+
+const SCENES = {
+  zhenxian: {
+    background: '/images/ui/b/background.png',
+    assets: [
+      '/images/ui/b/background.png',
+      '/images/ui/b/bar.png',
+      '/images/ui/b/bar1.png',
+      '/images/ui/b/bar2.png',
+      '/images/ui/b/shinchan-boat-guidenew-transparent.png',
+      '/images/ui/b/shell-dish-tray.png',
+      '/images/ui/b/transition/shinchan-red-redrawn.png',
+      '/images/ui/b/transition/shinchan-shark-redrawn.png',
+      '/images/ui/b/transition/shinchan-group-redrawn.png',
+      '/images/ui/b/transition/shinchan-beach-redrawn.png'
+    ]
+  },
+  xiaoxin: {
+    background: '/images/ui/c/background.png',
+    assets: [
+      '/images/ui/c/background.png',
+      '/images/ui/c/bar.png',
+      '/images/ui/c/bar1.png',
+      '/images/ui/c/bar2.png',
+      '/images/ui/c/sea-turtle-coral-tray-two.png',
+      '/images/ui/c/turtle-layered/trayCropnew-transparent.png',
+      '/images/ui/c/turtle-layered/shellCrop.png',
+      '/images/ui/c/turtle-layered/bodyCrop.png',
+      '/images/ui/c/turtle-layered/headStaticCrop.png',
+      '/images/ui/c/turtle-layered/finFrontLeftCrop.png',
+      '/images/ui/c/turtle-layered/finFrontRightCrop.png',
+      '/images/ui/c/turtle-layered/finRearLeftCrop.png',
+      '/images/ui/c/turtle-layered/finRearRightCrop.png',
+      '/images/ui/c/turtle-layered/splashGenerated.png',
+      '/images/ui/b/shell-dish-tray.png',
+      '/images/ui/c/transition/ocean-animals.png'
+    ]
+  }
+}
+const FALLBACK_SCENE_KEY = 'zhenxian'
+const getInitialSceneKey = () => {
+  const savedTheme = localStorage.getItem('selectedThemeKey')
+  return SCENES[savedTheme] ? savedTheme : FALLBACK_SCENE_KEY
+}
+const activeSceneKey = ref(getInitialSceneKey())
+const pendingSceneKey = ref('')
+const sceneTransitionPhase = ref('idle')
+const sceneRevision = ref(0)
+const sceneTransitionBusy = computed(() => sceneTransitionPhase.value !== 'idle')
+let sceneTransitionRun = 0
+
+const applySceneTheme = (sceneKey) => {
+  const scene = SCENES[sceneKey] || SCENES[FALLBACK_SCENE_KEY]
+  document.documentElement.style.setProperty('--theme-key', sceneKey)
+  document.documentElement.style.setProperty('--theme-bg', `url(${scene.background})`)
+  document.documentElement.setAttribute('data-theme', sceneKey)
+  localStorage.setItem('selectedThemeKey', sceneKey)
+}
+
+applySceneTheme(activeSceneKey.value)
+
+const waitForSceneFrame = (duration) => new Promise((resolve) => {
+  window.setTimeout(resolve, duration)
+})
+
+const preloadImage = (src) => new Promise((resolve) => {
+  if (!src) {
+    resolve()
+    return
+  }
+  const image = new Image()
+  const finish = () => resolve()
+  image.onload = finish
+  image.onerror = finish
+  image.src = src
+  if (image.complete) finish()
+})
+
+const preloadScene = async (sceneKey) => {
+  const scene = SCENES[sceneKey]
+  if (!scene) return
+  const dishAssets = displaySushiData.value
+    .slice(0, 8)
+    .map(item => item?.image || item?.imageUrl)
+    .filter(Boolean)
+  const loading = Promise.allSettled([...new Set([...scene.assets, ...dishAssets])].map(preloadImage))
+  await Promise.race([loading, waitForSceneFrame(2400)])
+}
+
+const handleThemeChange = async (theme) => {
+  const nextSceneKey = theme?.key
+  if (!SCENES[nextSceneKey] || sceneTransitionBusy.value) return
+  settingVisible.value = false
+  // 场景转场前先收回吊屏，避免全屏幕布动画与吊屏动画叠在一起。
+  closeFeaturedPromo()
+  if (nextSceneKey === activeSceneKey.value) return
+
+  const run = ++sceneTransitionRun
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false
+  pendingSceneKey.value = nextSceneKey
+  sceneTransitionPhase.value = 'covering'
+  await waitForSceneFrame(reducedMotion ? 20 : 1700)
+  if (run !== sceneTransitionRun) return
+
+  sceneTransitionPhase.value = 'covered'
+  await preloadScene(nextSceneKey)
+  if (run !== sceneTransitionRun) return
+
+  activeSceneKey.value = nextSceneKey
+  applySceneTheme(nextSceneKey)
+  sceneRevision.value += 1
+  await nextTick()
+
+  sceneTransitionPhase.value = 'revealing'
+  await waitForSceneFrame(reducedMotion ? 40 : 1050)
+  if (run !== sceneTransitionRun) return
+  sceneTransitionPhase.value = 'idle'
+  pendingSceneKey.value = ''
+}
 
 const shopId = Number(import.meta.env.VITE_SHOP_ID || 2)
 const deskId = Number(import.meta.env.VITE_DESK_ID || 77)
@@ -231,6 +389,9 @@ const assistantSelectedItemId = ref(null)
 const assistantContinueListening = ref(false)
 const assistantOrdering = ref(false)
 const lastAssistantOrderedItem = ref(null)
+const pendingAssistantAction = ref(null)
+const assistantRecommendationMode = ref('query')
+const assistantStreamPaused = ref(false)
 let assistantFeedbackTimer = null
 
 // 商品名同时作为 ASR 热词传给服务端；去重和数量上限避免启动报文过大。
@@ -252,6 +413,12 @@ const navigationItems = computed(() => displaySushiData.value)
 
 // 推荐池保存完整排序结果，recommendations 只暴露当前最多六项的可见批次。
 const assistantRecommendationPool = computed(() => {
+  if (assistantRecommendationMode.value !== 'query') {
+    return findAssistantPresetRecommendations({
+      items: displaySushiData.value,
+      mode: assistantRecommendationMode.value
+    })
+  }
   if (!voiceSearchKeyword.value) return []
   return findVoiceMatches(displaySushiData.value, voiceSearchKeyword.value)
 })
@@ -295,6 +462,9 @@ const resetVoiceSearch = () => {
   assistantSelectedItemId.value = null
   assistantContinueListening.value = false
   lastAssistantOrderedItem.value = null
+  pendingAssistantAction.value = null
+  assistantRecommendationMode.value = 'query'
+  if (callWaiterConfirmVisible.value) callWaiterConfirmVisible.value = false
 }
 
 watch(() => globalStore.voiceAssistantEnabled, (enabled) => {
@@ -309,6 +479,8 @@ watch(() => globalStore.voiceAssistantEnabled, (enabled) => {
 const handleVoiceTranscript = (text) => {
   const query = String(text || '').trim()
   if (!query || assistantOrdering.value) return
+  // A user voice command has priority over the passive promo video.
+  if (featuredPromoVisible.value) closeFeaturedPromo()
 
   const command = parseAssistantCommand({
     transcript: query,
@@ -316,8 +488,137 @@ const handleVoiceTranscript = (text) => {
     items: displaySushiData.value
   })
 
+  if (command.type === 'confirm_action') {
+    const pendingAction = pendingAssistantAction.value
+    if (!pendingAction) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.noPendingAction'), ASSISTANT_AUDIO.SELECTION_INVALID)
+      return
+    }
+    pendingAssistantAction.value = null
+    if (pendingAction.type === 'order_all') {
+      void placeAllAssistantOrders()
+    } else if (pendingAction.type === 'call_waiter') {
+      confirmCallWaiter({ assistant: true })
+    }
+    return
+  }
+
+  if (command.type === 'cancel_action' || (command.type === 'end_session' && pendingAssistantAction.value)) {
+    const hadPendingAction = Boolean(pendingAssistantAction.value)
+    pendingAssistantAction.value = null
+    callWaiterConfirmVisible.value = false
+    assistantContinueListening.value = true
+    setAssistantFeedback(
+      t(hadPendingAction ? 'assistant.actionCancelled' : 'assistant.noPendingAction'),
+      hadPendingAction ? ASSISTANT_AUDIO.ACTION_CANCELLED : ASSISTANT_AUDIO.SELECTION_INVALID
+    )
+    return
+  }
+
   if (command.type === 'order_all') {
-    void placeAllAssistantOrders()
+    const hasItems = ['left', 'right'].some((side) => cartOf(side).some((item) => item !== null))
+    if (!hasItems) {
+      assistantContinueListening.value = true
+      setAssistantFeedback(t('assistant.orderEmpty'), ASSISTANT_AUDIO.ORDER_EMPTY)
+      return
+    }
+    pendingAssistantAction.value = { type: 'order_all' }
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.orderConfirm'), ASSISTANT_AUDIO.ORDER_CONFIRM)
+    return
+  }
+
+  if (command.type === 'request_waiter') {
+    pendingAssistantAction.value = { type: 'call_waiter' }
+    callWaiter()
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.callWaiterConfirm'), ASSISTANT_AUDIO.CALL_WAITER_CONFIRM)
+    return
+  }
+
+  if (command.type === 'open_menu' || command.type === 'open_navigation') {
+    openNavigation()
+    assistantContinueListening.value = true
+    setAssistantFeedback(
+      t(command.type === 'open_menu' ? 'assistant.menuOpened' : 'assistant.navigationOpened'),
+      command.type === 'open_menu' ? ASSISTANT_AUDIO.OPEN_MENU : ASSISTANT_AUDIO.OPEN_NAVIGATION
+    )
+    return
+  }
+
+  if (command.type === 'open_side_menu') {
+    menuVisibility.value[command.side] = true
+    assistantContinueListening.value = true
+    setAssistantFeedback(
+      t(command.side === 'left' ? 'assistant.leftMenuOpened' : 'assistant.rightMenuOpened'),
+      command.side === 'left' ? ASSISTANT_AUDIO.OPEN_LEFT_MENU : ASSISTANT_AUDIO.OPEN_RIGHT_MENU
+    )
+    return
+  }
+
+  if (command.type === 'open_history') {
+    openOrderHistory()
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.historyOpened'), ASSISTANT_AUDIO.OPEN_HISTORY)
+    return
+  }
+
+  if (command.type === 'open_settings') {
+    openSettings()
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.settingsOpened'), ASSISTANT_AUDIO.OPEN_SETTINGS)
+    return
+  }
+
+  if (command.type === 'stream_pause' || command.type === 'stream_resume') {
+    assistantStreamPaused.value = command.type === 'stream_pause'
+    assistantContinueListening.value = true
+    setAssistantFeedback(
+      t(command.type === 'stream_pause' ? 'assistant.streamPaused' : 'assistant.streamResumed'),
+      command.type === 'stream_pause' ? ASSISTANT_AUDIO.STREAM_PAUSED : ASSISTANT_AUDIO.STREAM_RESUMED
+    )
+    return
+  }
+
+  if (command.type === 'stream_slower' || command.type === 'stream_faster') {
+    const delta = command.type === 'stream_slower' ? -0.25 : 0.25
+    beltSpeed.value = Math.min(3, Math.max(0.2, Number((beltSpeed.value + delta).toFixed(2))))
+    localStorage.setItem('beltSpeed', beltSpeed.value.toString())
+    assistantContinueListening.value = true
+    setAssistantFeedback(
+      t(command.type === 'stream_slower' ? 'assistant.streamSlower' : 'assistant.streamFaster'),
+      command.type === 'stream_slower' ? ASSISTANT_AUDIO.STREAM_SLOWER : ASSISTANT_AUDIO.STREAM_FASTER
+    )
+    return
+  }
+
+  if (['recommend_popular', 'recommend_featured', 'recommend_combo'].includes(command.type)) {
+    const modeByCommand = {
+      recommend_popular: 'popular',
+      recommend_featured: 'featured',
+      recommend_combo: 'combo'
+    }
+    const feedbackByMode = {
+      popular: ['assistant.popularIntro', ASSISTANT_AUDIO.POPULAR_INTRO],
+      featured: ['assistant.featuredIntro', ASSISTANT_AUDIO.FEATURED_INTRO],
+      combo: ['assistant.comboIntro', ASSISTANT_AUDIO.COMBO_INTRO]
+    }
+    const mode = modeByCommand[command.type]
+    assistantRecommendationMode.value = mode
+    voiceSearchKeyword.value = query
+    assistantRecommendationBatchIndex.value = 0
+    voiceMatchCount.value = assistantRecommendationPool.value.length
+    assistantSelectedItemId.value = null
+    assistantContinueListening.value = true
+    if (!assistantRecommendationPool.value.length) {
+      setAssistantFeedback(t('assistant.recommendationPresetEmpty'), ASSISTANT_AUDIO.RECOMMENDATION_EMPTY)
+      return
+    }
+    const [messageKey, audioKey] = feedbackByMode[mode]
+    setAssistantFeedback(t(messageKey, {
+      count: Math.min(assistantRecommendationPool.value.length, ASSISTANT_RECOMMENDATION_BATCH_SIZE)
+    }), audioKey)
     return
   }
 
@@ -360,7 +661,9 @@ const handleVoiceTranscript = (text) => {
       ? 'assistant.recommendationBatchRestarted'
       : 'assistant.recommendationBatchChanged', {
       count: assistantRecommendations.value.length
-    }), nextIndex === 0 ? ASSISTANT_AUDIO.BATCH_RESTARTED : ASSISTANT_AUDIO.NEXT_BATCH)
+    }), assistantRecommendationMode.value === 'query'
+      ? (nextIndex === 0 ? ASSISTANT_AUDIO.BATCH_RESTARTED : ASSISTANT_AUDIO.NEXT_BATCH)
+      : ASSISTANT_AUDIO.RECOMMENDATION_REPLACED)
     return
   }
 
@@ -414,6 +717,7 @@ const handleVoiceTranscript = (text) => {
   }
 
   voiceSearchKeyword.value = query
+  assistantRecommendationMode.value = 'query'
   assistantRecommendationBatchIndex.value = 0
   assistantContinueListening.value = true
   setAssistantFeedback(t(matches.length > ASSISTANT_RECOMMENDATION_BATCH_SIZE
@@ -481,19 +785,27 @@ const addAssistantItems = (selections) => {
       name: selection.item.name || selection.item.storeName,
       side: sideLabel,
       quantity: selection.quantity
-    }), ASSISTANT_AUDIO.ADDED)
+    }), sides.length > 1
+      ? ASSISTANT_AUDIO.ADDED_BOTH
+      : (sides[0] === 'left' ? ASSISTANT_AUDIO.ADDED_LEFT : ASSISTANT_AUDIO.ADDED_RIGHT))
   } else {
+    const sides = [...new Set(additions.map((addition) => addition.side))]
     setAssistantFeedback(t('assistant.addedMultipleToCart', {
       count: normalizedSelections.length,
       quantity: requestedQuantity
-    }), ASSISTANT_AUDIO.ADDED)
+    }), sides.length > 1
+      ? ASSISTANT_AUDIO.ADDED_BOTH
+      : (sides[0] === 'left' ? ASSISTANT_AUDIO.ADDED_LEFT : ASSISTANT_AUDIO.ADDED_RIGHT))
   }
   return true
 }
 
 const addAssistantItem = (item, quantity = 1) => addAssistantItems([{ item, quantity }])
 
-const handleAssistantRecommendationSelect = (item) => addAssistantItem(item, 1)
+const handleAssistantRecommendationSelect = (item) => {
+  if (featuredPromoVisible.value) closeFeaturedPromo()
+  addAssistantItem(item, 1)
+}
 
 // 从服务器获取商品数据
 const fetchSushiData = async () => {
@@ -532,12 +844,14 @@ const fetchSushiData = async () => {
 
 // 响应式数据（改用组合式函数统一管理购物车与进度）
 const { leftCart, rightCart, cartOf, countOf, add, remove, increase, decrease, clear } = useCart()
-const { plateProgress, applyOrder, resetLater } = useOrderProgress()
+const { plateProgress, applyOrder, reset: resetPlateProgress } = useOrderProgress()
 // const currentPlates = ref(2) // 暂未使用
 // const selectedSushi = ref(null) // 暂未使用
 const menuVisibility = ref({ left: false, right: false });
 const showSushiNavigation = ref(false)
 const settingVisible = ref(false)
+const gameFlowRef = ref(null)
+const gameModePaused = ref(false)
 
 // 购物车提示状态管理
 const leftCartTipsType = ref('')
@@ -577,48 +891,9 @@ const closeCartFullTips = (side) => {
 }
 
 
-// 传送带相关
-const beltTrack = ref(null)
-const beltItems = ref(null)
-// 由 useConveyorBelt 提供：displayOffset / isDragging / isMomentum / dragState
-
 // 传送带设置状态
 const beltDirection = ref('left') // 'left' 或 'right'
 const beltSpeed = ref(1) // 速度
-
-// 传送带配置 - 支持动态方向和速度
-const beltConfig = computed(() => ({
-  itemWidth: 380,
-  autoSpeed: beltSpeed.value * (beltDirection.value === 'left' ? 1 : -1), // 根据方向调整速度符号
-  maxVelocity: 15,
-  decay: 0.95,
-  minVelocity: 0.1,
-  dragThreshold: 15,
-  maxDragDistance: 50,
-  longPressDelay: 600
-}))
-
-// 初始化传送带（组合式） - 使用响应式配置
-const belt = useConveyorBelt({
-  beltConfig: beltConfig.value,
-  onUpdate: () => {}
-})
-const { displayOffset, isDragging, isMomentum, dragState, startDrag, updateConfig } = belt
-
-// 动画控制由 useConveyorBelt 内部 rAF 管理
-
-// 虚拟滚动：改用组合式函数封装，增大缓冲区以确保能看到所有菜品
-const { virtualScrollState, displayItems } = useVirtualPlates({
-  data: displaySushiData,
-  displayOffset,
-  itemWidth: 300,
-  gap: 130,
-  buffer: 15  // 增大缓冲区确保能展示更多菜品
-})
-
-// const singleLoopWidth = computed(() => {
-//   return (beltConfig.itemWidth + 10) * displaySushiData.length // 10px是gap间距
-// }) // 暂未使用
 
 
 // 格式化进度显示
@@ -626,14 +901,10 @@ const formattedProgress = computed(() => {
   return `${Math.round(plateProgress.value)}%`;
 })
 
-// 传送带核心逻辑由 useConveyorBelt 提供
-
-
-// 动量滚动
-// 动量滚动逻辑改由 useConveyorBelt.startMomentum 提供
 // 寿司点击处理 - 直接添加到购物车
 const handleSushiClick = (item, event) => {
-  if (!item.available) {
+  if (featuredPromoVisible.value) closeFeaturedPromo()
+  if (item?.available === false || item?.status === 'OFF_SHELF') {
     ElMessage.warning(t('common.soldOut'))
     return
   }
@@ -660,22 +931,6 @@ const handleNavigationAddToCart = (item, side) => {
     return
   }
   addToCart(item, side === 'left' ? 'left' : 'right')
-}
-
-// SushiPlate组件的拖动事件处理
-const handleSushiDragStart = (data) => {
-  console.log('寿司拖动开始:', data.item.name)
-  // 可以在这里添加拖动开始的逻辑
-}
-
-const handleSushiDragMove = () => {
-  // 拖动移动事件，通常不需要特殊处理
-  // 如果需要处理拖动数据，可以添加参数: (data)
-}
-
-const handleSushiDragEnd = (data) => {
-  console.log('寿司拖动结束:', data.item.name)
-  // 可以在这里添加拖动结束的逻辑，比如特殊的拖动操作
 }
 
 // 购物车操作
@@ -881,9 +1136,11 @@ const placeOrder = async (side, options = {}) => {
       }
     }, 3000)
 
-  // 静默处理扭蛋奖励（不显示提醒）
+  // 投盘进度满一轮后发放一次游戏资格，再立即清零，下一轮可继续累计。
     if (reachedReward) {
-      resetLater(2000)
+      closeFeaturedPromo()
+      gameFlowRef.value?.grantCredit()
+      resetPlateProgress()
     }
 
     if (notify) ElMessage.success(t('display.orderSubmitted', { orderId: backendOrderId }))
@@ -951,6 +1208,50 @@ const orderHistory = ref([])
 // 呼叫店员确认弹窗状态
 const callWaiterConfirmVisible = ref(false)
 
+// 招牌菜介绍吊屏：特殊事件第二位触发物点击后垂下，视频单次播放结束自动收回。
+// 状态声明放在所有弹窗状态之后，watch 依赖才不会踩到 TDZ。
+const featuredPromoItem = ref(null)
+const featuredPromoVisible = ref(false)
+let pendingFeaturedPromoItem = null
+
+const openFeaturedPromo = (item) => {
+  if (!item || !findPromoForItem(item)) return
+  featuredPromoItem.value = item
+  featuredPromoVisible.value = true
+}
+
+const handleFeaturedPromo = (item) => {
+  // 小禾正在下单时先记住意图，订单落定后再垂下，避免播报互相打断。
+  if (assistantOrdering.value) {
+    pendingFeaturedPromoItem = item
+    return
+  }
+  openFeaturedPromo(item)
+}
+
+const closeFeaturedPromo = () => {
+  featuredPromoVisible.value = false
+}
+
+watch(assistantOrdering, (busy) => {
+  if (busy || !pendingFeaturedPromoItem) return
+  const item = pendingFeaturedPromoItem
+  pendingFeaturedPromoItem = null
+  openFeaturedPromo(item)
+})
+
+// 打开任意弹窗或侧边菜单时收起吊屏，避免视觉层级互相遮挡。
+watch([
+  showSushiNavigation,
+  orderHistoryVisible,
+  settingVisible,
+  callWaiterConfirmVisible,
+  () => menuVisibility.value.left,
+  () => menuVisibility.value.right
+], (values) => {
+  if (values.some(Boolean)) closeFeaturedPromo()
+})
+
 // 结账功能 - 暂未使用
 // const checkout = () => {
 //   const allItems = [...leftCart.filter(item => item), ...rightCart.filter(item => item)]
@@ -969,13 +1270,19 @@ const callWaiter = () => {
   callWaiterConfirmVisible.value = true
 }
 
-const confirmCallWaiter = () => {
+const confirmCallWaiter = (options = {}) => {
   callWaiterConfirmVisible.value = false
+  if (pendingAssistantAction.value?.type === 'call_waiter') pendingAssistantAction.value = null
   ElMessage.info(t('display.waiterCalled'))
+  if (options?.assistant) {
+    assistantContinueListening.value = true
+    setAssistantFeedback(t('assistant.callWaiterSent'), ASSISTANT_AUDIO.CALL_WAITER_SENT)
+  }
 }
 
 const cancelCallWaiter = () => {
   callWaiterConfirmVisible.value = false
+  if (pendingAssistantAction.value?.type === 'call_waiter') pendingAssistantAction.value = null
 }
 
 // 选择购物车位置（预留扩展）
@@ -1085,19 +1392,10 @@ const getCartCount = (side) => {
 // 传送带设置处理函数
 const handleBeltDirectionChanged = (direction) => {
   beltDirection.value = direction
-  // 更新传送带配置
-  if (updateConfig) {
-    updateConfig(beltConfig.value)
-  }
 }
 
 const handleBeltSpeedChanged = (speed) => {
   beltSpeed.value = speed
-  // 更新传送带配置
-  if (updateConfig) {
-    updateConfig(beltConfig.value)
-    // 速度变化不需要重启，只需要更新配置
-  }
 }
 
 // 初始化传送带设置
@@ -1117,14 +1415,7 @@ const initBeltSettings = () => {
     }
   }
 
-  // 立即应用设置到传送带配置
-  if (updateConfig) {
-    updateConfig(beltConfig.value)
-  }
 }
-
-// 生命周期：改用组合式函数封装
-useConveyorLifecycle({ beltTrackRef: beltTrack, virtualScrollState, belt })
 
 // 组件挂载时初始化设置
 onMounted(async () => {
@@ -1138,13 +1429,6 @@ onMounted(async () => {
   await fetchSushiData();
 })
 
-// 监听传送带配置变化
-watch(beltConfig, (newConfig) => {
-  if (updateConfig) {
-    updateConfig(newConfig)
-  }
-}, { deep: true })
-
 // 监听菜品数据变化，自动重新计算
 watch(() => displaySushiData.length, () => {
   // 菜品数据变化时，虚拟滚动会自动重新计算
@@ -1153,15 +1437,287 @@ watch(() => displaySushiData.length, () => {
 }, { immediate: true })
 
 onUnmounted(() => {
-  if (dragState.longPressTimer) {
-    clearTimeout(dragState.longPressTimer)
-  }
   if (assistantFeedbackTimer) clearTimeout(assistantFeedbackTimer)
 })
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+
+/* Theme B keeps the 3840 x 1080 beach artwork visible and only floats the
+   functional surfaces that need contrast. */
+.conveyor-display {
+  color: #173944;
+  background-color: #61c5ef;
+}
+
+.top-section {
+  position: relative;
+  z-index: 50;
+  height: 178px; /* 加高：给 126px 的小禾角色留出完整头部空间 */
+  box-sizing: border-box;
+  padding: 12px 24px 10px;
+  display: flex;
+  align-items: stretch;
+}
+
+/* 单条主题横幅：品牌 / 投碟进度 / 小禾 三区；背景透明，直接透出页面主题背景（无裁切、无错位） */
+.top-scene-banner {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(270px, 0.72fr) minmax(330px, 1.08fr) minmax(460px, 1.2fr);
+  gap: 6px;
+  align-items: stretch;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+/* 品牌区保留文字对比度，中间投盘区尽量透出页面主题背景。 */
+.top-scene-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(95deg,
+    rgba(6, 36, 50, 0) 0%,
+    rgba(6, 36, 50, 0) 46%,
+    rgba(6, 36, 50, 0) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.brand-lockup {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  align-content: center;
+  padding: 10px 20px;
+}
+
+.brand-kicker {
+  color: #f4d28b;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-shadow: 0 1px 3px rgba(4, 26, 35, 0.5);
+}
+
+.brand-lockup strong {
+  color: #fff8e8;
+  font-size: 30px;
+  line-height: 1;
+  text-shadow: 0 2px 6px rgba(4, 26, 35, 0.6);
+}
+
+.brand-table {
+  color: rgba(255, 248, 232, 0.86);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgba(4, 26, 35, 0.45);
+}
+
+/* 投碟进度完全使用主题图片，由组件按真实百分比裁切 bar2.png。 */
+.top-progress {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 4;
+  width: min(941px, calc(100vw - 40px));
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.top-progress :deep(.plate-progress) {
+  width: 100%;
+}
+
+.assistant-slot {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 14px 2px 8px;
+  grid-column: 3;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.assistant-slot :deep(.assistant-recommendation-rail) {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 6px;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 230px);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
+  grid-template-columns: minmax(0, 1fr) 270px;
+}
+
+.assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 230px);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.assistant-slot :deep(.recommendation-list) { grid-auto-columns: 150px; gap: 8px; }
+.assistant-slot :deep(.recommendation-card) {
+  width: 150px;
+  height: 84px;
+  padding-left: 28px;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 7px;
+}
+.assistant-slot :deep(.recommendation-card img) { width: 46px; height: 46px; }
+.assistant-slot :deep(.recommendation-number) { left: 5px; width: 20px; height: 20px; font-size: 10px; }
+.assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 102px; }
+.assistant-slot :deep(.assistant-character) { width: 102px; height: 126px; }
+.assistant-slot :deep(.assistant-bubble) { width: fit-content; max-width: min(100%, 420px); min-height: 0; height: auto; justify-self: end; padding: 8px 12px; }
+.assistant-slot :deep(.assistant-bubble strong) { font-size: 15px; }
+.assistant-slot :deep(.assistant-bubble span) { font-size: 14px; }
+
+.middle-section {
+  min-height: 0;
+  padding: 0 18px 8px;
+  align-items: stretch;
+  /* 吊挂介绍屏从这里垂下/收回，裁剪让它看起来是从顶栏后方降下来的 */
+  overflow: hidden;
+}
+
+.middle-section :deep(.scenic-dish-stage) { height: 100%; }
+
+.middle-section > .product-state {
+  inset: 70px auto auto 50%;
+  width: min(440px, calc(100% - 32px));
+  min-height: 80px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+}
+
+@media (min-width: 1921px) {
+  .top-section {
+    height: 196px; /* 1921+ 小禾角色 150px，横幅需 ≥ 170px */
+    padding: 14px 28px 12px;
+  }
+
+  .brand-kicker { font-size: 13px; }
+  .brand-lockup strong { font-size: 36px; }
+  .brand-table { font-size: 15px; }
+  .top-scene-banner { grid-template-columns: minmax(420px, 0.7fr) minmax(560px, 1.05fr) minmax(1080px, 1.25fr); }
+  .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 320px; }
+  .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) { grid-template-columns: minmax(0, 1fr) 300px; }
+  .assistant-slot :deep(.recommendation-list) { grid-auto-columns: 160px; gap: 10px; }
+  .assistant-slot :deep(.recommendation-card) {
+    width: 160px;
+    height: 90px;
+    grid-template-columns: 50px minmax(0, 1fr);
+  }
+  .assistant-slot :deep(.recommendation-card img) { width: 50px; height: 50px; }
+  .assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 126px; }
+  .assistant-slot :deep(.assistant-character) { width: 126px; height: 150px; }
+  .assistant-slot :deep(.assistant-bubble) { max-width: min(100%, 520px); min-height: 0; padding: 10px 14px; }
+  .assistant-slot :deep(.assistant-bubble strong) { font-size: 17px; }
+  .assistant-slot :deep(.assistant-bubble span) { font-size: 16px; }
+}
+
+@media (max-width: 900px) {
+  .top-section {
+    height: 150px; /* ≤900 小禾角色 98px，横幅 ≥ 130px */
+    padding: 10px 14px;
+  }
+
+  .top-scene-banner { grid-template-columns: minmax(190px, 0.6fr) minmax(240px, 1fr) minmax(0, 1.15fr); }
+  .brand-lockup { padding-inline: 14px; }
+  .brand-lockup strong { font-size: 24px; }
+  .brand-table { font-size: 11px; }
+  .top-progress {
+    top: 6px;
+    width: calc(100vw - 28px);
+  }
+  .assistant-slot { padding: 0 8px 2px 4px; }
+  .assistant-slot :deep(.assistant-recommendation-rail) { padding: 3px; }
+  .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) { grid-template-columns: minmax(0, 1fr) 180px; }
+  .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 180px; }
+  .assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 78px; }
+  .assistant-slot :deep(.assistant-character) { width: 78px; height: 98px; }
+  .middle-section { padding-inline: 14px; }
+  .middle-section > .product-state { width: calc(100% - 28px); }
+}
+
+@media (max-width: 600px) {
+  .conveyor-display {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .top-section {
+    height: auto;
+    padding: 8px 10px 10px;
+  }
+
+  .top-progress {
+    top: 5px;
+    width: calc(100vw - 20px);
+  }
+  .top-scene-banner {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .brand-lockup {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 9px 12px 3px;
+  }
+  .brand-kicker { display: none; }
+  .brand-lockup strong { font-size: 24px; }
+  .brand-table { font-size: 11px; }
+  .assistant-slot {
+    grid-column: 1;
+    min-height: 0;
+    padding: 0 4px 2px;
+  }
+  .assistant-slot :deep(.assistant-recommendation-rail),
+  .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations),
+  .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
+    grid-template-columns: minmax(0, 1fr) 92px;
+  }
+  .assistant-slot :deep(.recommendation-lane__header) { display: none; }
+  .assistant-slot :deep(.recommendation-list) { display: none; }
+  .assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 76px; }
+  .assistant-slot :deep(.assistant-character) { width: 76px; height: 96px; }
+  .assistant-slot :deep(.assistant-bubble) { max-width: min(100%, 280px); min-height: 0; padding: 6px 8px; }
+  .middle-section { flex: 0 0 440px; min-height: 440px; padding: 0 8px 8px; }
+  .middle-section > .product-state { top: 56px; width: calc(100% - 16px); }
+}
 
 .product-state {
   position: absolute;
@@ -1295,4 +1851,145 @@ onUnmounted(() => {
     border-top: 1px solid #f0f0f0;
   }
 }
+
+/* 原版底部组件使用 827/790px 固定画布；移动端仅等比例收紧尺寸，
+   保留主题贴图、按钮顺序和左右购物车结构。 */
+@media (max-width: 600px) {
+  .bottom-section {
+    height: auto;
+    min-height: 388px;
+    padding: 0 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bottom-center { order: 1; }
+  .bottom-left { order: 2; }
+  .bottom-right { order: 3; }
+
+  .bottom-left,
+  .bottom-right {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bottom-left :deep(.cart-section),
+  .bottom-right :deep(.cart-section) {
+    width: 100%;
+    height: 126px;
+    padding: 8px;
+    background-size: 100% 100%;
+  }
+
+  .bottom-left :deep(.item-group),
+  .bottom-right :deep(.item-group) {
+    width: 100%;
+    height: 110px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  .bottom-left :deep(.cart-item),
+  .bottom-right :deep(.cart-item) {
+    width: 54px;
+    height: 106px;
+    gap: 3px;
+  }
+
+  .bottom-left :deep(.item-circle),
+  .bottom-right :deep(.item-circle) {
+    width: 54px;
+    height: 54px;
+  }
+
+  .bottom-left :deep(.item-info),
+  .bottom-right :deep(.item-info) {
+    margin-top: -7px;
+  }
+
+  .bottom-left :deep(.item-name-area),
+  .bottom-right :deep(.item-name-area) {
+    height: 22px;
+    padding: 0 2px;
+    line-height: 22px;
+    font-size: 10px;
+  }
+
+  .bottom-left :deep(.item-controls),
+  .bottom-right :deep(.item-controls) {
+    height: 22px;
+    padding: 0 3px;
+  }
+
+  .bottom-left :deep(.order-btn),
+  .bottom-right :deep(.order-btn) {
+    width: 66px;
+    height: 110px;
+    flex: 0 0 66px;
+    padding: 0;
+    background-size: 100% 100%;
+  }
+
+  .bottom-left :deep(.order-progress),
+  .bottom-right :deep(.order-progress) {
+    top: auto;
+    bottom: 16px;
+    font-size: 18px;
+  }
+
+  :deep(.bottom-center) {
+    width: 100%;
+    height: 170px;
+    padding: 8px;
+    margin: 0;
+    background-size: 100% 100%;
+  }
+
+  :deep(.center-layout) {
+    width: 100%;
+    height: 154px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 0;
+  }
+
+  :deep(.menu-btn) {
+    width: 64px;
+    height: 140px;
+    flex: 0 0 64px;
+    background-size: 100% 100%;
+  }
+
+  :deep(.center-functions) {
+    width: auto;
+    height: 144px;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 4px;
+  }
+
+  :deep(.function-row) {
+    height: 70px;
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  :deep(.first-row .function-btn),
+  :deep(.second-row .function-btn) {
+    width: auto;
+    height: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    background-size: 100% 100%;
+  }
+}
+
 </style>

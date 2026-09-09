@@ -19,9 +19,19 @@
             @close-tips="emit('close-cart-tips', 'left')"
           />
         </div>
-        <!-- 返回按钮 -->
-        <div class="return-btn" @click="closeNavigation">
-          {{ $t('menu.backToConveyor') }}
+        <!-- 分类页返回全局搜索；全局搜索页再返回传送带 -->
+        <div class="navigation-return-actions">
+          <button
+            v-if="activeFilter !== 'all'"
+            type="button"
+            class="return-btn return-btn--back"
+            @click="returnToAllItems"
+          >
+            {{ $t('common.back') }}
+          </button>
+          <button type="button" class="return-btn" @click="closeNavigation">
+            {{ $t('menu.backToConveyor') }}
+          </button>
         </div>
         <!-- 右侧购物车 -->
         <div class="bottom-right">
@@ -331,6 +341,12 @@ const handleFilterClick = (filterId) => {
 const applyFilter = (filterId) => {
   activeFilter.value = filterId
   // 重置位置到可见区域
+  offsetX.value = 50
+  offsetY.value = 50
+}
+
+const returnToAllItems = () => {
+  activeFilter.value = 'all'
   offsetX.value = 50
   offsetY.value = 50
 }
@@ -1129,21 +1145,56 @@ onUnmounted(() => {
 
 .return-btn {
   margin: 0 300px;
-  color: black;
-  border: 2px solid black;
+  min-width: clamp(180px, 14vw, 300px);
+  min-height: 62px;
+  box-sizing: border-box;
+  color: #fffdf3;
+  border: 2px solid rgba(247, 213, 142, 0.95);
   padding: 15px 30px;
   border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #fff;
+  background-color: #173d5c;
+  background-image: url('/images/ui/navigation/sushi-return-button-texture.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% 260%;
+  background-position: center 0;
+  box-shadow: 0 7px 16px rgba(19, 47, 61, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  text-shadow: 0 2px 3px rgba(9, 27, 41, 0.72);
   pointer-events: auto;
   &:hover {
-    background: #f0f0f0;
+    filter: brightness(1.1) saturate(1.08);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 20px rgba(19, 47, 61, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
+}
+
+.return-btn--back {
+  background-position: center 0;
+}
+
+.navigation-return-actions > .return-btn:not(.return-btn--back) {
+  background-color: #a93c2e;
+  background-position: center 100%;
+}
+
+.return-btn:focus-visible {
+  outline: 3px solid rgba(255, 214, 90, 0.9);
+  outline-offset: 3px;
+}
+
+.navigation-return-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.navigation-return-actions .return-btn {
+  margin: 0;
 }
 
 // 响应式设计

@@ -5,6 +5,15 @@
         <p class="game-kicker">{{ $t('games.localOnly') }}</p>
         <h2 id="catch-title">{{ $t('games.sushiCatch.title') }}</h2>
       </div>
+      <button
+        type="button"
+        class="game-close-button"
+        :aria-label="$t('common.close')"
+        :title="$t('common.close')"
+        @click="closeGame"
+      >
+        <el-icon><Close /></el-icon>
+      </button>
     </header>
 
     <div class="score-strip" aria-live="polite">
@@ -15,8 +24,12 @@
       <div class="metric"><span>{{ $t('games.combo') }}</span><strong>x{{ combo }}</strong></div>
     </div>
 
-    <div ref="arenaRef" class="catch-arena" :style="{ backgroundImage: `url(${sushiBackground})` }">
+    <div ref="arenaRef" class="catch-arena" :style="{ backgroundImage: `url(${immersiveBackground})` }">
       <div class="sea-shade"></div>
+      <div class="light-rays" aria-hidden="true"></div>
+      <div class="bubble-field" aria-hidden="true">
+        <i v-for="bubble in bubbles" :key="bubble.id" :style="bubble.style"></i>
+      </div>
       <div class="difficulty-meter">
         <span>{{ $t('games.difficulty') }}</span>
         <div><i :style="{ width: `${difficultyPercent}%` }"></i></div>
@@ -42,13 +55,43 @@
         <p>{{ stateDescription }}</p>
       </div>
     </div>
+
+    <div v-if="status === 'running'" class="catch-controls" role="group" :aria-label="$t('games.sushiCatch.moveControls')">
+      <button
+        type="button"
+        class="catch-control catch-control--left"
+        :aria-label="$t('games.left')"
+        @pointerdown.prevent="pressControl(-1, $event)"
+        @pointerup="releaseControl"
+        @pointercancel="releaseControl"
+        @pointerleave="releaseControl"
+        @lostpointercapture="releaseControl"
+      >
+        <el-icon><ArrowLeft /></el-icon>
+        <span>{{ $t('games.left') }}</span>
+      </button>
+      <button
+        type="button"
+        class="catch-control catch-control--right"
+        :aria-label="$t('games.right')"
+        @pointerdown.prevent="pressControl(1, $event)"
+        @pointerup="releaseControl"
+        @pointercancel="releaseControl"
+        @pointerleave="releaseControl"
+        @lostpointercapture="releaseControl"
+      >
+        <span>{{ $t('games.right') }}</span>
+        <el-icon><ArrowRight /></el-icon>
+      </button>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ArrowLeft, ArrowRight, Close } from '@element-plus/icons-vue'
 import { useI18n } from '@/i18n'
-import sushiBackground from '@/assets/games/sushi/background.webp'
+import immersiveBackground from '@/assets/games/sushi/immersive-background.png'
 import trayImage from '@/assets/games/sushi/tray.webp'
 import sushiNormalImage from '@/assets/games/sushi/sushi-normal.webp'
 import sushiRareImage from '@/assets/games/sushi/sushi-rare.webp'
@@ -74,12 +117,24 @@ const lives = ref(3)
 const combo = ref(0)
 const trayX = ref(50)
 const fallingItems = ref([])
+const arenaSize = ref({ width: 0, height: 0 })
+const bubbles = Array.from({ length: 18 }, (_, index) => ({
+  id: index,
+  style: {
+    '--bubble-left': `${4 + (index * 19) % 92}%`,
+    '--bubble-size': `${8 + (index % 4) * 5}px`,
+    '--bubble-delay': `${(index % 7) * -0.8}s`,
+    '--bubble-duration': `${7 + (index % 5)}s`
+  }
+}))
 
 let frameId = 0
 let lastFrameTime = 0
 let spawnAccumulator = 0
 let itemSequence = 0
 let moveTimer = 0
+let resizeObserver = null
+let fullscreenElement = null
 // Set 同时记录 A/B，可正确处理两键同时按下和不同顺序松开的情况。
 const pressedControls = new Set()
 
@@ -88,7 +143,14 @@ const displayedBest = computed(() => Math.max(props.bestScore, localBest.value, 
 const lifeText = computed(() => '♥'.repeat(Math.max(0, lives.value)) || '0')
 const elapsedRatio = computed(() => Math.min(1, Math.max(0, (GAME_DURATION - remainingMs.value) / GAME_DURATION)))
 const difficultyPercent = computed(() => Math.round(18 + elapsedRatio.value * 82))
-const trayStyle = computed(() => ({ left: `${trayX.value}%` }))
+const itemPixelSize = computed(() => Math.min(92, Math.max(58, (arenaSize.value.height || 520) * 0.105)))
+const trayWidth = computed(() => Math.min(320, Math.max(210, (arenaSize.value.height || 520) * 0.32)))
+const trayHeight = computed(() => Math.min(104, Math.max(72, (arenaSize.value.height || 520) * 0.105)))
+const trayStyle = computed(() => ({
+  left: `${trayX.value}%`,
+  width: `${trayWidth.value}px`,
+  height: `${trayHeight.value}px`
+}))
 const stateTitle = computed(() => {
   if (status.value === 'paused') return t('games.paused')
   if (status.value === 'finished') return lives.value <= 0 ? t('games.sushiCatch.outOfLives') : t('games.finished')
@@ -121,7 +183,7 @@ const createFallingItem = () => {
     ...definition,
     id: `fall-${itemSequence++}`,
     x: 7 + Math.random() * 86,
-    y: -58,
+    y: -itemPixelSize.value,
     speed: 105 + elapsedRatio.value * 155 + Math.random() * 32,
     rotation: Math.random() * 24 - 12
   }
@@ -130,6 +192,8 @@ const createFallingItem = () => {
 const itemStyle = (item) => ({
   left: `${item.x}%`,
   top: `${item.y}px`,
+  width: `${itemPixelSize.value}px`,
+  height: `${itemPixelSize.value}px`,
   transform: `translateX(-50%) rotate(${item.rotation}deg)`
 })
 
@@ -160,22 +224,22 @@ const resolveCatch = (item) => {
 const updateItems = (deltaSeconds) => {
   const arena = arenaRef.value
   if (!arena) return
-  const arenaScale = Math.max(0.75, arena.clientHeight / 420)
-  const trayTop = arena.clientHeight - 62
+  const arenaScale = Math.max(0.75, arena.clientHeight / 520)
+  const trayTop = arena.clientHeight - trayHeight.value - 8
   const trayCenterX = arena.clientWidth * trayX.value / 100
-  // 大屏按宽度放大有效接取范围，小屏保留至少 52px 的可操作宽度。
-  const catchRange = Math.max(52, arena.clientWidth * 0.105)
+  // 碰撞范围略小于托盘可见宽度，避免大屏因百分比容差过大而变得无脑可接。
+  const catchRange = trayWidth.value * 0.42 + itemPixelSize.value * 0.3
   const remaining = []
 
   fallingItems.value.forEach((item) => {
     item.y += item.speed * arenaScale * deltaSeconds
     const itemCenterX = arena.clientWidth * item.x / 100
-    const reachesTray = item.y + 48 >= trayTop && item.y < trayTop + 30
+    const reachesTray = item.y + itemPixelSize.value >= trayTop && item.y < trayTop + trayHeight.value * 0.55
     if (reachesTray && Math.abs(itemCenterX - trayCenterX) <= catchRange) {
       resolveCatch(item)
       return
     }
-    if (item.y <= arena.clientHeight + 64) remaining.push(item)
+    if (item.y <= arena.clientHeight + itemPixelSize.value) remaining.push(item)
   })
 
   fallingItems.value = remaining
@@ -255,8 +319,8 @@ const closeGame = () => {
 
 const moveTray = (direction) => {
   if (status.value !== 'running') return
-  // 保留 8% 边界，确保托盘图像不会完全移出可视区。
-  trayX.value = Math.max(8, Math.min(92, trayX.value + direction * 5))
+  // 触控长按速度降低到原来的约一半，给玩家预判和修正空间。
+  trayX.value = Math.max(8, Math.min(92, trayX.value + direction * 2.4))
 }
 
 const stopMoving = () => {
@@ -265,10 +329,36 @@ const stopMoving = () => {
 }
 
 const startMoving = (direction) => {
-  // 先移动一次减少按键反馈延迟，再用固定节奏支持外接按钮长按。
+  // 先移动一次减少触控反馈延迟，再用固定节奏支持按钮长按。
   stopMoving()
   moveTray(direction)
-  moveTimer = window.setInterval(() => moveTray(direction), 70)
+  moveTimer = window.setInterval(() => moveTray(direction), 90)
+}
+
+const pressControl = (direction, event) => {
+  event.currentTarget?.setPointerCapture?.(event.pointerId)
+  startMoving(direction)
+}
+
+const releaseControl = () => stopMoving()
+
+const enterFullscreen = async () => {
+  const element = document.querySelector('.game-stage-overlay .catch-game')
+  if (!element || !element.requestFullscreen || document.fullscreenElement) return
+  fullscreenElement = element
+  try {
+    await element.requestFullscreen({ navigationUI: 'hide' })
+  } catch {
+    // The visual full-viewport layout remains usable when browser fullscreen is denied.
+    fullscreenElement = null
+  }
+}
+
+const exitFullscreen = async () => {
+  if (document.fullscreenElement && document.exitFullscreen) {
+    try { await document.exitFullscreen() } catch {}
+  }
+  fullscreenElement = null
 }
 
 const syncKeyboardMovement = () => {
@@ -319,7 +409,15 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener('keyup', handleKeyup)
   window.addEventListener('blur', releaseControls)
+  if ('ResizeObserver' in window && arenaRef.value) {
+    resizeObserver = new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect
+      if (rect) arenaSize.value = { width: rect.width, height: rect.height }
+    })
+    resizeObserver.observe(arenaRef.value)
+  }
   void startGame()
+  void enterFullscreen()
 })
 
 onBeforeUnmount(() => {
@@ -329,23 +427,26 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('keyup', handleKeyup)
   window.removeEventListener('blur', releaseControls)
+  resizeObserver?.disconnect()
+  resizeObserver = null
+  if (document.fullscreenElement === fullscreenElement) void exitFullscreen()
 })
 </script>
 
 <style lang="scss" scoped>
 .catch-game {
-  width: min(2200px, 94vw);
-  height: min(940px, 94dvh);
+  width: 100vw;
+  height: 100dvh;
   min-height: 0;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 12px;
-  padding: 18px;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: clamp(8px, 1.2vh, 16px);
+  padding: clamp(12px, 1.8vw, 28px);
   box-sizing: border-box;
-  border-radius: 8px;
-  background: #f5f8fb;
-  color: #1f2933;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  border-radius: 0;
+  background: #063c55;
+  color: #f6fbfa;
+  box-shadow: none;
 }
 
 .game-header {
@@ -356,7 +457,25 @@ onBeforeUnmount(() => {
   h2 { margin: 2px 0 0; font-size: 24px; letter-spacing: 0; }
 }
 
-.game-kicker { margin: 0; color: #23657b; font-size: 13px; }
+.game-kicker { margin: 0; color: #bde9e6; font-size: 13px; }
+
+.game-close-button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 50%;
+  background: rgba(5, 38, 56, .58);
+  color: #fff;
+  cursor: pointer;
+  font-size: 21px;
+}
+
+.game-close-button:hover { background: rgba(233, 117, 95, .88); }
+.game-close-button:focus-visible,
+.catch-control:focus-visible { outline: 3px solid rgba(255, 214, 90, .8); outline-offset: 3px; }
 
 .score-strip {
   display: grid;
@@ -364,7 +483,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   padding: 10px;
   background: #17394b;
-  border-radius: 6px;
+  border-radius: 12px;
   color: #fff;
 }
 
@@ -392,13 +511,38 @@ onBeforeUnmount(() => {
   background-color: #8ed5dc;
   isolation: isolate;
   touch-action: none;
+  box-shadow: inset 0 0 70px rgba(4, 25, 44, .26), 0 12px 34px rgba(1, 22, 34, .22);
 }
 
 .sea-shade {
   position: absolute;
   inset: 0;
-  background: rgba(8, 64, 88, 0.08);
+  background: linear-gradient(180deg, rgba(0, 50, 76, .08), rgba(2, 31, 50, .24));
   z-index: -1;
+}
+
+.light-rays {
+  position: absolute;
+  inset: -25% 8% 0;
+  background: repeating-linear-gradient(108deg, transparent 0 12%, rgba(181, 248, 242, .1) 15%, transparent 22% 34%);
+  opacity: .62;
+  transform: translateX(-3%);
+  animation: rays-drift 15s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.bubble-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.bubble-field i {
+  position: absolute;
+  left: var(--bubble-left);
+  bottom: -30px;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border: 1px solid rgba(221, 255, 255, .78);
+  border-radius: 50%;
+  box-shadow: inset 2px 2px 2px rgba(255, 255, 255, .65), 0 0 8px rgba(203, 255, 255, .24);
+  opacity: .72;
+  animation: bubble-rise var(--bubble-duration) linear var(--bubble-delay) infinite;
 }
 
 .difficulty-meter {
@@ -418,8 +562,8 @@ onBeforeUnmount(() => {
 
 .falling-item {
   position: absolute;
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   box-sizing: border-box;
   filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
   img { width: 100%; height: 100%; object-fit: contain; }
@@ -432,8 +576,8 @@ onBeforeUnmount(() => {
 .catch-tray {
   position: absolute;
   bottom: 8px;
-  width: 170px;
-  height: 58px;
+  width: 220px;
+  height: 74px;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -442,6 +586,40 @@ onBeforeUnmount(() => {
   z-index: 3;
   img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.35)); }
 }
+
+.catch-controls {
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 24px);
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.catch-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: clamp(60px, 8vh, 88px);
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 10px;
+  background: rgba(8, 63, 82, .84);
+  box-shadow: 0 8px 18px rgba(1, 22, 34, .2), inset 0 1px 0 rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 800;
+  user-select: none;
+  touch-action: none;
+  -webkit-user-select: none;
+}
+
+.catch-control .el-icon { font-size: clamp(24px, 2.2vw, 34px); }
+.catch-control:active { transform: translateY(2px); background: #e9755f; }
+.catch-control--left,
+.catch-control--right { background: rgba(21, 100, 115, .9); }
 
 .game-state {
   position: absolute;
@@ -463,7 +641,7 @@ onBeforeUnmount(() => {
   .catch-game {
     width: 100vw;
     height: 100dvh;
-    padding: 10px;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
     gap: 8px;
     border-radius: 0;
   }
@@ -473,8 +651,16 @@ onBeforeUnmount(() => {
   .metric { justify-content: space-between; padding: 0 5px; strong { font-size: 18px; } }
   .score-strip .metric:last-child { grid-column: 1 / -1; }
   .catch-arena { min-height: 0; }
-  .catch-tray { width: 132px; height: 50px; }
-  .falling-item { width: 46px; height: 46px; font-size: 28px; }
+  .catch-tray { width: 210px; height: 72px; }
+  .falling-item { width: 58px; height: 58px; font-size: 28px; }
+  .catch-control { min-height: 68px; padding-inline: 8px; }
+}
+
+@keyframes rays-drift { from { transform: translateX(-3%) rotate(-1deg); } to { transform: translateX(3%) rotate(1deg); } }
+@keyframes bubble-rise { 0% { transform: translate3d(0, 0, 0) scale(.7); opacity: 0; } 12% { opacity: .7; } 100% { transform: translate3d(18px, -120%, 0) scale(1.15); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .light-rays, .bubble-field i { animation: none; }
 }
 
 </style>

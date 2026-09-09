@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   ASSISTANT_END_SESSION_HOTWORDS,
   ASSISTANT_ORDER_HOTWORDS,
+  findAssistantPresetRecommendations,
   findAssistantRecommendations,
   getAssistantRecommendationBatch,
   getAssistantRecommendationListWidth,
@@ -318,6 +319,78 @@ test('provides fixed order phrases as recognition hotwords', () => {
     '再来一份',
     '再来一个'
   ])
+})
+
+test('parses explicit interface controls without executing negative or help questions', () => {
+  const expectedCommands = new Map([
+    ['打开菜单', { type: 'open_menu' }],
+    ['打开菜品导航', { type: 'open_navigation' }],
+    ['打开左边菜单', { type: 'open_side_menu', side: 'left' }],
+    ['打开右侧菜单', { type: 'open_side_menu', side: 'right' }],
+    ['查看点餐记录', { type: 'open_history' }],
+    ['打开设置', { type: 'open_settings' }],
+    ['帮我叫店员', { type: 'request_waiter' }],
+    ['暂停菜品', { type: 'stream_pause' }],
+    ['继续传送', { type: 'stream_resume' }],
+    ['慢一点', { type: 'stream_slower' }],
+    ['快一点', { type: 'stream_faster' }],
+    ['推荐热门菜', { type: 'recommend_popular' }],
+    ['本店推荐', { type: 'recommend_featured' }],
+    ['适合两个人的组合', { type: 'recommend_combo' }],
+    ['确认', { type: 'confirm_action' }],
+    ['算了', { type: 'cancel_action' }]
+  ])
+
+  for (const [transcript, expected] of expectedCommands) {
+    assert.deepEqual(parseAssistantCommand({ transcript, recommendations: items, items }), expected, transcript)
+  }
+
+  for (const transcript of [
+    '不要打开设置',
+    '怎么打开菜单',
+    '不要叫店员',
+    '不要暂停菜品',
+    '不要慢一点',
+    '怎么查看点餐记录'
+  ]) {
+    const type = parseAssistantCommand({ transcript, recommendations: items, items }).type
+    assert.equal([
+      'open_menu',
+      'open_navigation',
+      'open_side_menu',
+      'open_history',
+      'open_settings',
+      'request_waiter',
+      'stream_pause',
+      'stream_resume',
+      'stream_slower',
+      'stream_faster'
+    ].includes(type), false, transcript)
+  }
+})
+
+test('builds stable popular, featured and two-person recommendation pools', () => {
+  const presetItems = [
+    { id: 1, name: '招牌刺身', categoryId: 21, sales: 70, isFeatured: true, available: true },
+    { id: 2, name: '店长推荐寿司', categoryId: 21, sales: 20, tags: ['店长推荐'], available: true },
+    { id: 3, name: '人气拉面', categoryId: 70, sales: 99, available: true },
+    { id: 4, name: '炸物拼盘', categoryId: 80, sales: 80, available: true },
+    { id: 5, name: '白桃饮品', categoryId: 28, sales: 60, available: true },
+    { id: 6, name: '售罄甜点', categoryId: 28, sales: 999, isFeatured: true, available: false }
+  ]
+
+  assert.deepEqual(
+    findAssistantPresetRecommendations({ items: presetItems, mode: 'popular' }).map((item) => item.id),
+    [3, 4, 1, 5, 2]
+  )
+  assert.deepEqual(
+    findAssistantPresetRecommendations({ items: presetItems, mode: 'featured' }).slice(0, 2).map((item) => item.id),
+    [1, 2]
+  )
+  assert.deepEqual(
+    findAssistantPresetRecommendations({ items: presetItems, mode: 'combo' }).slice(0, 4).map((item) => item.id),
+    [3, 4, 1, 5]
+  )
 })
 
 test('sizes the recommendation list from the visible item count and caps it at six', () => {

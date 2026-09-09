@@ -12,6 +12,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 // 全局样式
 import './styles/index.scss'
+import './styles/turtle-animation.scss'
 
 // NProgress
 import 'nprogress/nprogress.css'

@@ -21,7 +21,29 @@ export const ASSISTANT_AUDIO = Object.freeze({
   ORDER_EMPTY: 'order-empty',
   ORDER_SUBMITTING: 'order-submitting',
   ORDER_SUCCESS: 'order-success',
-  ORDER_FAILED: 'order-failed'
+  ORDER_FAILED: 'order-failed',
+  OPEN_MENU: 'open-menu',
+  OPEN_LEFT_MENU: 'open-left-menu',
+  OPEN_RIGHT_MENU: 'open-right-menu',
+  OPEN_NAVIGATION: 'open-navigation',
+  OPEN_HISTORY: 'open-history',
+  OPEN_SETTINGS: 'open-settings',
+  CALL_WAITER_CONFIRM: 'call-waiter-confirm',
+  CALL_WAITER_SENT: 'call-waiter-sent',
+  ORDER_CONFIRM: 'order-confirm',
+  ACTION_CANCELLED: 'action-cancelled',
+  STREAM_PAUSED: 'stream-paused',
+  STREAM_RESUMED: 'stream-resumed',
+  STREAM_SLOWER: 'stream-slower',
+  STREAM_FASTER: 'stream-faster',
+  POPULAR_INTRO: 'popular-intro',
+  FEATURED_INTRO: 'featured-intro',
+  COMBO_INTRO: 'combo-intro',
+  RECOMMENDATION_EMPTY: 'recommendation-empty',
+  RECOMMENDATION_REPLACED: 'recommendation-replaced',
+  ADDED_LEFT: 'added-left',
+  ADDED_RIGHT: 'added-right',
+  ADDED_BOTH: 'added-both'
 })
 
 // 错误码来自浏览器、VoiceClient 和语音服务，统一映射到有限的用户提示录音。

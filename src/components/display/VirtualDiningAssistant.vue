@@ -1,11 +1,11 @@
 <template>
   <section
     class="assistant-recommendation-rail"
-    :class="[`is-${phase}`, { 'has-recommendations': recommendations.length > 0 }]"
+    :class="[`is-${phase}`, { 'has-recommendations': recommendations.length > 0 && !watchingPromo, 'is-watching-promo': watchingPromo }]"
     :style="recommendationRailStyle"
     aria-live="polite"
   >
-    <div v-if="recommendations.length" class="recommendation-lane">
+    <div v-if="recommendations.length && !watchingPromo" class="recommendation-lane">
       <div class="recommendation-lane__header">
         <strong>{{ t('assistant.recommendations') }}</strong>
         <span v-if="customerTranscript" class="customer-transcript">
@@ -90,10 +90,33 @@ import xiaoheSessionEndedAudioUrl from '@/assets/assistant/xiaohe-session-ended.
 import xiaoheServiceUnavailableAudioUrl from '@/assets/assistant/xiaohe-service-unavailable.mp3'
 import xiaoheSessionTimeoutAudioUrl from '@/assets/assistant/xiaohe-session-timeout.mp3'
 import xiaoheSingleBatchAudioUrl from '@/assets/assistant/xiaohe-single-batch.mp3'
+import xiaoheActionCancelledAudioUrl from '@/assets/assistant/xiaohe-action-cancelled.mp3'
+import xiaoheAddedBothAudioUrl from '@/assets/assistant/xiaohe-added-both.mp3'
+import xiaoheAddedLeftAudioUrl from '@/assets/assistant/xiaohe-added-left.mp3'
+import xiaoheAddedRightAudioUrl from '@/assets/assistant/xiaohe-added-right.mp3'
+import xiaoheCallWaiterConfirmAudioUrl from '@/assets/assistant/xiaohe-call-waiter-confirm.mp3'
+import xiaoheCallWaiterSentAudioUrl from '@/assets/assistant/xiaohe-call-waiter-sent.mp3'
+import xiaoheComboIntroAudioUrl from '@/assets/assistant/xiaohe-combo-intro.mp3'
+import xiaoheFeaturedIntroAudioUrl from '@/assets/assistant/xiaohe-featured-intro.mp3'
+import xiaoheOpenHistoryAudioUrl from '@/assets/assistant/xiaohe-open-history.mp3'
+import xiaoheOpenLeftMenuAudioUrl from '@/assets/assistant/xiaohe-open-left-menu.mp3'
+import xiaoheOpenMenuAudioUrl from '@/assets/assistant/xiaohe-open-menu.mp3'
+import xiaoheOpenNavigationAudioUrl from '@/assets/assistant/xiaohe-open-navigation.mp3'
+import xiaoheOpenRightMenuAudioUrl from '@/assets/assistant/xiaohe-open-right-menu.mp3'
+import xiaoheOpenSettingsAudioUrl from '@/assets/assistant/xiaohe-open-settings.mp3'
+import xiaoheOrderConfirmAudioUrl from '@/assets/assistant/xiaohe-order-confirm.mp3'
+import xiaohePopularIntroAudioUrl from '@/assets/assistant/xiaohe-popular-intro.mp3'
+import xiaoheRecommendationEmptyAudioUrl from '@/assets/assistant/xiaohe-recommendation-empty.mp3'
+import xiaoheRecommendationReplacedAudioUrl from '@/assets/assistant/xiaohe-recommendation-replaced.mp3'
+import xiaoheStreamFasterAudioUrl from '@/assets/assistant/xiaohe-stream-faster.mp3'
+import xiaoheStreamPausedAudioUrl from '@/assets/assistant/xiaohe-stream-paused.mp3'
+import xiaoheStreamResumedAudioUrl from '@/assets/assistant/xiaohe-stream-resumed.mp3'
+import xiaoheStreamSlowerAudioUrl from '@/assets/assistant/xiaohe-stream-slower.mp3'
 import { useVoiceRecognition } from '@/composables/useVoiceRecognition'
 import { useI18n } from '@/i18n'
 import {
   ASSISTANT_END_SESSION_HOTWORDS,
+  ASSISTANT_CONTROL_HOTWORDS,
   ASSISTANT_ORDER_HOTWORDS,
   getAssistantRecommendationListWidth,
   isXiaoheWakePhrase
@@ -124,7 +147,29 @@ const assistantAudioUrls = Object.freeze({
   [ASSISTANT_AUDIO.ORDER_EMPTY]: xiaoheOrderEmptyAudioUrl,
   [ASSISTANT_AUDIO.ORDER_SUBMITTING]: xiaoheOrderSubmittingAudioUrl,
   [ASSISTANT_AUDIO.ORDER_SUCCESS]: xiaoheOrderSuccessAudioUrl,
-  [ASSISTANT_AUDIO.ORDER_FAILED]: xiaoheOrderFailedAudioUrl
+  [ASSISTANT_AUDIO.ORDER_FAILED]: xiaoheOrderFailedAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_MENU]: xiaoheOpenMenuAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_LEFT_MENU]: xiaoheOpenLeftMenuAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_RIGHT_MENU]: xiaoheOpenRightMenuAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_NAVIGATION]: xiaoheOpenNavigationAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_HISTORY]: xiaoheOpenHistoryAudioUrl,
+  [ASSISTANT_AUDIO.OPEN_SETTINGS]: xiaoheOpenSettingsAudioUrl,
+  [ASSISTANT_AUDIO.CALL_WAITER_CONFIRM]: xiaoheCallWaiterConfirmAudioUrl,
+  [ASSISTANT_AUDIO.CALL_WAITER_SENT]: xiaoheCallWaiterSentAudioUrl,
+  [ASSISTANT_AUDIO.ORDER_CONFIRM]: xiaoheOrderConfirmAudioUrl,
+  [ASSISTANT_AUDIO.ACTION_CANCELLED]: xiaoheActionCancelledAudioUrl,
+  [ASSISTANT_AUDIO.STREAM_PAUSED]: xiaoheStreamPausedAudioUrl,
+  [ASSISTANT_AUDIO.STREAM_RESUMED]: xiaoheStreamResumedAudioUrl,
+  [ASSISTANT_AUDIO.STREAM_SLOWER]: xiaoheStreamSlowerAudioUrl,
+  [ASSISTANT_AUDIO.STREAM_FASTER]: xiaoheStreamFasterAudioUrl,
+  [ASSISTANT_AUDIO.POPULAR_INTRO]: xiaohePopularIntroAudioUrl,
+  [ASSISTANT_AUDIO.FEATURED_INTRO]: xiaoheFeaturedIntroAudioUrl,
+  [ASSISTANT_AUDIO.COMBO_INTRO]: xiaoheComboIntroAudioUrl,
+  [ASSISTANT_AUDIO.RECOMMENDATION_EMPTY]: xiaoheRecommendationEmptyAudioUrl,
+  [ASSISTANT_AUDIO.RECOMMENDATION_REPLACED]: xiaoheRecommendationReplacedAudioUrl,
+  [ASSISTANT_AUDIO.ADDED_LEFT]: xiaoheAddedLeftAudioUrl,
+  [ASSISTANT_AUDIO.ADDED_RIGHT]: xiaoheAddedRightAudioUrl,
+  [ASSISTANT_AUDIO.ADDED_BOTH]: xiaoheAddedBothAudioUrl
 })
 
 const assistantCharacterUrls = Object.freeze({
@@ -178,10 +223,14 @@ const props = defineProps({
   actionBusy: {
     type: Boolean,
     default: false
+  },
+  watchingPromo: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['transcript', 'session-start', 'session-end', 'select-recommendation', 'wake'])
+const emit = defineEmits(['transcript', 'session-start', 'session-end', 'select-recommendation', 'wake', 'interrupt-promo'])
 const { currentLocale, t } = useI18n()
 
 // wakeMonitoring 表示助手总开关，awaitingCommand 区分当前是在等唤醒词还是等点餐指令。
@@ -223,6 +272,7 @@ const {
     '小禾小禾',
     ...ASSISTANT_ORDER_HOTWORDS,
     ...ASSISTANT_END_SESSION_HOTWORDS,
+    ...ASSISTANT_CONTROL_HOTWORDS,
     ...props.hotwords
   ])],
   onFinal: handleVoiceFinal,
@@ -513,6 +563,7 @@ function handleVoiceFinal(event) {
 }
 
 const statusText = computed(() => {
+  if (props.watchingPromo) return t('assistant.watchingPromo')
   if (props.feedbackMessage && !active.value) return props.feedbackMessage
   if (speaking.value) return t('assistant.speaking')
   if (phase.value === 'connecting') return t('assistant.connecting')
@@ -541,6 +592,10 @@ const buttonLabel = computed(() => monitoring.value
 
 // 手动开启时先进入 command，用户无需在刚点击按钮后再说一次唤醒词。
 const handleToggle = async () => {
+  if (props.watchingPromo) {
+    emit('interrupt-promo')
+    return
+  }
   if (monitoring.value) {
     wakeMonitoring.value = false
     awaitingCommand.value = false
@@ -626,6 +681,18 @@ watch(() => props.actionBusy, (busy) => {
   }
   if (wakeMonitoring.value && !props.feedbackMessage && !speaking.value) scheduleListening('wake', 300)
 }, { flush: 'sync' })
+
+// 热门视频播放时保留小禾可见并继续接受用户主动语音，但暂停主动播报、推荐和唤醒提示。
+watch(() => props.watchingPromo, (watching) => {
+  if (!watching) {
+    if (wakeMonitoring.value && !props.actionBusy && !speaking.value) scheduleListening('wake', 300)
+    return
+  }
+  clearRestartTimer()
+  invalidatePromptFlow()
+  stopAssistantSound()
+  awaitingCommand.value = false
+})
 
 // 错误播报只允许一个在途任务，revision 用于废弃已被新错误取代的异步回调。
 watch([phase, errorCode], ([currentPhase, currentErrorCode]) => {
@@ -789,8 +856,15 @@ onUnmounted(() => {
   gap: 10px;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
-  scrollbar-width: thin;
+  padding: 0 8px 4px 0;
+  scrollbar-width: none;
+  scroll-padding-inline: 4px 12px;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
 }
+
+.recommendation-list::-webkit-scrollbar { display: none; }
 
 .recommendation-card {
   position: relative;
@@ -808,6 +882,7 @@ onUnmounted(() => {
   cursor: pointer;
   text-align: left;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  scroll-snap-align: start;
 
   &:hover,
   &:focus-visible {
@@ -894,12 +969,15 @@ onUnmounted(() => {
 }
 
 .assistant-bubble {
-  width: 100%;
+  width: fit-content;
+  max-width: min(100%, 420px);
   min-width: 0;
-  min-height: 86px;
+  min-height: 0;
+  height: auto;
   padding: 9px 10px;
   display: grid;
   align-content: center;
+  justify-self: end;
   gap: 2px;
   color: #243235;
   background: rgba(255, 255, 255, 0.96);
@@ -915,6 +993,7 @@ onUnmounted(() => {
   span {
     font-size: 14px;
     line-height: 1.35;
+    white-space: normal;
     overflow-wrap: anywhere;
   }
 
@@ -1080,8 +1159,9 @@ onUnmounted(() => {
   }
 
   .assistant-bubble {
-    min-height: 62px;
-    padding: 6px;
+    min-height: 0;
+    max-width: min(100%, 280px);
+    padding: 6px 8px;
 
     span {
       font-size: 11px;

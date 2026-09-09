@@ -28,6 +28,25 @@ export const ASSISTANT_END_SESSION_HOTWORDS = Object.freeze([
   '先待命'
 ])
 
+export const ASSISTANT_CONTROL_HOTWORDS = Object.freeze([
+  '打开菜单',
+  '打开左侧菜单',
+  '打开右侧菜单',
+  '打开菜品导航',
+  '查看点餐记录',
+  '打开设置',
+  '呼叫店员',
+  '暂停菜品',
+  '继续传送',
+  '慢一点',
+  '快一点',
+  '推荐热门菜',
+  '本店推荐',
+  '双人组合',
+  '确认',
+  '取消'
+])
+
 /** 根据卡片数量计算推荐栏宽度，最多只展示一批六张卡片。 */
 export const getAssistantRecommendationListWidth = (
   count,
@@ -248,6 +267,68 @@ export const findAssistantRecommendations = ({ items = [], categories = [], tran
     .map((entry) => entry.item)
 }
 
+const getAssistantItemText = (item) => normalizeAssistantText([
+  item.name,
+  item.storeName,
+  item.keyword,
+  item.recommendationType,
+  item.storeInfo,
+  item.description,
+  Array.isArray(item.tags) ? item.tags.map((tag) => tag?.name || tag).join(' ') : item.tags
+].filter(Boolean).join(' '))
+
+/**
+ * 构造无需自由文本检索的固定推荐池。
+ * featured 优先使用后端真实推荐字段和菜单文案；字段缺失时继续按销量稳定兜底。
+ * combo 先按销量排序，再轮流抽取不同分类，避免双人组合全是同一类菜品。
+ */
+export const findAssistantPresetRecommendations = ({ items = [], mode = 'popular' }) => {
+  const availableItems = (Array.isArray(items) ? items : [])
+    .filter((item) => item.available !== false && item.status !== 'OFF_SHELF')
+  const bySales = [...availableItems].sort((a, b) => (
+    (Number(b.sales) || 0) - (Number(a.sales) || 0)
+    || String(a.id ?? '').localeCompare(String(b.id ?? ''))
+  ))
+
+  if (mode === 'popular') return bySales
+
+  if (mode === 'featured') {
+    return bySales
+      .map((item) => {
+        const text = getAssistantItemText(item)
+        let score = 0
+        if (item.isFeatured === true || item.isRecommended === true || item.recommend === true) score += 200
+        if (/门店推荐|本店推荐|店长推荐|老板推荐|主厨推荐|招牌|featured|recommended/.test(text)) score += 120
+        return { item, score, sales: Number(item.sales) || 0 }
+      })
+      .sort((a, b) => b.score - a.score || b.sales - a.sales)
+      .map(({ item }) => item)
+  }
+
+  if (mode === 'combo') {
+    const grouped = new Map()
+    bySales.forEach((item) => {
+      const category = String(item.categoryId ?? item.cateId ?? item.category?.id ?? item.categoryName ?? 'other')
+      if (!grouped.has(category)) grouped.set(category, [])
+      grouped.get(category).push(item)
+    })
+    const result = []
+    while (result.length < bySales.length) {
+      let added = false
+      grouped.forEach((group) => {
+        const item = group.shift()
+        if (!item) return
+        result.push(item)
+        added = true
+      })
+      if (!added) break
+    }
+    return result
+  }
+
+  return bySales
+}
+
 const spokenNumbers = {
   一: 1,
   二: 2,
@@ -380,6 +461,71 @@ export const isAssistantEndSessionCommand = (value) => {
     || /^(?:暂时|先)?不用(?:你|小禾)了?$/.test(query)
 }
 
+const isBlockedAssistantAction = (query) => (
+  /不要|不用|别|取消|先不|暂时不|不需要|不想/.test(query)
+  || /怎么|如何|哪里|在哪|能不能|可不可以|是否/.test(query)
+  || /(?:吗|呢)$/.test(query)
+)
+
+const matchesAssistantAction = (query, pattern) => (
+  !isBlockedAssistantAction(query) && pattern.test(query)
+)
+
+const parseAssistantInterfaceCommand = (value) => {
+  const query = normalizeAssistantText(value).replace(/^小禾(?:小禾)?/, '')
+
+  if (/^(?:确认|确定|好的|可以|没问题|确认执行|确认下单|确认呼叫)$/.test(query)) {
+    return { type: 'confirm_action' }
+  }
+  if (/^(?:取消|算了|取消操作|不用执行|不用叫了|先不下单了)$/.test(query)) {
+    return { type: 'cancel_action' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|展开|显示)(?:一下)?(?:左边|左侧)菜单|(?:左边|左侧)菜单(?:打开|展开)/)) {
+    return { type: 'open_side_menu', side: 'left' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|展开|显示)(?:一下)?(?:右边|右侧)菜单|(?:右边|右侧)菜单(?:打开|展开)/)) {
+    return { type: 'open_side_menu', side: 'right' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|进入|显示)(?:一下)?(?:菜品|寿司|点餐)?导航/)) {
+    return { type: 'open_navigation' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|展开|显示)(?:一下)?(?:完整|全部)?菜单/)) {
+    return { type: 'open_menu' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|查看|看看)(?:一下)?(?:点餐|订单|下单)(?:记录|历史)/)) {
+    return { type: 'open_history' }
+  }
+  if (matchesAssistantAction(query, /(?:打开|进入|显示)(?:一下)?(?:系统)?设置/)) {
+    return { type: 'open_settings' }
+  }
+  if (matchesAssistantAction(query, /(?:帮我|麻烦)?(?:呼叫|叫|找)(?:一下)?(?:服务员|店员)/)) {
+    return { type: 'request_waiter' }
+  }
+  if (matchesAssistantAction(query, /(?:暂停|停下|停一下)(?:菜品|传送|海浪|传送带)?/)) {
+    return { type: 'stream_pause' }
+  }
+  if (matchesAssistantAction(query, /(?:继续|恢复|开始)(?:菜品|传送|海浪|传送带)?/)) {
+    return { type: 'stream_resume' }
+  }
+  if (matchesAssistantAction(query, /(?:慢一点|慢一些|减速|速度调慢)/)) {
+    return { type: 'stream_slower' }
+  }
+  if (matchesAssistantAction(query, /(?:快一点|快一些|加速|速度调快)/)) {
+    return { type: 'stream_faster' }
+  }
+  if (matchesAssistantAction(query, /(?:推荐|看看|来点).*(?:热门|人气|畅销|卖得好)|(?:热门|人气|畅销)菜/)) {
+    return { type: 'recommend_popular' }
+  }
+  if (matchesAssistantAction(query, /(?:本店|门店|店长|老板|主厨)(?:推荐|招牌)|招牌菜/)) {
+    return { type: 'recommend_featured' }
+  }
+  if (matchesAssistantAction(query, /(?:适合)?(?:两个|两个人|双人).*(?:组合|套餐|搭配)|(?:双人|两人)(?:组合|套餐|搭配)/)) {
+    return { type: 'recommend_combo' }
+  }
+
+  return null
+}
+
 /**
  * 将一条识别文本归类为页面可以执行的稳定命令对象。
  * 优先级依次为：提交订单、重复上一道菜、换批、结束会话、序号选择、菜名选择、重新推荐。
@@ -389,6 +535,9 @@ export const parseAssistantCommand = ({ transcript = '', recommendations = [], i
   const query = normalizeAssistantText(transcript)
   const quantity = parseAssistantQuantity(transcript)
   const ordinalSelections = parseAssistantOrdinalSelections(transcript, recommendations)
+
+  const interfaceCommand = parseAssistantInterfaceCommand(query)
+  if (interfaceCommand) return interfaceCommand
 
   if (isAssistantPlaceOrderCommand(query)) {
     return { type: 'order_all' }

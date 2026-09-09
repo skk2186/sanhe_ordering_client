@@ -11,9 +11,14 @@ export const normalizeProductImage = (value) => {
   if (!imageUrl) return ''
 
   try {
+    // 绝对外链（http/https 且带真实域名）直接返回，避免把 CDN 域名重写成本机地址。
+    // 否则局域网客户端会把 localhost:48081 指向自己，导致菜品图片全部裂掉。
+    if (/^https?:\/\//i.test(imageUrl.trim())) return imageUrl
+
     const parsedUrl = new URL(imageUrl, 'http://local.invalid')
     if (!parsedUrl.pathname.startsWith(BACKEND_FILE_PATH_PREFIX)) return imageUrl
 
+    // 仅相对路径（如 /admin-api/infra/file/...）才需要拼接后端地址
     const filePath = `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`
     return API_BASE_URL ? `${API_BASE_URL}${filePath}` : filePath
   } catch {
