@@ -20,8 +20,10 @@
       <div v-else-if="sceneKey === 'midnight-station'" class="transition-collage transition-collage--station">
         <div class="station-transition-sign">
           <span class="station-transition-sign__kicker">NIGHT SERVICE</span>
+          <span class="station-transition-sign__flip">NEXT SERVICE</span>
           <strong>MIDNIGHT<br>STATION</strong>
           <span class="station-transition-sign__line"></span>
+          <span class="station-transition-sign__flip station-transition-sign__flip--route">ROUTE 03 · OPEN</span>
         </div>
         <div class="station-transition-rails" aria-hidden="true">
           <span class="station-transition-rail station-transition-rail--one"></span>
@@ -30,6 +32,7 @@
         <div class="station-transition-signal" aria-hidden="true">
           <i></i><i></i><i></i>
         </div>
+        <span class="station-transition-ticket-rip" aria-hidden="true"></span>
       </div>
 
       <div v-else class="transition-collage transition-collage--ocean">
@@ -288,6 +291,25 @@ const bubbleStyle = (index) => ({
   background: var(--station-border);
 }
 
+.station-transition-sign__flip {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 6px;
+  color: var(--station-text-primary);
+  background: var(--station-secondary);
+  border-radius: var(--station-radius-ticket);
+  font-family: var(--station-font-number);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  transform-origin: center bottom;
+}
+
+.station-transition-sign__flip--route {
+  color: var(--station-primary-strong);
+  background: var(--station-surface-muted);
+}
+
 .station-transition-rails {
   position: absolute;
   left: 5%;
@@ -333,6 +355,107 @@ const bubbleStyle = (index) => ({
 .station-transition-signal i:nth-child(2) { background: var(--station-accent); }
 .station-transition-signal i:last-child { background: var(--station-secondary); }
 
+.station-transition-ticket-rip {
+  position: absolute;
+  left: 50%;
+  bottom: 15%;
+  width: min(520px, 64vw);
+  height: 2px;
+  display: block;
+  background: var(--station-accent);
+  clip-path: polygon(0 0, 7% 100%, 14% 0, 22% 100%, 30% 0, 39% 100%, 48% 0, 58% 100%, 68% 0, 77% 100%, 87% 0, 100% 100%, 100% 0);
+  transform: translateX(-50%) scaleX(0.12);
+  transform-origin: center;
+  opacity: 0.88;
+}
+
+.is-covering.is-midnight-station .station-transition-rails {
+  animation: station-route-close 1650ms var(--station-easing-exit) both;
+}
+
+.is-covered.is-midnight-station .station-transition-rails {
+  transform: scaleX(0.1);
+  opacity: 0.8;
+}
+
+.is-revealing.is-midnight-station .station-transition-rails {
+  animation: station-route-open 900ms var(--station-easing-enter) both;
+}
+
+.is-covering.is-midnight-station .station-transition-sign {
+  animation: station-board-enter 1650ms var(--station-easing-enter) both;
+}
+
+.is-covered.is-midnight-station .station-transition-sign {
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.is-revealing.is-midnight-station .station-transition-sign {
+  animation: station-board-exit 900ms var(--station-easing-exit) both;
+}
+
+.is-covering.is-midnight-station .station-transition-ticket-rip {
+  animation: station-ticket-tear 1650ms var(--station-easing-standard) both;
+}
+
+.is-covered.is-midnight-station .station-transition-ticket-rip {
+  transform: translateX(-50%) scaleX(0.1);
+}
+
+.is-revealing.is-midnight-station .station-transition-ticket-rip {
+  animation: station-ticket-open 900ms var(--station-easing-enter) both;
+}
+
+.is-revealing.is-midnight-station .station-transition-signal i {
+  animation: station-signal-cycle 900ms var(--station-easing-standard) both;
+}
+
+.is-revealing.is-midnight-station .station-transition-signal i:nth-child(1) { animation-delay: 0ms; }
+.is-revealing.is-midnight-station .station-transition-signal i:nth-child(2) { animation-delay: 130ms; }
+.is-revealing.is-midnight-station .station-transition-signal i:nth-child(3) { animation-delay: 260ms; }
+
+@keyframes station-route-close {
+  0% { opacity: 0.1; transform: scaleX(1); }
+  58% { opacity: 1; transform: scaleX(0.34); }
+  100% { opacity: 0.88; transform: scaleX(0.1); }
+}
+
+@keyframes station-route-open {
+  from { opacity: 0.88; transform: scaleX(0.1); }
+  62% { opacity: 1; transform: scaleX(1.04); }
+  to { opacity: 0.74; transform: scaleX(1); }
+}
+
+@keyframes station-board-enter {
+  0% { opacity: 0; transform: translate(-50%, -44%) rotate(-6deg) scaleY(0.42); }
+  38% { opacity: 1; transform: translate(-50%, -50%) rotate(2deg) scaleY(0.96); }
+  58% { transform: translate(-50%, -50%) rotate(-2deg) scaleY(1.02); }
+  100% { opacity: 1; transform: translate(-50%, -50%) rotate(-2deg) scaleY(1); }
+}
+
+@keyframes station-board-exit {
+  from { opacity: 1; transform: translate(-50%, -50%) rotate(-2deg) scaleY(1); }
+  to { opacity: 0; transform: translate(-50%, -57%) rotate(2deg) scaleY(0.74); }
+}
+
+@keyframes station-ticket-tear {
+  0% { opacity: 0; transform: translateX(-50%) scaleX(0.08); }
+  48% { opacity: 1; transform: translateX(-50%) scaleX(0.8); }
+  100% { opacity: 0.88; transform: translateX(-50%) scaleX(1); }
+}
+
+@keyframes station-ticket-open {
+  from { opacity: 0.88; transform: translateX(-50%) scaleX(0.1); }
+  to { opacity: 0; transform: translateX(-50%) scaleX(1); }
+}
+
+@keyframes station-signal-cycle {
+  0% { opacity: 0.34; transform: scale(0.78); }
+  35% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.44; transform: scale(0.92); }
+}
+
 @keyframes station-cover {
   from { clip-path: inset(100% 0 0 0); }
   58% { clip-path: inset(9% 0 9% 0); }
@@ -368,12 +491,43 @@ const bubbleStyle = (index) => ({
   .bubble-field span { animation: none; }
   .is-midnight-station .scene-transition-curtain {
     animation-duration: 1ms !important;
-    clip-path: inset(0) !important;
   }
   .is-midnight-station .station-transition-sign,
   .is-midnight-station .station-transition-rail,
   .is-midnight-station .station-transition-signal {
     transition: none !important;
+  }
+  .is-covering.is-midnight-station .scene-transition-curtain,
+  .is-covered.is-midnight-station .scene-transition-curtain {
+    clip-path: inset(0) !important;
+  }
+  .is-covering.is-midnight-station .station-transition-sign,
+  .is-covered.is-midnight-station .station-transition-sign {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) rotate(-2deg) !important;
+    animation: none !important;
+  }
+  .is-covering.is-midnight-station .station-transition-rails,
+  .is-covered.is-midnight-station .station-transition-rails {
+    opacity: 0.8 !important;
+    transform: scaleX(0.1) !important;
+    animation: none !important;
+  }
+  .is-covering.is-midnight-station .station-transition-ticket-rip,
+  .is-covered.is-midnight-station .station-transition-ticket-rip {
+    opacity: 0.88 !important;
+    transform: translateX(-50%) scaleX(0.1) !important;
+    animation: none !important;
+  }
+  .is-revealing.is-midnight-station .scene-transition-curtain {
+    clip-path: inset(0 0 100% 0) !important;
+  }
+  .is-revealing.is-midnight-station .station-transition-sign,
+  .is-revealing.is-midnight-station .station-transition-rails,
+  .is-revealing.is-midnight-station .station-transition-ticket-rip,
+  .is-revealing.is-midnight-station .station-transition-signal i {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }
 </style>

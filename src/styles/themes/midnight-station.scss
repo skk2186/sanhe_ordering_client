@@ -82,11 +82,16 @@ html[data-theme='midnight-station'] {
   --station-space-6: 32px;
   --station-space-7: 48px;
 
-  /* Motion: foundation only in phase 01; complex choreography is deferred */
+  /* Motion: shared rhythm for the station's phase 02 interaction system */
   --station-motion-instant: 100ms;
   --station-motion-fast: 180ms;
   --station-motion-normal: 280ms;
   --station-motion-scene: 1200ms;
+  --station-motion-stamp: 380ms;
+  --station-motion-transfer: 520ms;
+  --station-motion-receive: 220ms;
+  --station-motion-number: 190ms;
+  --station-motion-remove: 260ms;
   --station-easing-standard: cubic-bezier(0.22, 0.72, 0.24, 1);
   --station-easing-enter: cubic-bezier(0.18, 0.76, 0.2, 1);
   --station-easing-exit: cubic-bezier(0.55, 0, 0.72, 0.24);

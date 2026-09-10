@@ -293,7 +293,7 @@ const copy = computed(() => ({
   close: t('common.close')
 }))
 
-// 展示版只开放主题 B、C；主题 A 的旧缓存会在初始化时回退到主题 B。
+// 主题选项与显示页 SCENES 保持一致；无效缓存仍回退到 zhenxian。
 const themeItem = computed(() => [
   { title: '蜡笔小新·海滩', img: '/images/ui/b/background.png', key: 'zhenxian' },
   { title: '海底贝壳', img: '/images/ui/c/background.png', key: 'xiaoxin' },
@@ -302,7 +302,7 @@ const themeItem = computed(() => [
 const availableThemeKeys = computed(() => new Set(themeItem.value.map(item => item.key)))
 const fallbackThemeKey = 'zhenxian'
 
-// 当前样板默认进入主题 B，用户仍可在设置中切换并保存其他主题。
+// 当前样板默认进入 zhenxian，用户可在设置中切换并保存其他主题。
 const selectedThemeKey = ref(
   availableThemeKeys.value.has(props.defaultThemeKey) ? props.defaultThemeKey : fallbackThemeKey
 )

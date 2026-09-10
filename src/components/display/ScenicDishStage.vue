@@ -56,6 +56,16 @@
       <div class="tide-current tide-current--front" aria-hidden="true"></div>
 
       <div
+        v-if="themeKey === 'midnight-station' && effectivePaused"
+        class="station-platform-hold"
+        role="status"
+        aria-live="polite"
+      >
+        <strong>PLATFORM HOLD</strong>
+        <span>PAUSED</span>
+      </div>
+
+      <div
         v-if="streamCycleItems.length"
         ref="streamRef"
         class="tide-stream"
@@ -77,6 +87,8 @@
                 'is-sold-out': entry.kind === 'dish' && !isAvailable(entry.item),
                 'is-recommended': entry.kind === 'dish' && recommendationIds.has(String(entry.item.id))
               }"
+              :data-station-lane="entry.lane"
+              :data-station-entry-key="getEntryKey(entry, cycleIndex)"
               :style="entry.style"
             >
               <BeachBoatPass
@@ -98,13 +110,28 @@
               <article
                 v-else
                 class="tide-dish"
+                :class="{
+                  'is-station-pressed': themeKey === 'midnight-station' && pressedDishKey === getEntryKey(entry, cycleIndex),
+                  'is-station-stamped': themeKey === 'midnight-station' && selectedDishKey === getEntryKey(entry, cycleIndex)
+                }"
+                :data-station-entry-key="getEntryKey(entry, cycleIndex)"
                 :tabindex="isAvailable(entry.item) ? 0 : -1"
                 :aria-label="`${getName(entry.item)} ¥${formatPrice(entry.item.price)}`"
-                @click="emitDishClick(entry.item, $event)"
-                @keydown.enter.prevent="emitDishClick(entry.item, $event)"
+                @pointerdown="handleDishPointerDown(getEntryKey(entry, cycleIndex), $event)"
+                @pointerup="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
+                @pointercancel="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
+                @pointerleave="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
+                @click="handleDishClick(entry.item, $event, getEntryKey(entry, cycleIndex))"
+                @keydown.enter.prevent="handleDishClick(entry.item, $event, getEntryKey(entry, cycleIndex))"
               >
                 <span v-if="recommendationIds.has(String(entry.item.id))" class="tide-dish__ai">AI</span>
                 <span v-if="!isAvailable(entry.item)" class="tide-dish__soldout">{{ t('common.soldOut') }}</span>
+                <span v-if="themeKey === 'midnight-station'" class="station-platform-marker" aria-hidden="true"></span>
+                <span
+                  v-if="themeKey === 'midnight-station' && selectedDishKey === getEntryKey(entry, cycleIndex)"
+                  class="station-dish-stamp"
+                  aria-hidden="true"
+                >BOARDING</span>
                 <img
                   class="tide-dish__shell"
                   src="/images/ui/b/shell-dish-tray.png"
@@ -180,6 +207,8 @@ const isStreamDragging = ref(false)
 const reducedMotion = ref(false)
 const themeKey = computed(() => props.sceneKey)
 const sceneEntryActive = ref(false)
+const pressedDishKey = ref('')
+const selectedDishKey = ref('')
 const specialEventOffset = ref(5)
 const getPopularity = item => Number(item?.salesCount ?? item?.sales ?? item?.soldCount ?? 0)
 const availablePromoItems = computed(() => props.items
@@ -305,8 +334,15 @@ const computeInertiaTimeConstant = (velocity) => (
 let categoryClickTimer = 0
 let streamClickTimer = 0
 let sceneEntryTimer = 0
+let dishPressTimer = 0
+let dishStampTimer = 0
 let lastSplashLayoutTime = 0
 const SPLASH_LAYOUT_INTERVAL = 34
+const STATION_FOCUS_INTERVAL_MS = 84
+let lastStationFocusUpdate = 0
+let stationFocusMetrics = []
+let stationFocusClientWidth = 0
+let stationFocusMetricsDirty = true
 
 const WAVE_PROFILE = [
   { offset: 30, lift: 7, tilt: -1.1 },
@@ -322,6 +358,12 @@ const WAVE_PHASE_STEP = Math.PI / 4
 const WAVE_AMPLITUDE = 42
 const DISH_LIFT_AMPLITUDE = 8
 const TILT_AMPLITUDE = 1.4
+
+const STATION_LANE_PROFILES = [
+  { name: 'back', y: -18, scale: 0.94, opacity: 0.72, brightness: 0.94, z: 1 },
+  { name: 'middle', y: 0, scale: 0.985, opacity: 0.9, brightness: 0.98, z: 2 },
+  { name: 'front', y: 18, scale: 1, opacity: 1, brightness: 1, z: 3 }
+]
 
 const getImage = (item) => item?.image || item?.imageUrl || DEFAULT_DISH_IMAGE
 // The app API uses cateId, while older/mock payloads may use categoryId or
@@ -342,6 +384,7 @@ const getCategoryName = (item) => String(
     ?? ''
 )
 const getItemKey = (item, fallback) => String(item?.id ?? item?.productId ?? fallback)
+const getEntryKey = (entry, cycleIndex = '') => `${cycleIndex}-${entry.kind}-${entry.instanceIndex}-${getItemKey(entry.item, entry.sourceIndex)}`
 const isAvailable = (item) => item && item.available !== false && item.status !== 'OFF_SHELF'
 const formatPrice = (value) => {
   const price = Number(value)
@@ -396,11 +439,13 @@ const streamCycleItems = computed(() => {
     const waveOffset = Math.sin(phase) * WAVE_AMPLITUDE
     const lift = Math.sin(phase) * DISH_LIFT_AMPLITUDE
     const tilt = Math.cos(phase) * TILT_AMPLITUDE
+    const stationLane = STATION_LANE_PROFILES[instanceIndex % STATION_LANE_PROFILES.length]
     return {
       kind: 'dish',
       item: list[sourceIndex],
       sourceIndex,
       instanceIndex,
+      lane: themeKey.value === 'midnight-station' ? stationLane.name : undefined,
       style: {
         '--wave-offset': `${waveOffset}px`,
         '--lift-up': `${lift * -0.55}px`,
@@ -411,7 +456,17 @@ const streamCycleItems = computed(() => {
         '--tilt-main': `${tilt}deg`,
         '--tilt-soft': `${tilt * 0.45}deg`,
         '--tilt-return': `${tilt * -0.35}deg`,
-        '--float-delay': `${instanceIndex * -620}ms`
+        '--float-delay': `${instanceIndex * -620}ms`,
+        ...(themeKey.value === 'midnight-station'
+          ? {
+              '--station-lane-y': `${stationLane.y}px`,
+              '--station-lane-scale': stationLane.scale,
+              '--station-lane-opacity': stationLane.opacity,
+              '--station-lane-brightness': stationLane.brightness,
+              '--station-lane-z': stationLane.z,
+              '--station-entry-delay': `${420 + (instanceIndex % MIN_STREAM_ITEMS) * 42}ms`
+            }
+          : {})
       }
     }
   })
@@ -450,6 +505,67 @@ const getStreamCycleWidth = () => {
   const cycle = streamRef.value?.querySelector('.tide-cycle')
   streamCycleWidth = cycle?.offsetWidth || 0
   return streamCycleWidth
+}
+
+// Midnight uses the existing scroll stream as its only source of truth. This
+// cache gives the visual focus treatment a content-space position without
+// reading every dish's layout on every animation frame.
+const cacheStationFocusMetrics = async () => {
+  if (themeKey.value !== 'midnight-station') {
+    stationFocusMetrics = []
+    stationFocusClientWidth = 0
+    stationFocusMetricsDirty = false
+    return
+  }
+
+  await nextTick()
+  const stream = streamRef.value
+  if (!stream) return
+  const streamRect = stream.getBoundingClientRect()
+  stationFocusClientWidth = stream.clientWidth
+  stationFocusMetrics = Array.from(stream.querySelectorAll('.tide-slot:not(.is-queue-event)'))
+    .map((slot) => {
+      const rect = slot.getBoundingClientRect()
+      return {
+        element: slot,
+        center: rect.left - streamRect.left + stream.scrollLeft + rect.width / 2
+      }
+    })
+  stationFocusMetricsDirty = false
+}
+
+const clearStationFocusStyles = () => {
+  stationFocusMetrics.forEach(({ element }) => {
+    element.style.removeProperty('--station-focus-scale')
+    element.style.removeProperty('--station-focus-brightness')
+    element.style.removeProperty('--station-focus-opacity')
+    element.removeAttribute('data-station-focus')
+  })
+  stationFocusMetrics = []
+  stationFocusMetricsDirty = true
+}
+
+const updateStationFocus = (time) => {
+  if (themeKey.value !== 'midnight-station' || !streamRef.value) return
+  if (time - lastStationFocusUpdate < STATION_FOCUS_INTERVAL_MS) return
+  lastStationFocusUpdate = time
+
+  if (stationFocusMetricsDirty) {
+    cacheStationFocusMetrics()
+    return
+  }
+
+  const stream = streamRef.value
+  const viewportCenter = stream.scrollLeft + stationFocusClientWidth / 2
+  const focusRange = Math.max(280, stationFocusClientWidth * 0.42)
+  for (const metric of stationFocusMetrics) {
+    const focus = Math.max(0, 1 - Math.abs(metric.center - viewportCenter) / focusRange)
+    const laneOpacity = Number.parseFloat(metric.element.style.getPropertyValue('--station-lane-opacity')) || 1
+    metric.element.style.setProperty('--station-focus-scale', (1 + focus * 0.015).toFixed(3))
+    metric.element.style.setProperty('--station-focus-brightness', (1 + focus * 0.055).toFixed(3))
+    metric.element.style.setProperty('--station-focus-opacity', Math.min(1, laneOpacity + focus * 0.1).toFixed(3))
+    metric.element.toggleAttribute('data-station-focus', focus > 0.72)
+  }
 }
 
 const normalizeStreamPosition = () => {
@@ -611,6 +727,8 @@ const runStreamFrame = (time) => {
       if (scrollDelta) stream.scrollLeft += scrollDelta
       normalizeStreamPosition()
     }
+
+    updateStationFocus(time)
   }
 
   // 滚动更新后定位特殊事件并发射水花粒子；传送带暂停时不再生成新粒子
@@ -700,6 +818,7 @@ const handleStreamPointerMove = (event) => {
   if (!streamDrag.moved) {
     streamDrag.moved = true
     isStreamDragging.value = true
+    clearDishPress()
     stream.setPointerCapture?.(event.pointerId)
   }
   if (event.cancelable) event.preventDefault()
@@ -753,6 +872,37 @@ const emitDishClick = (item, event) => {
   if (isAvailable(item)) emit('dish-click', item, event)
 }
 
+const clearDishPress = () => {
+  window.clearTimeout(dishPressTimer)
+  pressedDishKey.value = ''
+}
+
+const handleDishPointerDown = (entryKey, event) => {
+  if (themeKey.value !== 'midnight-station' || event.button !== 0) return
+  window.clearTimeout(dishPressTimer)
+  pressedDishKey.value = entryKey
+  dishPressTimer = window.setTimeout(() => {
+    pressedDishKey.value = ''
+  }, 120)
+}
+
+const handleDishPointerUp = (entryKey) => {
+  if (pressedDishKey.value === entryKey) clearDishPress()
+}
+
+const handleDishClick = (item, event, entryKey) => {
+  clearDishPress()
+  if (!isAvailable(item)) return
+  if (themeKey.value === 'midnight-station') {
+    window.clearTimeout(dishStampTimer)
+    selectedDishKey.value = entryKey
+    dishStampTimer = window.setTimeout(() => {
+      selectedDishKey.value = ''
+    }, 380)
+  }
+  emitDishClick(item, event)
+}
+
 // 舞台级热门内容触发物被点击时，把匹配的热门菜品原样上抛给展示页。
 const emitFeaturedPromo = (item) => {
   if (isAvailable(item)) emit('featured-promo', item)
@@ -786,10 +936,16 @@ watch(streamCycleItems, () => {
   resetStreamPosition()
   // 槽位列表变化意味着事件元素重建，需要重新收集引用
   rebuildEventArtCache()
+  stationFocusMetricsDirty = true
+  cacheStationFocusMetrics()
 })
 watch([themeKey, () => props.entryRevision], randomizeSpecialEventOffset)
 // 切换场景后船/海龟元素整体更换，同样重建缓存
-watch(themeKey, () => { rebuildEventArtCache() })
+watch(themeKey, () => {
+  clearStationFocusStyles()
+  rebuildEventArtCache()
+  cacheStationFocusMetrics()
+})
 watch(() => props.entryRevision, (nextRevision, previousRevision) => {
   if (nextRevision === previousRevision) return
   triggerSceneEntry()
@@ -801,7 +957,10 @@ onMounted(() => {
   triggerSceneEntry()
   if (window.ResizeObserver) {
     // 容器尺寸变化（含窗口缩放）会使 clamp() 槽距变化，届时失效循环宽度缓存
-    streamResizeObserver = new ResizeObserver(() => { invalidateCycleWidth() })
+    streamResizeObserver = new ResizeObserver(() => {
+      invalidateCycleWidth()
+      stationFocusMetricsDirty = true
+    })
     observeStreamSize()
   }
   resetStreamPosition()
@@ -816,6 +975,9 @@ onUnmounted(() => {
   window.clearTimeout(categoryClickTimer)
   window.clearTimeout(streamClickTimer)
   window.clearTimeout(sceneEntryTimer)
+  window.clearTimeout(dishPressTimer)
+  window.clearTimeout(dishStampTimer)
+  clearStationFocusStyles()
 })
 </script>
 
@@ -2006,6 +2168,201 @@ onUnmounted(() => {
   .scenic-dish-stage.is-midnight-station .tide-pause:focus-visible {
     transition: none;
     transform: none;
+  }
+}
+
+/* Midnight Station motion system: one real horizontal stream, three visual
+   depth lanes. Scroll, drag and inertia remain owned by the existing stream. */
+.scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+  position: relative;
+  z-index: var(--station-lane-z, 2);
+  opacity: var(--station-focus-opacity, var(--station-lane-opacity, 1));
+  transform: translate3d(0, var(--station-lane-y, 0px), 0) scale(var(--station-lane-scale, 1));
+  filter: brightness(var(--station-focus-brightness, var(--station-lane-brightness, 1)));
+  transition: transform var(--station-motion-normal) var(--station-easing-standard),
+    opacity var(--station-motion-normal) ease,
+    filter var(--station-motion-normal) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot[data-station-focus] {
+  z-index: 8;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish {
+  position: relative;
+  overflow: visible;
+}
+
+.scenic-dish-stage.is-midnight-station .station-platform-marker {
+  position: absolute;
+  left: 19%;
+  right: 19%;
+  bottom: -10px;
+  height: 3px;
+  display: block;
+  background: var(--station-accent);
+  border-radius: var(--station-radius-small);
+  opacity: 0.26;
+  transform: scaleX(0.42);
+  transform-origin: center;
+  transition: opacity var(--station-motion-fast) ease,
+    transform var(--station-motion-fast) var(--station-easing-standard);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot[data-station-focus] .station-platform-marker,
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .station-platform-marker,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-platform-marker {
+  opacity: 0.96;
+  transform: scaleX(1);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-stamp {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  padding: 4px 6px;
+  color: var(--station-text-primary);
+  background: var(--station-primary);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  font-family: var(--station-font-number);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  animation: station-dish-stamp var(--station-motion-stamp) var(--station-easing-enter) both;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish.is-station-pressed {
+  box-shadow: var(--station-shadow-pressed);
+  transform: translateY(1px) scale(0.985);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish.is-station-stamped {
+  border-color: var(--station-accent);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish.is-station-stamped .tide-dish__copy {
+  border-top-color: var(--station-accent);
+}
+
+.scenic-dish-stage.is-midnight-station .station-platform-hold {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 20;
+  min-width: 190px;
+  padding: 10px 18px;
+  display: grid;
+  gap: 3px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e2);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: station-hold-in var(--station-motion-normal) var(--station-easing-enter) both;
+}
+
+.station-platform-hold strong {
+  color: var(--station-primary-strong);
+  font-family: var(--station-font-number);
+  font-size: var(--station-size-ticket);
+  letter-spacing: 0.12em;
+}
+
+.station-platform-hold span {
+  color: var(--station-text-muted);
+  font-family: var(--station-font-ui);
+  font-size: var(--station-size-body);
+}
+
+.scenic-dish-stage.is-midnight-station.is-scene-entering {
+  animation: station-stage-open var(--station-motion-scene) var(--station-easing-enter) both;
+  filter: none;
+}
+
+.scenic-dish-stage.is-midnight-station.is-scene-entering .tide-current {
+  animation: station-rail-deploy 760ms var(--station-easing-enter) both;
+}
+
+.scenic-dish-stage.is-midnight-station.is-scene-entering .tide-current--back { animation-delay: 120ms; }
+.scenic-dish-stage.is-midnight-station.is-scene-entering .tide-current--middle { animation-delay: 210ms; }
+.scenic-dish-stage.is-midnight-station.is-scene-entering .tide-current--front { animation-delay: 300ms; }
+
+.scenic-dish-stage.is-midnight-station.is-scene-entering .tide-cycle:nth-child(2) .tide-slot:not(.is-queue-event) {
+  animation: station-dish-arrive 600ms var(--station-easing-enter) var(--station-entry-delay) both;
+}
+
+.scenic-dish-stage.is-midnight-station.is-paused .tide-current,
+.scenic-dish-stage.is-midnight-station.is-paused .tide-cycle:nth-child(2) .tide-slot {
+  animation-play-state: paused;
+}
+
+@keyframes station-stage-open {
+  0% { opacity: 0.68; transform: translate3d(0, 7px, 0); }
+  52% { opacity: 0.94; transform: translate3d(0, -1px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes station-rail-deploy {
+  from { opacity: 0; transform: translateX(-1%) scaleX(0.12); transform-origin: center; }
+  to { opacity: 1; transform: translateX(0) scaleX(1); transform-origin: center; }
+}
+
+@keyframes station-dish-arrive {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--station-lane-y, 0px), 0) scale(0.92);
+  }
+  68% {
+    opacity: var(--station-focus-opacity, var(--station-lane-opacity, 1));
+    transform: translate3d(0, var(--station-lane-y, 0px), 0) scale(1.018);
+  }
+  to {
+    opacity: var(--station-focus-opacity, var(--station-lane-opacity, 1));
+    transform: translate3d(0, var(--station-lane-y, 0px), 0) scale(var(--station-lane-scale, 1));
+  }
+}
+
+@keyframes station-dish-stamp {
+  0% { opacity: 0; transform: translateY(4px) rotate(-3deg); }
+  22% { opacity: 1; transform: translateY(0) rotate(-3deg); }
+  78% { opacity: 1; transform: translateY(0) rotate(-3deg); }
+  100% { opacity: 0; transform: translateY(-4px) rotate(-3deg); }
+}
+
+@keyframes station-hold-in {
+  from { opacity: 0; transform: translate(-50%, -46%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-dish-stage.is-midnight-station.is-scene-entering {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event),
+  .scenic-dish-stage.is-midnight-station .tide-dish,
+  .scenic-dish-stage.is-midnight-station .station-platform-marker,
+  .scenic-dish-stage.is-midnight-station .station-platform-hold {
+    transition: none;
+    animation: none !important;
+  }
+
+  .scenic-dish-stage.is-midnight-station.is-scene-entering .tide-current,
+  .scenic-dish-stage.is-midnight-station.is-scene-entering .tide-cycle:nth-child(2) .tide-slot:not(.is-queue-event) {
+    animation: none !important;
+    opacity: var(--station-focus-opacity, var(--station-lane-opacity, 1));
+    transform: translate3d(0, var(--station-lane-y, 0px), 0) scale(var(--station-lane-scale, 1));
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-dish.is-station-pressed {
+    transform: translateY(1px) scale(0.985);
   }
 }
 </style>

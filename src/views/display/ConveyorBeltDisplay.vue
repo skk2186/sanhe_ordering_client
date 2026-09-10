@@ -75,11 +75,17 @@
       </div>
 
       <!-- 招牌菜介绍吊屏：只覆盖舞台区，播完一次自动收回 -->
-      <FeaturedDishScreen
-        :item="featuredPromoItem"
-        :visible="featuredPromoVisible"
+    <FeaturedDishScreen
+      :item="featuredPromoItem"
+      :visible="featuredPromoVisible"
+      :theme-key="activeSceneKey"
+      @close="closeFeaturedPromo"
+    />
+
+      <StationCartTransfer
+        v-if="activeSceneKey === 'midnight-station'"
+        ref="stationCartTransferRef"
         :theme-key="activeSceneKey"
-        @close="closeFeaturedPromo"
       />
     </div>
 
@@ -94,6 +100,7 @@
             :count="getCartCount('left')"
             :tips-type="leftCartTipsType"
             :submitting="submittingSide === 'left'"
+            :order-feedback="orderFeedback.left"
             @place-order="placeOrder"
             @remove="removeItem"
             @increase="increaseQuantity"
@@ -124,6 +131,7 @@
           :count="getCartCount('right')"
           :tips-type="rightCartTipsType"
           :submitting="submittingSide === 'right'"
+          :order-feedback="orderFeedback.right"
           @place-order="placeOrder"
           @remove="removeItem"
           @increase="increaseQuantity"
@@ -225,6 +233,7 @@ import OrderHistoryDialog from '@/components/order/OrderHistoryDialog.vue'
 import ScenicDishStage from '@/components/display/ScenicDishStage.vue'
 import SceneTransitionOverlay from '@/components/display/SceneTransitionOverlay.vue'
 import FeaturedDishScreen from '@/components/display/FeaturedDishScreen.vue'
+import StationCartTransfer from '@/components/display/midnight/StationCartTransfer.vue'
 import GameInvitationFlow from '@/components/display/GameInvitationFlow.vue'
 import TopPlateProgress from '@/components/display/TopPlateProgress.vue'
 import CartPanel from '@/components/display/CartPanel.vue'
@@ -863,11 +872,23 @@ const menuVisibility = ref({ left: false, right: false });
 const showSushiNavigation = ref(false)
 const settingVisible = ref(false)
 const gameFlowRef = ref(null)
+const stationCartTransferRef = ref(null)
 const gameModePaused = ref(false)
 
 // 购物车提示状态管理
 const leftCartTipsType = ref('')
 const rightCartTipsType = ref('')
+const orderFeedback = ref({ left: '', right: '' })
+const orderFeedbackTimers = { left: 0, right: 0 }
+
+const setOrderFeedback = (side, status) => {
+  window.clearTimeout(orderFeedbackTimers[side])
+  orderFeedback.value = { ...orderFeedback.value, [side]: status }
+  if (!status) return
+  orderFeedbackTimers[side] = window.setTimeout(() => {
+    orderFeedback.value = { ...orderFeedback.value, [side]: '' }
+  }, 760)
+}
 
 // 记录每侧购物车的上一次商品数量，用于判断是否刚刚变满
 const leftPrevCount = ref(0)
@@ -931,9 +952,9 @@ const handleSushiClick = (item, event) => {
 
   // 根据位置添加到对应的购物车
   if (isLeftSide) {
-    addToCart(item, 'left')
+    addToCart(item, 'left', { sourceElement: event?.currentTarget?.closest?.('.tide-dish') || event?.target?.closest?.('.tide-dish') })
   } else {
-    addToCart(item, 'right')
+    addToCart(item, 'right', { sourceElement: event?.currentTarget?.closest?.('.tide-dish') || event?.target?.closest?.('.tide-dish') })
   }
 }
 
@@ -946,10 +967,19 @@ const handleNavigationAddToCart = (item, side) => {
 }
 
 // 购物车操作
-const addToCart = (item, side) => {
+const addToCart = (item, side, uiMeta = {}) => {
   const result = add(item, side)
   // 取消所有购物车操作的提醒，保持界面简洁
   if (result.ok) {
+    if (activeSceneKey.value === 'midnight-station') {
+      stationCartTransferRef.value?.play({
+        item,
+        side: result.side || side,
+        index: result.index,
+        sourceElement: uiMeta.sourceElement || null,
+        sourcePoint: uiMeta.sourcePoint || null
+      })
+    }
     // 静默添加成功
     // 检查购物车是否刚刚变满
     checkCartFull()
@@ -1155,10 +1185,12 @@ const placeOrder = async (side, options = {}) => {
       resetPlateProgress()
     }
 
+    setOrderFeedback(side, 'success')
     if (notify) ElMessage.success(t('display.orderSubmitted', { orderId: backendOrderId }))
     return { status: 'success', orderId: backendOrderId }
   } catch (error) {
     console.error('提交订单失败:', error)
+    setOrderFeedback(side, 'error')
     if (notify) ElMessage.error(t('display.orderFailed'))
     return { status: 'failed', error }
   } finally {
@@ -1450,6 +1482,8 @@ watch(() => displaySushiData.length, () => {
 
 onUnmounted(() => {
   if (assistantFeedbackTimer) clearTimeout(assistantFeedbackTimer)
+  window.clearTimeout(orderFeedbackTimers.left)
+  window.clearTimeout(orderFeedbackTimers.right)
 })
 </script>
 

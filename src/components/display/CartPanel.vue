@@ -1,7 +1,14 @@
 <template>
   <div
     class="cart-section"
-    :class="[`cart-section--${side}`, { 'is-midnight-station': themeKey === 'midnight-station' }]"
+    :class="[
+      `cart-section--${side}`,
+      {
+        'is-midnight-station': themeKey === 'midnight-station',
+        'is-order-success': orderFeedback === 'success',
+        'is-order-error': orderFeedback === 'error'
+      }
+    ]"
   >
 
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
@@ -9,6 +16,13 @@
         :class="tipsType"
         @click="handleTipsClick"
     >
+      <span
+        v-if="themeKey === 'midnight-station' && tipsType === 'order_meal'"
+        class="station-order-signal"
+        aria-hidden="true"
+      >
+        <i></i><i></i><i></i><b>SIGNAL GREEN</b>
+      </span>
       <!-- out_meal 提示：点击任意位置关闭 -->
     </div>
 
@@ -17,19 +31,44 @@
           :style="'order: ' + (side ==='left' ? '1' : '0') "
           :aria-label="`${$t('common.placeOrder')}-${side}`" :aria-disabled="submitting"
           :title="$t('common.placeOrder')" @click="!submitting && $emit('place-order', side)">
+        <span v-if="themeKey === 'midnight-station' && submitting" class="station-departure-signal" aria-hidden="true">ROUTE</span>
+        <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'success'" class="station-departure-signal is-success" aria-hidden="true">ACCEPTED</span>
+        <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'error'" class="station-departure-signal is-error" aria-hidden="true">CHECK</span>
         <el-icon v-if="submitting" class="submitting-icon"><Loading /></el-icon>
         <div v-else class="order-progress">{{ count }}/4</div>
       </div>
 
       <!-- 购物车圆形显示 -->
-      <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" :class="'cart-item cart-item-'+side">
+      <div
+        v-for="(item, index) in items"
+        :key="`${side}-circle-${index}`"
+        :class="[
+          'cart-item',
+          `cart-item-${side}`,
+          {
+            'is-station-quantity-changing': quantityChanging.has(index),
+            'is-station-increasing': quantityDirections[index] === 'increase',
+            'is-station-decreasing': quantityDirections[index] === 'decrease'
+          }
+        ]"
+        :data-station-cart-side="side"
+        :data-station-cart-index="index"
+      >
         <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" @click="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
             <img :src="item.image" :alt="item.name" />
           </div>
             <button v-if="item" class="circle-close-btn" type="button" :disabled="submitting"
             :aria-label="$t('common.remove')" :title="$t('common.remove')"
-                  @click.stop="$emit('remove', side, index)">×</button>
+                  @click.stop="handleRemove(index)">×</button>
+        </div>
+        <div
+          v-if="themeKey === 'midnight-station' && removedTicket && removedTicket.index === index"
+          class="station-removed-ticket"
+          aria-hidden="true"
+        >
+          <strong>{{ removedTicket.name }}</strong>
+          <span>REMOVED</span>
         </div>
         <!-- 下方信息区域 - 始终显示 -->
         <div class="item-info" :class="{ 'empty-info': !item }">
@@ -40,7 +79,12 @@
             <button class="minus-btn" type="button" :disabled="!item || submitting" :aria-disabled="!item || submitting"
              :class="{ 'empty-btn': !item }" :aria-label="$t('common.decrease')" title="-"
                     @click="item && $emit('decrease', side, index)">-</button>
-            <span class="quantity-display" :class="{ 'empty-quantity': !item }" aria-live="polite">{{ item ? item.quantity : 0 }}</span>
+          <span
+            class="quantity-display"
+            :class="{ 'empty-quantity': !item }"
+            :data-station-quantity="item ? item.quantity : 0"
+            aria-live="polite"
+          >{{ item ? item.quantity : 0 }}</span>
             <button class="plus-btn" type="button" :disabled="!item || submitting || (item && item.quantity >= 4)" :aria-disabled="!item || submitting || (item && item.quantity >= 4)"
              :class="{ 'empty-btn': !item, 'max-quantity': item && item.quantity >= 4 }" :aria-label="$t('common.increase')" title="+"
                     @click="item && item.quantity < 4 && $emit('increase', side, index)">+</button>
@@ -54,7 +98,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 const props = defineProps({
   side: { type: String, required: true },
@@ -62,6 +106,7 @@ const props = defineProps({
   items: { type: Array, required: true },
   count: { type: Number, required: true },
   submitting: { type: Boolean, default: false },
+  orderFeedback: { type: String, default: '' },
   tipsType: {
     type: String,
     default: '',
@@ -72,6 +117,76 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select', 'close-tips'])
+const quantityChanging = ref(new Set())
+const quantityDirections = ref({})
+const removedTicket = ref(null)
+const quantityTimers = new Map()
+let removedTicketTimer = 0
+
+const getMotionDuration = (token, fallback) => {
+  const raw = window.getComputedStyle(document.documentElement).getPropertyValue(token).trim()
+  const value = Number.parseFloat(raw)
+  return Number.isFinite(value) ? value : fallback
+}
+
+const showRemovedTicket = (index, item) => {
+  if (props.themeKey !== 'midnight-station' || !item) return
+  window.clearTimeout(removedTicketTimer)
+  removedTicket.value = {
+    index,
+    name: item.name || item.storeName || item.productName || 'DISH'
+  }
+  removedTicketTimer = window.setTimeout(() => {
+    removedTicket.value = null
+  }, getMotionDuration('--station-motion-remove', 260))
+}
+
+const markQuantityChange = (index, direction) => {
+  if (props.themeKey !== 'midnight-station') return
+  const nextChanging = new Set(quantityChanging.value)
+  nextChanging.add(index)
+  quantityChanging.value = nextChanging
+  quantityDirections.value = { ...quantityDirections.value, [index]: direction }
+
+  window.clearTimeout(quantityTimers.get(index))
+  const timer = window.setTimeout(() => {
+    const settled = new Set(quantityChanging.value)
+    settled.delete(index)
+    quantityChanging.value = settled
+    const nextDirections = { ...quantityDirections.value }
+    delete nextDirections[index]
+    quantityDirections.value = nextDirections
+    quantityTimers.delete(index)
+  }, getMotionDuration('--station-motion-number', 190))
+  quantityTimers.set(index, timer)
+}
+
+const handleRemove = (index) => {
+  const item = props.items[index]
+  showRemovedTicket(index, item)
+  // Emit immediately so business state and persisted cart data are never
+  // delayed by the visual removal ticket.
+  emit('remove', props.side, index)
+}
+
+watch(() => props.items.map(item => item
+  ? {
+      id: item.id,
+      quantity: item.quantity,
+      name: item.name || item.storeName || item.productName || 'DISH'
+    }
+  : null), (next, previous) => {
+  if (!Array.isArray(previous)) return
+  next.forEach((item, index) => {
+    const previousItem = previous[index]
+    const previousQuantity = Number(previousItem?.quantity)
+    const nextQuantity = Number(item?.quantity)
+    if (Number.isFinite(previousQuantity) && Number.isFinite(nextQuantity) && previousQuantity !== nextQuantity) {
+      markQuantityChange(index, nextQuantity > previousQuantity ? 'increase' : 'decrease')
+    }
+    if (previousItem && !item) showRemovedTicket(index, previousItem)
+  })
+})
 
 // 处理提示点击事件
 const handleTipsClick = () => {
@@ -81,6 +196,11 @@ const handleTipsClick = () => {
   }
   // order_meal类型不处理点击，让它自动3秒后关闭
 }
+
+onUnmounted(() => {
+  quantityTimers.forEach(timer => window.clearTimeout(timer))
+  window.clearTimeout(removedTicketTimer)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -632,6 +752,15 @@ const handleTipsClick = () => {
   }
 
   .tips-overlay {
+    top: 10px;
+    left: auto;
+    right: 10px;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    padding: 8px 12px;
+    z-index: 10;
+    pointer-events: auto;
     color: var(--station-text-on-surface);
     background: var(--station-surface);
     border: 2px solid var(--station-primary);
@@ -641,7 +770,196 @@ const handleTipsClick = () => {
     letter-spacing: 0.12em;
 
     &::before { content: 'SEAT FULL'; }
-    &.order_meal::before { content: 'ORDER SENT'; }
+    &.order_meal {
+      color: var(--station-text-on-surface);
+      border-color: var(--station-success);
+      animation: station-order-success var(--station-motion-receive) var(--station-easing-standard) both;
+      &::before { content: 'ORDER SENT'; }
+      &::after {
+        content: none;
+      }
+    }
+    &.out_meal { animation: station-full-alert var(--station-motion-receive) var(--station-easing-standard) both; }
   }
+
+  .station-order-signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+
+    i {
+      width: 8px;
+      height: 8px;
+      display: block;
+      background: var(--station-border);
+      border: 1px solid var(--station-text-on-surface);
+      border-radius: 50%;
+      animation: station-signal-light var(--station-motion-receive) var(--station-easing-standard) both;
+    }
+
+    i:nth-child(1) { --station-signal-color: var(--station-primary); animation-delay: 0ms; }
+    i:nth-child(2) { --station-signal-color: var(--station-accent); animation-delay: 110ms; }
+    i:nth-child(3) { --station-signal-color: var(--station-success); animation-delay: 220ms; }
+
+    b {
+      margin-left: 3px;
+      color: var(--station-success);
+      font-family: var(--station-font-number);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  .cart-item {
+    position: relative;
+    transition: transform var(--station-motion-fast) var(--station-easing-standard);
+  }
+
+  .cart-item.is-station-receiving .item-circle {
+    animation: station-ticket-catch var(--station-motion-receive) var(--station-easing-enter) both;
+  }
+
+  .cart-item.is-station-receiving .item-info {
+    border-color: var(--station-accent);
+  }
+
+  .quantity-display {
+    position: relative;
+    min-width: 2ch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+    backface-visibility: hidden;
+  }
+
+  .cart-item.is-station-quantity-changing .quantity-display {
+    animation: station-number-flip var(--station-motion-number) var(--station-easing-standard) both;
+  }
+
+  .cart-item.is-station-increasing .quantity-display { --station-number-direction: -1; }
+  .cart-item.is-station-decreasing .quantity-display { --station-number-direction: 1; }
+
+  .station-removed-ticket {
+    position: absolute;
+    left: 50%;
+    top: 38px;
+    z-index: 4;
+    width: 88px;
+    min-height: 52px;
+    padding: 7px 6px;
+    box-sizing: border-box;
+    display: grid;
+    align-content: center;
+    gap: 3px;
+    color: var(--station-text-on-surface);
+    background: var(--station-surface-muted);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: var(--station-shadow-e1);
+    text-align: center;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: station-ticket-remove var(--station-motion-remove) var(--station-easing-exit) both;
+
+    strong {
+      overflow: hidden;
+      font-family: var(--station-font-ui);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    span {
+      color: var(--station-primary-strong);
+      font-family: var(--station-font-number);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  .order-btn.is-submitting .station-departure-signal,
+  .order-btn.is-order-success .station-departure-signal,
+  .order-btn.is-order-error .station-departure-signal { display: block; }
+
+  .station-departure-signal {
+    position: absolute;
+    top: 48px;
+    left: 50%;
+    z-index: 3;
+    color: var(--station-text-primary);
+    font-family: var(--station-font-number);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    transform: translateX(-50%);
+  }
+
+  .order-btn.is-submitting .submitting-icon { display: none; }
+
+  .station-departure-signal:not(.is-success):not(.is-error) {
+    animation: station-departure-sweep 900ms linear infinite;
+  }
+
+  .station-departure-signal.is-success { color: var(--station-success); }
+  .station-departure-signal.is-error { color: var(--station-text-primary); }
+
+  @keyframes station-ticket-catch {
+    0% { transform: translateY(0); box-shadow: var(--station-shadow-e0); }
+    42% { transform: translateY(-3px); box-shadow: inset 0 0 0 2px var(--station-accent), var(--station-shadow-e1); }
+    100% { transform: translateY(0); box-shadow: var(--station-shadow-e0); }
+  }
+
+  @keyframes station-number-flip {
+    0% { opacity: 0.35; transform: translateY(calc(var(--station-number-direction, -1) * 7px)) rotateX(-24deg); }
+    100% { opacity: 1; transform: translateY(0) rotateX(0); }
+  }
+
+  @keyframes station-ticket-remove {
+    from { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+    to { opacity: 0; transform: translate(-50%, -50%) translateY(12px); }
+  }
+
+  @keyframes station-full-alert {
+    0% { opacity: 0; transform: translateY(-3px); }
+    30% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes station-order-success {
+    0% { opacity: 0; transform: translateY(-3px); border-color: var(--station-primary); }
+    38% { opacity: 1; transform: translateY(0); border-color: var(--station-accent); }
+    100% { opacity: 1; transform: translateY(0); border-color: var(--station-success); }
+  }
+
+  @keyframes station-signal-light {
+    0% { background: var(--station-border); transform: scale(0.8); }
+    55% { background: var(--station-signal-color); transform: scale(1.16); }
+    100% { background: var(--station-signal-color); transform: scale(1); }
+  }
+
+  @keyframes station-departure-sweep {
+    0%, 100% { opacity: 0.62; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-section.is-midnight-station .tips-overlay.out_meal,
+  .cart-section.is-midnight-station .tips-overlay.order_meal,
+  .cart-section.is-midnight-station .cart-item.is-station-receiving .item-circle,
+  .cart-section.is-midnight-station .cart-item.is-station-quantity-changing .quantity-display,
+  .cart-section.is-midnight-station .station-removed-ticket,
+  .cart-section.is-midnight-station .station-departure-signal {
+    animation: none !important;
+  }
+
+  .cart-section.is-midnight-station .station-order-signal i {
+    animation: none !important;
+    background: var(--station-signal-color);
+  }
+
+  .cart-section.is-midnight-station .station-removed-ticket { opacity: 0; }
 }
 </style>
