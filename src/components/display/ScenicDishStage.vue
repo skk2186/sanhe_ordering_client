@@ -206,7 +206,10 @@ const props = defineProps({
 
 const emit = defineEmits(['dish-click', 'paused-change', 'featured-promo'])
 const { t } = useI18n()
-const DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
+// Midnight gets a real dish fallback; legacy themes keep their historical
+// asset path so this polish pass cannot alter their visual language.
+const LEGACY_DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
+const MIDNIGHT_DEFAULT_DISH_IMAGE = '/images/menu/generated/nigiri.webp'
 const getName = item => item?.name || item?.storeName || item?.productName || t('common.unknown')
 // A shorter cycle makes the beach event recur sooner without placing two
 // boats on screen at once.
@@ -379,7 +382,9 @@ const STATION_LANE_PROFILES = [
   { name: 'front', y: 18, scale: 1, opacity: 1, brightness: 1, z: 3 }
 ]
 
-const getImage = (item) => item?.image || item?.imageUrl || DEFAULT_DISH_IMAGE
+const getImage = (item) => item?.image || item?.imageUrl || (
+  themeKey.value === 'midnight-station' ? MIDNIGHT_DEFAULT_DISH_IMAGE : LEGACY_DEFAULT_DISH_IMAGE
+)
 // The app API uses cateId, while older/mock payloads may use categoryId or
 // snake_case fields. Keep category matching tolerant of all supported shapes.
 const getCategoryId = (item) => String(
@@ -926,7 +931,9 @@ const handleImageError = (event) => {
   const image = event?.target
   if (!image || image.dataset.fallbackApplied === '1') return
   image.dataset.fallbackApplied = '1'
-  image.src = DEFAULT_DISH_IMAGE
+  image.src = themeKey.value === 'midnight-station'
+    ? MIDNIGHT_DEFAULT_DISH_IMAGE
+    : LEGACY_DEFAULT_DISH_IMAGE
 }
 
 const triggerSceneEntry = async () => {
@@ -2530,7 +2537,7 @@ onUnmounted(() => {
   overflow: hidden;
   color: var(--station-text-on-surface);
   font-family: var(--station-font-ui);
-  font-size: clamp(11px, 0.72vw, 14px);
+  font-size: clamp(12px, 0.72vw, 16px);
   font-weight: 700;
   line-height: 1.15;
   text-overflow: ellipsis;
@@ -2540,7 +2547,7 @@ onUnmounted(() => {
 .scenic-dish-stage.is-midnight-station .station-dish-ticket strong {
   color: var(--station-primary-strong);
   font-family: var(--station-font-number);
-  font-size: clamp(14px, 0.9vw, 18px);
+  font-size: clamp(15px, 0.9vw, 21px);
   line-height: 1;
 }
 

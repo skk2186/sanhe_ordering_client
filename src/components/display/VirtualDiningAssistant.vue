@@ -32,7 +32,10 @@
           @click="emit('select-recommendation', item, index)"
         >
           <span class="recommendation-number">{{ index + 1 }}</span>
-          <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name || item.storeName" />
+          <img
+            :src="item.image || (themeKey === 'midnight-station' ? '/images/menu/generated/nigiri.webp' : '/images/default-dish.jpg')"
+            :alt="item.name || item.storeName"
+          />
           <span class="recommendation-copy">
             <strong>{{ item.name || item.storeName }}</strong>
             <span>¥{{ formatPrice(item.price) }}</span>
@@ -1405,8 +1408,25 @@ onUnmounted(() => {
   }
 
   .assistant-character {
+    width: 94px;
+    height: 114px;
+
     .assistant-halo { background: transparent; border-color: var(--station-accent); }
     &:hover .assistant-halo { background: var(--station-accent-soft); }
+  }
+
+  .assistant-halo {
+    left: 22px;
+    right: 22px;
+    bottom: 8px;
+    height: 16px;
+    border: 0;
+    background: radial-gradient(ellipse, var(--station-accent-soft), transparent 72%);
+    opacity: 0.72;
+  }
+
+  .assistant-character img {
+    filter: drop-shadow(0 5px 5px rgba(28, 48, 51, 0.2));
   }
 }
 </style>

@@ -229,6 +229,19 @@ html[data-theme='midnight-station'] .bottom-section {
   }
 }
 
+/* Ultra-wide dining displays need a larger reading floor. Keep the layout
+   proportions stable while lifting only the text caps and primary controls. */
+@media (min-width: 1921px) {
+  html[data-theme='midnight-station'] {
+    --station-size-dish-name: 26px;
+    --station-size-price: 30px;
+    --station-size-body: 18px;
+    --station-size-button: 22px;
+    --station-size-assistant: 18px;
+    --station-size-ticket: 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-theme='midnight-station'] *,
   html[data-theme='midnight-station'] *::before,

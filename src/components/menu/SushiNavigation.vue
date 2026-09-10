@@ -157,7 +157,7 @@
                 @keydown.space.prevent="addToCart(item, $event)"
               >
                 <div class="item-image">
-                  <img :src="item.image || DEFAULT_DISH_IMAGE" :alt="item.name" @error="handleImageError" />
+                  <img :src="getDishImage(item)" :alt="item.name" @error="handleImageError" />
                   <div v-if="!item.available" class="sold-out-overlay">
                     <span>{{ $t('common.soldOut') }}</span>
                   </div>
@@ -191,7 +191,8 @@ import CartPanel from '@/components/display/CartPanel.vue'
 import { useI18n } from '@/i18n'
 
 const { t } = useI18n()
-const DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
+const LEGACY_DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
+const MIDNIGHT_DEFAULT_DISH_IMAGE = '/images/menu/generated/nigiri.webp'
 const IMAGE_PRELOAD_TIMEOUT_MS = 3000
 
 // Props
@@ -377,8 +378,15 @@ const formatPrice = (price) => {
   return Number.isFinite(value) ? value.toFixed(2) : '0.00'
 }
 
+const getDishImage = (item) => item?.image || item?.imageUrl || (
+  props.themeKey === 'midnight-station' ? MIDNIGHT_DEFAULT_DISH_IMAGE : LEGACY_DEFAULT_DISH_IMAGE
+)
+
 const handleImageError = (event) => {
-  if (!event.target.src.endsWith(DEFAULT_DISH_IMAGE)) event.target.src = DEFAULT_DISH_IMAGE
+  const fallback = props.themeKey === 'midnight-station'
+    ? MIDNIGHT_DEFAULT_DISH_IMAGE
+    : LEGACY_DEFAULT_DISH_IMAGE
+  if (!event.target.src.endsWith(fallback)) event.target.src = fallback
 }
 
 // 开始拖拽

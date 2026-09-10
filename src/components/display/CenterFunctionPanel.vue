@@ -1,29 +1,47 @@
 <template>
   <div class="bottom-center" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }">
     <div class="center-layout">
-      <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')"></button>
+      <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')">
+        <el-icon class="function-glyph" aria-hidden="true"><Menu /></el-icon>
+        <span class="function-label">{{ $t('common.menu') }}</span>
+      </button>
       <div class="center-functions">
         <div class="function-row first-row">
           <button class="function-btn navigation-btn" type="button"
               :aria-label="$t('common.search')" @click="$emit('open-navigation')">
+            <el-icon class="function-glyph" aria-hidden="true"><Search /></el-icon>
+            <span class="function-label">{{ $t('common.search') }}</span>
           </button>
           <button class="function-btn checkout-btn" type="button"
               :aria-label="$t('common.orderHistory')" @click="$emit('open-order-history')">
+            <el-icon class="function-glyph" aria-hidden="true"><Tickets /></el-icon>
+            <span class="function-label">{{ $t('common.orderHistory') }}</span>
           </button>
         </div>
         <div class="function-row second-row">
           <button class="function-btn settings-btn" type="button" :aria-label="$t('common.systemSettings')"
-              @click="$emit('open-settings')"></button>
+              @click="$emit('open-settings')">
+            <el-icon class="function-glyph" aria-hidden="true"><Setting /></el-icon>
+            <span class="function-label">{{ $t('common.systemSettings') }}</span>
+          </button>
           <button class="function-btn waiter-btn" type="button" :aria-label="$t('common.callWaiter')"
-              @click="$emit('call-waiter')"></button>
+              @click="$emit('call-waiter')">
+            <el-icon class="function-glyph" aria-hidden="true"><Bell /></el-icon>
+            <span class="function-label">{{ $t('common.callWaiter') }}</span>
+          </button>
         </div>
       </div>
-      <button class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right')"></button>
+      <button class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right')">
+        <el-icon class="function-glyph" aria-hidden="true"><Menu /></el-icon>
+        <span class="function-label">{{ $t('common.menu') }}</span>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { Bell, Menu, Search, Setting, Tickets } from '@element-plus/icons-vue'
+
 defineProps({
   themeKey: { type: String, default: 'zhenxian' }
 })
@@ -70,6 +88,9 @@ defineEmits([
   font: inherit;
   cursor: pointer;
 }
+
+.function-glyph,
+.function-label { display: none; }
 
 @media (min-width: 769px) and (max-width: 1920px) {
   .bottom-center {
@@ -146,23 +167,6 @@ defineEmits([
       transform var(--station-motion-instant) ease,
       box-shadow var(--station-motion-fast) ease;
 
-    &::after {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 100%;
-      padding-inline: var(--station-space-2);
-      color: var(--station-text-on-surface);
-      font-family: var(--station-font-number);
-      font-size: var(--station-size-ticket);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: 0.08em;
-      text-align: center;
-      white-space: pre-line;
-      transform: translate(-50%, -50%);
-    }
-
     &:hover,
     &:focus-visible {
       background-color: var(--station-surface-elevated);
@@ -181,13 +185,42 @@ defineEmits([
   .menu-btn {
     writing-mode: horizontal-tb;
     text-orientation: mixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
 
-  .menu-btn::after { content: 'MENU'; }
-  .navigation-btn::after { content: 'FIND\A SEARCH'; }
-  .checkout-btn::after { content: 'LOG\A HISTORY'; }
-  .settings-btn::after { content: 'SET\A UP'; }
-  .waiter-btn::after { content: 'CALL\A STAFF'; }
+  .function-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .function-glyph {
+    display: inline-flex;
+    color: var(--station-accent);
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .function-label {
+    display: block;
+    max-width: 100%;
+    padding-inline: 4px;
+    color: var(--station-text-primary);
+    font-family: var(--station-font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .settings-btn,
   .waiter-btn { background-color: var(--station-surface-muted); }
@@ -209,7 +242,15 @@ defineEmits([
   .function-btn:hover,
   .function-btn:focus-visible {
     background-color: var(--station-surface);
-    &::after { color: var(--station-text-on-surface); }
+    .function-glyph,
+    .function-label { color: var(--station-text-on-surface); }
+  }
+}
+
+@media (min-width: 1921px) {
+  .bottom-center.is-midnight-station {
+    .function-glyph { font-size: 28px; }
+    .function-label { font-size: 16px; }
   }
 }
 

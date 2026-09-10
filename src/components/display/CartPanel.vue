@@ -38,6 +38,7 @@
           @click="!submitting && $emit('place-order', side)"
           @keydown.enter.prevent="!submitting && $emit('place-order', side)"
           @keydown.space.prevent="!submitting && $emit('place-order', side)">
+        <span v-if="themeKey === 'midnight-station'" class="order-action-label">{{ $t('common.placeOrder') }}</span>
         <span v-if="themeKey === 'midnight-station' && submitting" class="station-departure-signal" aria-hidden="true">ROUTE</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'success'" class="station-departure-signal is-success" aria-hidden="true">ACCEPTED</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'error'" class="station-departure-signal is-error" aria-hidden="true">CHECK</span>
@@ -67,7 +68,11 @@
           @keydown.enter.prevent="$emit('select', side, index)"
           @keydown.space.prevent="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
-            <img :src="item.image" :alt="item.name" />
+            <img
+              :src="item.image || (themeKey === 'midnight-station' ? '/images/menu/generated/nigiri.webp' : '/images/default-dish.jpg')"
+              :alt="item.name"
+              @error="handleImageError"
+            />
           </div>
             <button v-if="item" class="circle-close-btn" type="button" :disabled="submitting"
             :aria-label="$t('common.remove')" :title="$t('common.remove')"
@@ -133,6 +138,15 @@ const quantityDirections = ref({})
 const removedTicket = ref(null)
 const quantityTimers = new Map()
 let removedTicketTimer = 0
+
+const handleImageError = (event) => {
+  const image = event?.target
+  if (!image || image.dataset.fallbackApplied === '1') return
+  image.dataset.fallbackApplied = '1'
+  image.src = props.themeKey === 'midnight-station'
+    ? '/images/menu/generated/nigiri.webp'
+    : '/images/default-dish.jpg'
+}
 
 const getMotionDuration = (token, fallback) => {
   const raw = window.getComputedStyle(document.documentElement).getPropertyValue(token).trim()
@@ -734,19 +748,6 @@ onUnmounted(() => {
       transform var(--station-motion-instant) ease,
       box-shadow var(--station-motion-fast) ease;
 
-    &::before {
-      content: 'DEPART';
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      color: var(--station-text-primary);
-      font-family: var(--station-font-number);
-      font-size: var(--station-size-ticket);
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      transform: translateX(-50%);
-    }
-
     &:hover,
     &:focus-visible {
       background: var(--station-primary-strong);
@@ -755,6 +756,20 @@ onUnmounted(() => {
     }
 
     &:active { transform: translateY(1px); box-shadow: var(--station-shadow-pressed); }
+
+    .order-action-label {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      color: var(--station-text-primary);
+      font-family: var(--station-font-ui);
+      font-size: var(--station-size-ticket);
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      white-space: nowrap;
+      transform: translateX(-50%);
+    }
 
     .order-progress {
       color: var(--station-text-primary);

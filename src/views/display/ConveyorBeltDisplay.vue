@@ -1808,6 +1808,44 @@ onUnmounted(() => {
     color: var(--station-primary);
     font-size: 42px;
   }
+
+  .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
+    grid-template-columns: minmax(0, 1fr) 214px;
+  }
+
+  .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) {
+    grid-template-columns: minmax(0, 1fr) minmax(176px, 214px);
+  }
+
+  .assistant-slot :deep(.virtual-assistant) {
+    grid-template-columns: minmax(0, 1fr) 94px;
+  }
+
+  .assistant-slot :deep(.assistant-character) {
+    width: 94px;
+    height: 114px;
+  }
+}
+
+@media (min-width: 1921px) {
+  .conveyor-display.is-midnight-station {
+    .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
+      grid-template-columns: minmax(0, 1fr) 254px;
+    }
+
+    .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) {
+      grid-template-columns: minmax(0, 1fr) minmax(206px, 254px);
+    }
+
+    .assistant-slot :deep(.virtual-assistant) {
+      grid-template-columns: minmax(0, 1fr) 108px;
+    }
+
+    .assistant-slot :deep(.assistant-character) {
+      width: 108px;
+      height: 130px;
+    }
+  }
 }
 
 .bottom-left, .bottom-right {
