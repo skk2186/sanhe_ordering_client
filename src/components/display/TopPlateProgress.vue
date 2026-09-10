@@ -1,6 +1,7 @@
 <template>
   <div
     class="plate-progress"
+    :class="{ 'is-midnight-station': themeKey === 'midnight-station' }"
     role="progressbar"
     :aria-label="`距离游戏开始还有 ${formatted}`"
     aria-valuemin="0"
@@ -8,10 +9,22 @@
     :aria-valuenow="numericProgress"
     :style="{ '--progress': `${numericProgress}%` }"
   >
-    <img class="progress-background" :src="assetUrls.background" alt="" aria-hidden="true">
-    <img class="progress-fill-art" :src="assetUrls.fill" alt="" aria-hidden="true">
-    <img class="progress-frame" :src="assetUrls.frame" alt="" aria-hidden="true">
-    <span class="progress-count">{{ formatted }}</span>
+    <template v-if="themeKey === 'midnight-station'">
+      <div class="station-progress__track" aria-hidden="true">
+        <span class="station-progress__fill"></span>
+        <span class="station-progress__marker station-progress__marker--one"></span>
+        <span class="station-progress__marker station-progress__marker--two"></span>
+        <span class="station-progress__marker station-progress__marker--three"></span>
+      </div>
+      <span class="station-progress__label">PLATE ROUTE</span>
+      <span class="station-progress__count">{{ formatted }}</span>
+    </template>
+    <template v-else>
+      <img class="progress-background" :src="assetUrls.background" alt="" aria-hidden="true">
+      <img class="progress-fill-art" :src="assetUrls.fill" alt="" aria-hidden="true">
+      <img class="progress-frame" :src="assetUrls.frame" alt="" aria-hidden="true">
+      <span class="progress-count">{{ formatted }}</span>
+    </template>
   </div>
 </template>
 
@@ -100,6 +113,72 @@ const assetUrls = computed(() => {
   text-shadow: 0 2px 3px rgba(43, 19, 9, 0.72);
 }
 
+.station-progress__track,
+.station-progress__fill,
+.station-progress__marker {
+  position: absolute;
+  display: block;
+}
+
+.plate-progress.is-midnight-station {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--station-radius-panel);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.station-progress__track {
+  inset: 42% 8% auto;
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-small, 4px);
+  background: var(--station-background-deep);
+}
+
+.station-progress__fill {
+  inset: 0 auto 0 0;
+  width: var(--progress);
+  background: var(--station-primary);
+  transition: width var(--station-motion-normal) var(--station-easing-standard);
+}
+
+.station-progress__marker {
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: var(--station-accent);
+  opacity: 0.8;
+}
+
+.station-progress__marker--one { left: 25%; }
+.station-progress__marker--two { left: 50%; }
+.station-progress__marker--three { left: 75%; }
+
+.station-progress__label {
+  position: absolute;
+  left: 8%;
+  top: 19%;
+  color: var(--station-text-secondary);
+  font-family: var(--station-font-number);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.station-progress__count {
+  position: absolute;
+  right: 8%;
+  top: 16%;
+  color: var(--station-text-primary);
+  font-family: var(--station-font-number);
+  font-size: clamp(18px, 1.2vw, 24px);
+  font-weight: 700;
+  line-height: 1;
+}
+
 @media (max-width: 600px) {
   .progress-count {
     font-size: 16px;
@@ -107,7 +186,8 @@ const assetUrls = computed(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .progress-fill-art {
+  .progress-fill-art,
+  .station-progress__fill {
     transition: none;
   }
 }

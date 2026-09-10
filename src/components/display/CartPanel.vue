@@ -1,5 +1,8 @@
 <template>
-  <div class="cart-section">
+  <div
+    class="cart-section"
+    :class="[`cart-section--${side}`, { 'is-midnight-station': themeKey === 'midnight-station' }]"
+  >
 
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
@@ -55,6 +58,7 @@ import { computed } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 const props = defineProps({
   side: { type: String, required: true },
+  themeKey: { type: String, default: 'zhenxian' },
   items: { type: Array, required: true },
   count: { type: Number, required: true },
   submitting: { type: Boolean, default: false },
@@ -460,6 +464,184 @@ const handleTipsClick = () => {
       bottom: 18px;
       font-size: 22px;
     }
+  }
+}
+/* Midnight Station foundation: the two carts become seat ticket racks while
+   keeping the existing four-slot structure and all event handlers intact. */
+.cart-section.is-midnight-station {
+  color: var(--station-text-primary);
+  background: var(--station-background-deep);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e1);
+  padding-top: 28px;
+
+  &::before {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    color: var(--station-accent);
+    font-family: var(--station-font-number);
+    font-size: var(--station-size-ticket);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  &.cart-section--left::before { content: 'LEFT SEAT / A'; }
+  &.cart-section--right::before { content: 'RIGHT SEAT / B'; }
+
+  .item-group { gap: clamp(8px, 0.9vw, 18px); }
+
+  .cart-item-left,
+  .cart-item-right { background: transparent; }
+
+  .item-circle {
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-control);
+    background: var(--station-surface-elevated);
+    box-shadow: var(--station-shadow-e0);
+    transition: transform var(--station-motion-fast) var(--station-easing-standard),
+      border-color var(--station-motion-fast) ease,
+      box-shadow var(--station-motion-fast) ease;
+
+    &:hover,
+    &:focus-within {
+      border-color: var(--station-hover);
+      box-shadow: var(--station-shadow-e1);
+      transform: translateY(-2px);
+    }
+
+    &.empty-item {
+      background: var(--station-paper-ghost);
+      border-style: dashed;
+      &::after { color: var(--station-text-secondary); }
+    }
+  }
+
+  .item-info {
+    margin-top: -12px;
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: var(--station-shadow-e0);
+  }
+
+  .item-name-area {
+    color: var(--station-text-on-surface);
+    background: var(--station-surface);
+    font-family: var(--station-font-ui);
+    font-size: clamp(12px, 0.75vw, 15px);
+    font-weight: 700;
+  }
+
+  .item-controls {
+    color: var(--station-text-on-surface);
+    background: var(--station-surface-muted);
+  }
+
+  .quantity-display {
+    color: var(--station-text-on-surface);
+    font-family: var(--station-font-number);
+    font-size: var(--station-size-ticket);
+  }
+
+  .item-controls .minus-btn,
+  .item-controls .plus-btn {
+    width: 30px;
+    min-width: 30px;
+    height: 26px;
+    color: var(--station-text-on-surface);
+    background: var(--station-surface-elevated);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-small);
+    transition: background var(--station-motion-fast) ease,
+      border-color var(--station-motion-fast) ease,
+      transform var(--station-motion-instant) ease;
+
+    &:hover:not(.empty-btn),
+    &:focus-visible:not(.empty-btn) {
+      color: var(--station-text-on-surface);
+      background: var(--station-hover);
+      border-color: var(--station-primary);
+      transform: none;
+    }
+
+    &:active:not(.empty-btn) {
+      transform: translateY(1px);
+      box-shadow: var(--station-shadow-pressed);
+    }
+
+    &.max-quantity {
+      color: var(--station-text-secondary);
+      background: var(--station-surface-muted);
+      border-color: var(--station-border);
+    }
+  }
+
+  .circle-close-btn {
+    width: 28px;
+    height: 28px;
+    color: var(--station-text-primary);
+    background: var(--station-primary-strong);
+    border: 1px solid var(--station-accent);
+    border-radius: var(--station-radius-small);
+    transition: background var(--station-motion-fast) ease,
+      transform var(--station-motion-instant) ease;
+
+    &:hover,
+    &:focus-visible { background: var(--station-primary); transform: none; }
+    &:active { transform: translateY(1px); }
+  }
+
+  .order-btn {
+    color: var(--station-text-primary);
+    background: var(--station-primary);
+    border: 1px solid var(--station-accent);
+    border-radius: var(--station-radius-control);
+    box-shadow: var(--station-shadow-e1);
+    transition: background var(--station-motion-fast) ease,
+      transform var(--station-motion-instant) ease,
+      box-shadow var(--station-motion-fast) ease;
+
+    &::before {
+      content: 'DEPART';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      color: var(--station-text-primary);
+      font-family: var(--station-font-number);
+      font-size: var(--station-size-ticket);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      transform: translateX(-50%);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--station-primary-strong);
+      box-shadow: var(--station-shadow-e2);
+      transform: translateY(-1px);
+    }
+
+    &:active { transform: translateY(1px); box-shadow: var(--station-shadow-pressed); }
+
+    .order-progress {
+      color: var(--station-text-primary);
+      font-family: var(--station-font-number);
+      text-shadow: none;
+    }
+  }
+
+  .tips-overlay {
+    color: var(--station-text-on-surface);
+    background: var(--station-surface);
+    border: 2px solid var(--station-primary);
+    font-family: var(--station-font-number);
+    font-size: var(--station-size-ticket);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+
+    &::before { content: 'SEAT FULL'; }
+    &.order_meal::before { content: 'ORDER SENT'; }
   }
 }
 </style>

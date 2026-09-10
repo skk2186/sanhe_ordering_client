@@ -8,6 +8,7 @@
       'is-chef-theme': themeKey === 'ailaotou',
       'is-beach-theme': themeKey === 'zhenxian',
       'is-underwater-theme': themeKey === 'xiaoxin',
+      'is-midnight-station': themeKey === 'midnight-station',
       'is-scene-entering': sceneEntryActive
     }"
     :style="stageTimingStyle"
@@ -414,7 +415,7 @@ const streamCycleItems = computed(() => {
       }
     }
   })
-  if (!list.length || activeCategoryId.value !== 'all') return entries
+  if (!list.length || activeCategoryId.value !== 'all' || themeKey.value === 'midnight-station') return entries
   const eventIndex = Math.min(specialEventOffset.value, entries.length)
   const eventWave = WAVE_PROFILE[(eventIndex + 2) % WAVE_PROFILE.length]
   entries.splice(eventIndex, 0, {
@@ -1711,5 +1712,300 @@ onUnmounted(() => {
 
 .scenic-dish-stage .tide-slot:not(.is-queue-event) .tide-dish {
   animation: dish-bob var(--bob-duration) ease-in-out var(--float-delay) infinite;
+}
+
+/* Midnight Station foundation: a quiet rail stage, paper dish tickets and
+   signal-like controls. Phase 01 deliberately keeps the existing horizontal
+   conveyor interaction and omits special-event art/complex choreography. */
+.scenic-dish-stage.is-midnight-station {
+  --ink: var(--station-text-on-surface);
+  --stream-gap: clamp(48px, 3vw, 112px);
+  --stream-drop: clamp(76px, 8vh, 126px);
+  color: var(--station-text-primary);
+  background: transparent;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stage {
+  inset: 0 0 62px;
+  background: var(--station-overlay-faint);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stage::before,
+.scenic-dish-stage.is-midnight-station .tide-stage::after {
+  position: absolute;
+  z-index: 0;
+  content: '';
+  pointer-events: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stage::before {
+  left: 4%;
+  right: 4%;
+  top: 28%;
+  bottom: 21%;
+  border-top: 1px solid var(--station-paper-line);
+  border-bottom: 1px solid var(--station-paper-line-soft);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stage::after {
+  left: 7%;
+  right: 7%;
+  top: 52%;
+  border-top: 1px solid var(--station-accent-line);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-current {
+  left: 6%;
+  width: 88%;
+  height: 18px;
+  border: 0;
+  border-top: 2px solid var(--station-accent-line-strong);
+  border-radius: 0;
+  filter: none;
+  opacity: 1;
+  transform: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-current::after {
+  top: 7px;
+  height: 1px;
+  background: none;
+  border-top: 1px dashed var(--station-paper-dash);
+  animation: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-current--back { top: 31%; }
+.scenic-dish-stage.is-midnight-station .tide-current--middle { top: 53%; }
+.scenic-dish-stage.is-midnight-station .tide-current--front { top: 75%; }
+
+.scenic-dish-stage.is-midnight-station .tide-toolbar {
+  gap: var(--station-space-2);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-categories button,
+.scenic-dish-stage.is-midnight-station .tide-pause {
+  color: var(--station-text-primary);
+  background: var(--station-background-deep);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-control);
+  box-shadow: var(--station-shadow-e0);
+  backdrop-filter: none;
+  transition: color var(--station-motion-fast) ease,
+    background-color var(--station-motion-fast) ease,
+    border-color var(--station-motion-fast) ease,
+    transform var(--station-motion-instant) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-categories button {
+  min-height: 48px;
+  padding: 10px 18px;
+  font-family: var(--station-font-number);
+  font-size: var(--station-size-ticket);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-categories button:hover,
+.scenic-dish-stage.is-midnight-station .tide-categories button:focus-visible,
+.scenic-dish-stage.is-midnight-station .tide-pause:hover,
+.scenic-dish-stage.is-midnight-station .tide-pause:focus-visible {
+  color: var(--station-text-on-surface);
+  background: var(--station-hover);
+  border-color: var(--station-accent);
+  transform: translateY(-1px);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-categories button.is-active {
+  color: var(--station-text-primary);
+  background: var(--station-primary);
+  border-color: var(--station-primary);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-pause {
+  width: 48px;
+  height: 48px;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stream {
+  z-index: 3;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+  width: clamp(210px, 10vw, 330px);
+  flex-basis: clamp(210px, 10vw, 330px);
+  padding-top: clamp(76px, 8vh, 126px);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish {
+  height: clamp(200px, 11vw, 286px);
+  padding: 12px 14px 13px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 7px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e1);
+  animation: none;
+  will-change: auto;
+  transition: border-color var(--station-motion-fast) ease,
+    box-shadow var(--station-motion-fast) ease,
+    transform var(--station-motion-fast) var(--station-easing-standard);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish::after,
+.scenic-dish-stage.is-midnight-station .tide-dish__shell,
+.scenic-dish-stage.is-midnight-station .tide-dish__beach-board,
+.scenic-dish-stage.is-midnight-station .tide-dish__chef-tray {
+  display: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
+  border-color: var(--station-primary);
+  box-shadow: var(--station-shadow-e2);
+  transform: translateY(-3px);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
+  outline: 3px solid var(--station-accent);
+  outline-offset: 3px;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__image,
+.scenic-dish-stage.is-midnight-station .tide-dish__copy {
+  transform: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__image {
+  width: clamp(136px, 7vw, 220px);
+  border: 4px solid var(--station-surface-elevated);
+  border-radius: 50%;
+  background: var(--station-surface-elevated);
+  box-shadow: var(--station-shadow-e1);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .tide-dish__image,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .tide-dish__image {
+  filter: brightness(1.04);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__copy {
+  width: 100%;
+  min-height: 36px;
+  box-sizing: border-box;
+  padding: 5px 7px;
+  gap: 8px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface-elevated);
+  border-top: 1px solid var(--station-border);
+  border-radius: var(--station-radius-ticket);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__copy h3 {
+  color: var(--station-text-on-surface);
+  font-family: var(--station-font-ui);
+  font-size: var(--station-size-dish-name);
+  font-weight: 700;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__copy strong {
+  color: var(--station-primary-strong);
+  font-family: var(--station-font-number);
+  font-size: var(--station-size-price);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__ai {
+  top: 10px;
+  right: 10px;
+  width: auto;
+  height: auto;
+  padding: 4px 6px;
+  color: var(--station-text-primary);
+  background: var(--station-secondary);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  font-family: var(--station-font-number);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot.is-recommended .tide-dish {
+  border-color: var(--station-accent);
+  box-shadow: inset 0 0 0 2px var(--station-accent-inset), var(--station-shadow-e1);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__soldout {
+  padding: 5px 12px;
+  color: var(--station-text-primary);
+  background: var(--station-error);
+  border: 1px solid var(--station-surface-elevated);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e1);
+  transform: translate(-50%, -50%);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-empty {
+  color: var(--station-text-primary);
+  background: var(--station-background-deep);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-control);
+  box-shadow: var(--station-shadow-e1);
+  backdrop-filter: none;
+}
+
+@media (min-width: 1921px) {
+  .scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+    width: 330px;
+    flex-basis: 330px;
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-dish { height: 286px; }
+  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 220px; }
+  .scenic-dish-stage.is-midnight-station .tide-categories button { min-height: 52px; }
+}
+
+@media (max-width: 900px) {
+  .scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+    width: 190px;
+    flex-basis: 190px;
+    padding-top: 78px;
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-dish { height: 198px; }
+  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 138px; }
+  .scenic-dish-stage.is-midnight-station .tide-categories button { min-height: 46px; padding-inline: 14px; }
+}
+
+@media (max-width: 600px) {
+  .scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+    width: 170px;
+    flex-basis: 170px;
+    padding-top: 56px;
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-dish {
+    height: 184px;
+    padding: 8px 9px 10px;
+  }
+
+  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 120px; }
+  .scenic-dish-stage.is-midnight-station .tide-dish__copy { min-height: 31px; gap: 4px; }
+  .scenic-dish-stage.is-midnight-station .tide-dish__copy h3 { max-width: 82px; font-size: 12px; }
+  .scenic-dish-stage.is-midnight-station .tide-dish__copy strong { font-size: 13px; }
+  .scenic-dish-stage.is-midnight-station .tide-pause { width: 44px; height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-dish-stage.is-midnight-station .tide-dish,
+  .scenic-dish-stage.is-midnight-station .tide-dish:hover,
+  .scenic-dish-stage.is-midnight-station .tide-dish:focus-visible,
+  .scenic-dish-stage.is-midnight-station .tide-categories button:hover,
+  .scenic-dish-stage.is-midnight-station .tide-categories button:focus-visible,
+  .scenic-dish-stage.is-midnight-station .tide-pause:hover,
+  .scenic-dish-stage.is-midnight-station .tide-pause:focus-visible {
+    transition: none;
+    transform: none;
+  }
 }
 </style>

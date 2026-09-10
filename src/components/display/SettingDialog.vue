@@ -4,12 +4,14 @@
       :title="copy.systemSettings"
       width="min(1300px, 94vw)"
       class="luxury-settings-dialog"
-      :style="{ '--settings-theme-bg': `url(${selectedThemePreview.img})` }"
+      :class="{ 'is-midnight-station': selectedThemeKey === 'midnight-station' }"
+      :style="{ '--settings-theme-bg': selectedThemePreview.img ? `url(${selectedThemePreview.img})` : 'none' }"
       center
   >
     <section
       class="settings-hero"
-      :style="{ backgroundImage: `url(${selectedThemePreview.img})` }"
+      :class="{ 'settings-hero--station': selectedThemeKey === 'midnight-station' }"
+      :style="{ backgroundImage: selectedThemePreview.img ? `url(${selectedThemePreview.img})` : 'none' }"
       aria-labelledby="settings-hero-title"
     >
       <div class="settings-hero__veil"></div>
@@ -39,7 +41,8 @@
               @click="selectTheme(item)"
               :class="{
                 'theme-card--active': selectedThemeKey === item.key,
-                'theme-card--disabled': themeChanging
+                'theme-card--disabled': themeChanging,
+                'theme-card--station': item.preview === 'station'
               }"
               :aria-disabled="themeChanging"
           >
@@ -47,7 +50,17 @@
             <div class="theme-card__check" v-if="selectedThemeKey === item.key">
               <el-icon><Check /></el-icon>
             </div>
-            <img :src="item.img" :alt="copy.themeBackground" class="theme-card__img">
+            <div
+              v-if="item.preview"
+              class="theme-card__preview theme-card__preview--station"
+              aria-hidden="true"
+            >
+              <span class="theme-card__preview-line theme-card__preview-line--one"></span>
+              <span class="theme-card__preview-line theme-card__preview-line--two"></span>
+              <span class="theme-card__preview-ticket">MIDNIGHT<br>STATION</span>
+              <span class="theme-card__preview-signal"></span>
+            </div>
+            <img v-else :src="item.img" :alt="copy.themeBackground" class="theme-card__img">
             <div class="theme-card__title">{{ item.title }}</div>
             <div class="theme-card__key">{{ item.key }}</div>
           </div>
@@ -281,19 +294,20 @@ const copy = computed(() => ({
 }))
 
 // 展示版只开放主题 B、C；主题 A 的旧缓存会在初始化时回退到主题 B。
-const themeItem = [
-  { title: "蜡笔小新·海滩", img: "/images/ui/b/background.png", key: 'zhenxian'},
-  { title: "海底贝壳", img: "/images/ui/c/background.png", key: 'xiaoxin' }
-]
-const availableThemeKeys = new Set(themeItem.map(item => item.key))
+const themeItem = computed(() => [
+  { title: '蜡笔小新·海滩', img: '/images/ui/b/background.png', key: 'zhenxian' },
+  { title: '海底贝壳', img: '/images/ui/c/background.png', key: 'xiaoxin' },
+  { title: t('settings.themeMidnightStation'), img: '', key: 'midnight-station', preview: 'station' }
+])
+const availableThemeKeys = computed(() => new Set(themeItem.value.map(item => item.key)))
 const fallbackThemeKey = 'zhenxian'
 
 // 当前样板默认进入主题 B，用户仍可在设置中切换并保存其他主题。
 const selectedThemeKey = ref(
-  availableThemeKeys.has(props.defaultThemeKey) ? props.defaultThemeKey : fallbackThemeKey
+  availableThemeKeys.value.has(props.defaultThemeKey) ? props.defaultThemeKey : fallbackThemeKey
 )
 const selectedThemePreview = computed(() => (
-  themeItem.find(item => item.key === selectedThemeKey.value) || themeItem[0]
+  themeItem.value.find(item => item.key === selectedThemeKey.value) || themeItem.value[0]
 ))
 
 // 传送带设置状态
@@ -360,12 +374,12 @@ watch(currentLanguage, (language) => {
 }, { immediate: true })
 
 watch(() => props.defaultThemeKey, (themeKey) => {
-  selectedThemeKey.value = availableThemeKeys.has(themeKey) ? themeKey : fallbackThemeKey
+  selectedThemeKey.value = availableThemeKeys.value.has(themeKey) ? themeKey : fallbackThemeKey
 })
 
 watch(() => props.modelValue, (isVisible) => {
   if (!isVisible) return
-  selectedThemeKey.value = availableThemeKeys.has(props.defaultThemeKey)
+  selectedThemeKey.value = availableThemeKeys.value.has(props.defaultThemeKey)
     ? props.defaultThemeKey
     : fallbackThemeKey
 })
@@ -987,5 +1001,181 @@ initBeltSettings()
   .luxury-settings-dialog .language-settings,
   .luxury-settings-dialog .conveyor-settings,
   .luxury-settings-dialog .voice-settings { padding: 14px; }
+}
+
+/* Station ticket preview and control-room dialog skin. The preview is built
+   from CSS geometry so this phase does not introduce a low-quality placeholder
+   raster asset. */
+.theme-card__preview {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+  display: block;
+  background: var(--station-background);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-control);
+}
+
+.theme-card__preview-line {
+  position: absolute;
+  left: 8%;
+  width: 84%;
+  height: 1px;
+  background: var(--station-border);
+  opacity: 0.72;
+  transform: rotate(-4deg);
+}
+
+.theme-card__preview-line--one { top: 36%; }
+.theme-card__preview-line--two { top: 64%; }
+
+.theme-card__preview-ticket {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 14px 18px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  font-family: var(--station-font-number);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.12em;
+  text-align: center;
+  transform: translate(-50%, -50%) rotate(-4deg);
+}
+
+.theme-card__preview-signal {
+  position: absolute;
+  right: 10%;
+  top: 12%;
+  width: 12px;
+  height: 12px;
+  background: var(--station-primary);
+  border: 2px solid var(--station-accent);
+  border-radius: 50%;
+}
+
+.theme-card--station:hover .theme-card__preview,
+.theme-card--station.theme-card--active .theme-card__preview {
+  border-color: var(--station-primary);
+}
+
+.luxury-settings-dialog.is-midnight-station {
+  --settings-ink: var(--station-text-on-surface);
+  --settings-muted: var(--station-text-muted);
+  --settings-sea: var(--station-secondary);
+  --settings-sea-soft: var(--station-secondary-soft);
+  --settings-coral: var(--station-primary);
+  --settings-gold: var(--station-accent);
+  border-color: var(--station-border);
+  border-radius: var(--station-radius-panel);
+  background: var(--station-surface-elevated);
+  box-shadow: var(--station-shadow-e3);
+
+  &::before { display: none; }
+
+  .el-dialog__header {
+    background: var(--station-background-deep);
+    border-bottom: 1px solid var(--station-border);
+
+    .el-dialog__title { color: var(--station-text-primary); font-family: var(--station-font-brand); }
+  }
+
+  .el-dialog__headerbtn .el-dialog__close { color: var(--station-text-secondary); }
+  .el-dialog__body { background: var(--station-surface-elevated); }
+  .el-dialog__footer { background: var(--station-surface); border-top-color: var(--station-border); }
+
+  .settings-hero--station {
+    background: var(--station-background);
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e1);
+
+    &::after {
+      position: absolute;
+      right: 8%;
+      top: 20%;
+      width: 36%;
+      height: 56%;
+      content: 'MIDNIGHT\A STATION';
+      color: var(--station-surface);
+      border: 1px solid var(--station-border);
+      font-family: var(--station-font-number);
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0.16em;
+      text-align: center;
+      white-space: pre;
+      opacity: 0.9;
+      display: grid;
+      place-items: center;
+      transform: rotate(2deg);
+    }
+
+    .settings-hero__veil {
+      background: linear-gradient(90deg, var(--station-veil-deep), var(--station-veil-mid) 58%, var(--station-veil-soft));
+    }
+
+    .settings-hero__content { color: var(--station-text-primary); }
+    .settings-hero__eyebrow { color: var(--station-accent); font-family: var(--station-font-number); }
+    h2 { color: var(--station-text-primary); font-family: var(--station-font-brand); }
+    p { color: var(--station-text-secondary); }
+    .settings-hero__badge { color: var(--station-text-primary); border-color: var(--station-border); border-radius: var(--station-radius-ticket); background: transparent; }
+    .settings-hero__dot { background: var(--station-primary); box-shadow: none; }
+  }
+
+  .setting-tabs .el-tabs__nav {
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-control);
+    background: var(--station-surface-muted);
+  }
+
+  .setting-tabs .el-tabs__item {
+    border-radius: var(--station-radius-small);
+    color: var(--settings-muted);
+    &.is-active { color: var(--station-text-primary); background: var(--station-secondary); box-shadow: none; }
+  }
+
+  .theme-card,
+  .language-settings,
+  .conveyor-settings,
+  .voice-settings {
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-panel);
+    background: var(--station-surface);
+    box-shadow: var(--station-shadow-e0);
+  }
+
+  .theme-card {
+    &__title { color: var(--station-text-on-surface); font-family: var(--station-font-ui); }
+    &__check { background: var(--station-primary); border-radius: var(--station-radius-small); box-shadow: none; }
+    &--active { border-color: var(--station-primary); background: var(--station-surface-elevated); box-shadow: inset 0 0 0 1px var(--station-primary); }
+    &--active .theme-card__title { color: var(--station-primary-strong); }
+  }
+
+  .section-title,
+  .voice-setting-row__content h3,
+  .assistant-sound-toggle,
+  .assistant-volume-control { color: var(--station-text-on-surface); }
+  .voice-setting-row { border-color: var(--station-border); }
+  .voice-setting-row__icon { color: var(--station-secondary); background: var(--station-surface-muted); border-color: var(--station-border); border-radius: var(--station-radius-small); }
+  .voice-setting-row__content p,
+  .speed-labels { color: var(--station-text-muted); }
+  .direction-card { border-color: var(--station-border); border-radius: var(--station-radius-control); background: var(--station-surface-elevated); }
+  .direction-card--active { border-color: var(--station-primary); background: var(--station-surface); }
+  .direction-card--active .direction-icon,
+  .direction-card--active .direction-label { color: var(--station-primary); }
+  .direction-card .direction-check { background: var(--station-primary); border-radius: var(--station-radius-small); }
+  .settings-close { background: var(--station-primary); border-radius: var(--station-radius-control); box-shadow: var(--station-shadow-e1); }
+}
+
+@media (max-width: 768px) {
+  .luxury-settings-dialog.is-midnight-station .settings-hero--station::after { right: 6%; width: 42%; font-size: 14px; }
+  .luxury-settings-dialog.is-midnight-station .theme-card__preview { height: 148px; }
 }
 </style>

@@ -150,6 +150,7 @@ const messages = {
     },
     settings: {
       themeBackground: '主题背景',
+      themeMidnightStation: '午夜月台 · Midnight Station',
       gameOne: '游戏一',
       gameTwo: '游戏二',
       pendingSetup: '待设置',
@@ -651,6 +652,7 @@ replaceMessages(ja, {
 })
 
 replaceMessages(en, {
+  'settings.themeMidnightStation': 'Midnight Station · 午夜月台',
   'assistant.menuOpened': 'The full menu is open',
   'assistant.navigationOpened': 'Dish navigation is open',
   'assistant.leftMenuOpened': 'The left menu is open',
@@ -673,6 +675,7 @@ replaceMessages(en, {
 })
 
 replaceMessages(ja, {
+  'settings.themeMidnightStation': 'ミッドナイト・ステーション · 午夜月台',
   'assistant.menuOpened': 'メニューを開きました',
   'assistant.navigationOpened': '料理ナビを開きました',
   'assistant.leftMenuOpened': '左側のメニューを開きました',

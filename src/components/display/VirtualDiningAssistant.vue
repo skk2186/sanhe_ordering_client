@@ -1,7 +1,7 @@
 <template>
   <section
     class="assistant-recommendation-rail"
-    :class="[`is-${phase}`, { 'has-recommendations': recommendations.length > 0 && !watchingPromo, 'is-watching-promo': watchingPromo }]"
+    :class="[`is-${phase}`, { 'has-recommendations': recommendations.length > 0 && !watchingPromo, 'is-watching-promo': watchingPromo, 'is-midnight-station': themeKey === 'midnight-station' }]"
     :style="recommendationRailStyle"
     aria-live="polite"
   >
@@ -227,6 +227,10 @@ const props = defineProps({
   watchingPromo: {
     type: Boolean,
     default: false
+  },
+  themeKey: {
+    type: String,
+    default: 'zhenxian'
   }
 })
 
@@ -1176,5 +1180,90 @@ onUnmounted(() => {
   .virtual-assistant *::after {
     animation: none !important;
   }
+}
+
+/* Midnight Station visual skin. Voice recognition, audio and phase state are
+   intentionally untouched; the assistant reads as a station dispatch window. */
+.assistant-recommendation-rail.is-midnight-station {
+  color: var(--station-text-primary);
+  background: transparent;
+  border-color: transparent;
+  border-radius: var(--station-radius-panel);
+  box-shadow: none;
+
+  &.has-recommendations {
+    background: var(--station-overlay-deep);
+    border-color: var(--station-border);
+    box-shadow: var(--station-shadow-e1);
+  }
+
+  .recommendation-lane__header {
+    strong { color: var(--station-accent); font-family: var(--station-font-number); }
+    span { color: var(--station-text-secondary); }
+    .customer-transcript { color: var(--station-text-primary); }
+  }
+
+  .recommendation-card {
+    color: var(--station-text-on-surface);
+    background: var(--station-surface);
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: var(--station-shadow-e0);
+    transition: border-color var(--station-motion-fast) ease,
+      box-shadow var(--station-motion-fast) ease,
+      transform var(--station-motion-fast) var(--station-easing-standard);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--station-primary);
+      box-shadow: var(--station-shadow-e1);
+      transform: translateY(-1px);
+    }
+
+    &.is-selected {
+      border-color: var(--station-accent);
+      box-shadow: inset 0 0 0 2px var(--station-accent), var(--station-shadow-e1);
+    }
+  }
+
+  .recommendation-number {
+    color: var(--station-text-primary);
+    background: var(--station-primary);
+    border-radius: var(--station-radius-small);
+  }
+
+  .recommendation-copy {
+    strong { color: var(--station-text-on-surface); }
+    span { color: var(--station-primary-strong); }
+  }
+
+  .assistant-bubble {
+    color: var(--station-text-on-surface);
+    background: var(--station-surface-elevated);
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: var(--station-shadow-e1);
+
+    strong {
+      color: var(--station-primary);
+      font-family: var(--station-font-number);
+      letter-spacing: 0.06em;
+    }
+  }
+
+  .assistant-character {
+    .assistant-halo {
+      background: var(--station-accent-soft);
+      border-color: var(--station-accent);
+      border-radius: var(--station-radius-small);
+    }
+
+    &:focus-visible {
+      outline-color: var(--station-accent);
+      border-radius: var(--station-radius-control);
+    }
+  }
+
+  .sound-level i { background: var(--station-primary); }
 }
 </style>

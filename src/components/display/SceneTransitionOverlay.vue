@@ -17,6 +17,21 @@
         <div class="beach-foam beach-foam--front"></div>
       </div>
 
+      <div v-else-if="sceneKey === 'midnight-station'" class="transition-collage transition-collage--station">
+        <div class="station-transition-sign">
+          <span class="station-transition-sign__kicker">NIGHT SERVICE</span>
+          <strong>MIDNIGHT<br>STATION</strong>
+          <span class="station-transition-sign__line"></span>
+        </div>
+        <div class="station-transition-rails" aria-hidden="true">
+          <span class="station-transition-rail station-transition-rail--one"></span>
+          <span class="station-transition-rail station-transition-rail--two"></span>
+        </div>
+        <div class="station-transition-signal" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </div>
+      </div>
+
       <div v-else class="transition-collage transition-collage--ocean">
         <div class="underwater-light"></div>
         <div class="bubble-field">
@@ -124,6 +139,10 @@ const bubbleStyle = (index) => ({
     linear-gradient(180deg, #168fbd 0%, #075c8f 48%, #063a70 100%);
 }
 
+.is-midnight-station .scene-transition-curtain {
+  background: var(--station-background);
+}
+
 .is-covering.is-zhenxian .scene-transition-curtain {
   animation: beach-cover 1650ms cubic-bezier(0.52, 0.08, 0.22, 1) both;
 }
@@ -138,6 +157,14 @@ const bubbleStyle = (index) => ({
 
 .is-revealing.is-xiaoxin .scene-transition-curtain {
   animation: ocean-reveal 900ms cubic-bezier(0.42, 0, 0.18, 1) both;
+}
+
+.is-covering.is-midnight-station .scene-transition-curtain {
+  animation: station-cover 1650ms var(--station-easing-exit, cubic-bezier(0.55, 0, 0.72, 0.24)) both;
+}
+
+.is-revealing.is-midnight-station .scene-transition-curtain {
+  animation: station-reveal 900ms var(--station-easing-enter, cubic-bezier(0.18, 0.76, 0.2, 1)) both;
 }
 
 .is-covered .scene-transition-curtain {
@@ -214,6 +241,110 @@ const bubbleStyle = (index) => ({
   to { clip-path: circle(0 at 50% -10%); }
 }
 
+.transition-collage--station {
+  background: var(--station-background);
+}
+
+.station-transition-sign {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(420px, 56vw);
+  min-height: 220px;
+  padding: 28px 34px;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface);
+  border: 2px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e2);
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.station-transition-sign__kicker,
+.station-transition-sign__line {
+  font-family: var(--station-font-number);
+}
+
+.station-transition-sign__kicker {
+  color: var(--station-primary);
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.station-transition-sign strong {
+  font-family: var(--station-font-brand, serif);
+  font-size: clamp(30px, 4vw, 64px);
+  line-height: 1.02;
+  letter-spacing: 0.06em;
+}
+
+.station-transition-sign__line {
+  width: 100%;
+  height: 1px;
+  background: var(--station-border);
+}
+
+.station-transition-rails {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 30%;
+  bottom: 30%;
+}
+
+.station-transition-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--station-accent);
+  opacity: 0.74;
+}
+
+.station-transition-rail--one { top: 0; }
+.station-transition-rail--two { bottom: 0; }
+
+.station-transition-signal {
+  position: absolute;
+  right: 8%;
+  top: 12%;
+  width: 34px;
+  padding: 8px 6px;
+  display: grid;
+  gap: 6px;
+  background: var(--station-background-deep);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-small);
+}
+
+.station-transition-signal i {
+  width: 20px;
+  height: 20px;
+  display: block;
+  border: 1px solid var(--station-border);
+  border-radius: 50%;
+}
+
+.station-transition-signal i:first-child { background: var(--station-primary); }
+.station-transition-signal i:nth-child(2) { background: var(--station-accent); }
+.station-transition-signal i:last-child { background: var(--station-secondary); }
+
+@keyframes station-cover {
+  from { clip-path: inset(100% 0 0 0); }
+  58% { clip-path: inset(9% 0 9% 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes station-reveal {
+  from { clip-path: inset(0); }
+  34% { clip-path: inset(0 0 0 0); }
+  to { clip-path: inset(0 0 100% 0); }
+}
+
 @keyframes transition-bubble-rise {
   0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.7); }
   18% { opacity: 0.82; }
@@ -235,5 +366,14 @@ const bubbleStyle = (index) => ({
 @media (prefers-reduced-motion: reduce) {
   .scene-transition-curtain { animation-duration: 1ms !important; }
   .bubble-field span { animation: none; }
+  .is-midnight-station .scene-transition-curtain {
+    animation-duration: 1ms !important;
+    clip-path: inset(0) !important;
+  }
+  .is-midnight-station .station-transition-sign,
+  .is-midnight-station .station-transition-rail,
+  .is-midnight-station .station-transition-signal {
+    transition: none !important;
+  }
 }
 </style>

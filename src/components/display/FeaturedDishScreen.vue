@@ -283,4 +283,39 @@ onUnmounted(clearTimers)
 
   .featured-screen__video { transition: none; }
 }
+
+/* Phase 01 skin only: the existing promo flow remains a single-play promo,
+   while Midnight Station presents it as a paper station notice board. */
+.is-midnight-station .featured-screen__rope { display: none; }
+
+.is-midnight-station .featured-screen__body {
+  padding: 14px;
+  background: var(--station-surface-elevated);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e3);
+}
+
+.is-midnight-station .featured-screen__media {
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-ticket);
+  background: var(--station-background-deep);
+}
+
+.is-midnight-station .featured-screen__badge {
+  color: var(--station-text-primary);
+  background: var(--station-primary);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: none;
+  font-family: var(--station-font-number);
+}
+
+.is-midnight-station .featured-screen__close {
+  color: var(--station-text-primary);
+  background: var(--station-primary-strong);
+  border-color: var(--station-accent);
+  border-radius: var(--station-radius-small);
+  box-shadow: none;
+}
 </style>

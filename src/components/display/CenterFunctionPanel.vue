@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-center">
+  <div class="bottom-center" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }">
     <div class="center-layout">
       <div class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')"></div>
       <div class="center-functions">
@@ -24,7 +24,11 @@
 </template>
 
 <script setup>
-// 无需 props，事件由父级承接
+defineProps({
+  themeKey: { type: String, default: 'zhenxian' }
+})
+
+// 无需业务 props，事件由父级承接；themeKey 只负责视觉皮肤。
 defineEmits([
   'open-detail-menu',
   'open-navigation',
@@ -104,6 +108,83 @@ defineEmits([
     flex: 1 1 0;
     min-width: 0;
     background-size: 100% 100%;
+  }
+}
+
+/* Midnight Station control console. The existing buttons and emitted events
+   remain unchanged; only their presentation becomes a compact station desk. */
+.bottom-center.is-midnight-station {
+  background: var(--station-background-deep);
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e1);
+
+  .center-layout {
+    gap: var(--station-space-2);
+  }
+
+  .menu-btn,
+  .function-btn {
+    position: relative;
+    background-image: none;
+    background-color: var(--station-surface);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-control);
+    box-shadow: var(--station-shadow-e0);
+    transition: background-color var(--station-motion-fast) ease,
+      border-color var(--station-motion-fast) ease,
+      transform var(--station-motion-instant) ease,
+      box-shadow var(--station-motion-fast) ease;
+
+    &::after {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100%;
+      padding-inline: var(--station-space-2);
+      color: var(--station-text-on-surface);
+      font-family: var(--station-font-number);
+      font-size: var(--station-size-ticket);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.08em;
+      text-align: center;
+      white-space: pre-line;
+      transform: translate(-50%, -50%);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--station-surface-elevated);
+      border-color: var(--station-primary);
+      box-shadow: var(--station-shadow-e1);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      background-color: var(--station-surface-muted);
+      transform: translateY(1px);
+      box-shadow: var(--station-shadow-pressed);
+    }
+  }
+
+  .menu-btn {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+  }
+
+  .menu-btn::after { content: 'MENU'; }
+  .navigation-btn::after { content: 'FIND\A SEARCH'; }
+  .checkout-btn::after { content: 'LOG\A HISTORY'; }
+  .settings-btn::after { content: 'SET\A UP'; }
+  .waiter-btn::after { content: 'CALL\A STAFF'; }
+
+  .settings-btn,
+  .waiter-btn { background-color: var(--station-surface-muted); }
+
+  .waiter-btn {
+    border-color: var(--station-primary);
+    &::after { color: var(--station-primary-strong); }
   }
 }
 

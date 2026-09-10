@@ -1,0 +1,197 @@
+/*
+ * Midnight Sushi Station
+ *
+ * This file is the only source of truth for the third display theme's
+ * semantic tokens. Component skins consume these variables instead of
+ * repeating the palette in individual Vue files.
+ */
+
+html[data-theme='midnight-station'] {
+  color-scheme: dark;
+
+  /* Color */
+  --station-background: #151A19;
+  --station-background-deep: #0E1211;
+  --station-surface: #ECE5D6;
+  --station-surface-elevated: #F7F2E8;
+  --station-surface-muted: #D8D1C2;
+  --station-primary: #A63D32;
+  --station-primary-strong: #7E2C28;
+  --station-secondary: #31584D;
+  --station-accent: #D3A94E;
+  --station-text-primary: #F6F0E5;
+  --station-text-on-surface: #202725;
+  --station-text-secondary: #BEB8AA;
+  --station-text-muted: #5D665F;
+  --station-border: #6D776B;
+  --station-selected: #C84C3E;
+  --station-hover: #E1B75D;
+  --station-success: #8EAF78;
+  --station-warning: #D39A45;
+  --station-error: #C8594B;
+
+  // Derived alpha tokens keep component skins free of scattered theme colors.
+  --station-overlay-deep: rgba(14, 18, 17, 0.92);
+  --station-overlay-faint: rgba(14, 18, 17, 0.18);
+  --station-paper-ghost: rgba(236, 229, 214, 0.08);
+  --station-paper-line: rgba(236, 229, 214, 0.42);
+  --station-paper-line-soft: rgba(236, 229, 214, 0.18);
+  --station-paper-dash: rgba(236, 229, 214, 0.36);
+  --station-accent-soft: rgba(211, 169, 78, 0.16);
+  --station-accent-line: rgba(211, 169, 78, 0.38);
+  --station-accent-line-strong: rgba(211, 169, 78, 0.78);
+  --station-accent-inset: rgba(211, 169, 78, 0.42);
+  --station-secondary-soft: rgba(49, 88, 77, 0.12);
+  --station-veil-deep: rgba(14, 18, 17, 0.96);
+  --station-veil-mid: rgba(14, 18, 17, 0.7);
+  --station-veil-soft: rgba(14, 18, 17, 0.18);
+
+  /* Radius */
+  --station-radius-panel: 8px;
+  --station-radius-control: 6px;
+  --station-radius-ticket: 3px;
+  --station-radius-small: 4px;
+
+  /* Elevation: restrained, opaque layers instead of glow */
+  --station-shadow-e0: none;
+  --station-shadow-e1: 0 4px 12px rgba(14, 18, 17, 0.22);
+  --station-shadow-e2: 0 10px 22px rgba(14, 18, 17, 0.32);
+  --station-shadow-e3: 0 18px 34px rgba(14, 18, 17, 0.42);
+  --station-shadow-pressed: inset 0 2px 0 rgba(14, 18, 17, 0.24);
+
+  /* Typography: reuse locally available system/CJK fonts */
+  --station-font-brand: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', serif;
+  --station-font-ui: 'Noto Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', sans-serif;
+  --station-font-number: 'Roboto Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --station-size-brand: clamp(28px, 2vw, 36px);
+  --station-size-scene-title: clamp(22px, 1.6vw, 32px);
+  --station-size-dish-name: clamp(16px, 1.1vw, 24px);
+  --station-size-price: clamp(20px, 1.35vw, 28px);
+  --station-size-table: clamp(16px, 1vw, 18px);
+  --station-size-body: clamp(14px, 0.9vw, 16px);
+  --station-size-button: clamp(17px, 1.05vw, 20px);
+  --station-size-assistant: clamp(14px, 0.9vw, 16px);
+  --station-size-ticket: clamp(12px, 0.78vw, 14px);
+
+  /* Spacing: 4px base with an 8px operating rhythm */
+  --station-space-1: 4px;
+  --station-space-2: 8px;
+  --station-space-3: 12px;
+  --station-space-4: 16px;
+  --station-space-5: 24px;
+  --station-space-6: 32px;
+  --station-space-7: 48px;
+
+  /* Motion: foundation only in phase 01; complex choreography is deferred */
+  --station-motion-instant: 100ms;
+  --station-motion-fast: 180ms;
+  --station-motion-normal: 280ms;
+  --station-motion-scene: 1200ms;
+  --station-easing-standard: cubic-bezier(0.22, 0.72, 0.24, 1);
+  --station-easing-enter: cubic-bezier(0.18, 0.76, 0.2, 1);
+  --station-easing-exit: cubic-bezier(0.55, 0, 0.72, 0.24);
+  --station-easing-spring: cubic-bezier(0.22, 1.18, 0.36, 1);
+
+  /* Existing shared hooks used by the display shell */
+  --theme-active-color: var(--station-primary);
+  --theme-bg: none;
+}
+
+html[data-theme='midnight-station'] body {
+  color: var(--station-text-primary);
+  background-color: var(--station-background);
+  font-family: var(--station-font-ui);
+}
+
+/* Page foundation. The stage provides the rail geometry; the page stays
+   quiet so dishes remain the primary visual level. */
+html[data-theme='midnight-station'] .conveyor-display {
+  position: relative;
+  isolation: isolate;
+  color: var(--station-text-primary);
+  background: var(--station-background);
+  font-family: var(--station-font-ui);
+}
+
+html[data-theme='midnight-station'] .conveyor-display > * {
+  position: relative;
+}
+
+html[data-theme='midnight-station'] .conveyor-display::before,
+html[data-theme='midnight-station'] .conveyor-display::after {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+}
+
+html[data-theme='midnight-station'] .conveyor-display::before {
+  inset: 0 0 213px;
+  background: linear-gradient(180deg, rgba(49, 88, 77, 0.1), transparent 28%, rgba(14, 18, 17, 0.22));
+}
+
+html[data-theme='midnight-station'] .conveyor-display::after {
+  left: 3%;
+  right: 3%;
+  bottom: 213px;
+  height: 1px;
+  background: var(--station-border);
+  opacity: 0.42;
+}
+
+html[data-theme='midnight-station'] .top-scene-banner {
+  background: rgba(14, 18, 17, 0.82);
+  border-color: rgba(236, 229, 214, 0.26);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e1);
+}
+
+html[data-theme='midnight-station'] .top-scene-banner::before {
+  background: linear-gradient(90deg, rgba(166, 61, 50, 0.18), transparent 34%, rgba(211, 169, 78, 0.08));
+}
+
+html[data-theme='midnight-station'] .brand-kicker {
+  color: var(--station-accent);
+  font-family: var(--station-font-number);
+  letter-spacing: 0.13em;
+  text-shadow: none;
+}
+
+html[data-theme='midnight-station'] .brand-lockup strong {
+  color: var(--station-text-primary);
+  font-family: var(--station-font-brand);
+  text-shadow: none;
+}
+
+html[data-theme='midnight-station'] .brand-table {
+  color: var(--station-text-secondary);
+  font-family: var(--station-font-number);
+  text-shadow: none;
+}
+
+html[data-theme='midnight-station'] .assistant-slot {
+  background: rgba(236, 229, 214, 0.08);
+  border-left: 1px solid rgba(236, 229, 214, 0.16);
+}
+
+html[data-theme='midnight-station'] .bottom-section {
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  html[data-theme='midnight-station'] .conveyor-display::before {
+    inset: 0 0 0;
+  }
+
+  html[data-theme='midnight-station'] .conveyor-display::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='midnight-station'] *,
+  html[data-theme='midnight-station'] *::before,
+  html[data-theme='midnight-station'] *::after {
+    scroll-behavior: auto !important;
+  }
+}

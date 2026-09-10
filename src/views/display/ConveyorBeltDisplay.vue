@@ -3,7 +3,8 @@
     class="conveyor-display"
     :class="{
       'is-scene-changing': sceneTransitionBusy,
-      'is-scene-revealing': sceneTransitionPhase === 'revealing'
+      'is-scene-revealing': sceneTransitionPhase === 'revealing',
+      'is-midnight-station': activeSceneKey === 'midnight-station'
     }"
   >
     <!-- 顶部工作区：单条主题横幅三区（品牌 / 投碟进度 / 小禾），背景透明透出页面背景。 -->
@@ -32,6 +33,7 @@
             :feedback-revision="assistantFeedbackRevision"
             :feedback-audio-key="assistantFeedbackAudioKey"
             :selected-item-id="assistantSelectedItemId"
+            :theme-key="activeSceneKey"
             :sound-enabled="globalStore.ttsEnabled"
             :volume="globalStore.assistantVolume"
             :continue-listening="assistantContinueListening"
@@ -45,7 +47,7 @@
       </div>
     </div>
 
-    <!-- 主题 B 浪花送餐场景：浏览、左右加购和语音推荐继续使用原有业务链路。 -->
+    <!-- 主题舞台：浏览、左右加购和语音推荐继续使用原有业务链路。 -->
     <div class="middle-section">
       <ScenicDishStage
         :scene-key="activeSceneKey"
@@ -87,6 +89,7 @@
       <div class="bottom-left">
           <CartPanel
             side="left"
+            :theme-key="activeSceneKey"
             :items="leftCart"
             :count="getCartCount('left')"
             :tips-type="leftCartTipsType"
@@ -103,6 +106,7 @@
 
       <!-- 中间功能按钮区 -->
       <CenterFunctionPanel
+        :theme-key="activeSceneKey"
         @open-detail-menu="openDetailMenu"
         @open-navigation="openNavigation"
         @open-order-history="openOrderHistory"
@@ -115,6 +119,7 @@
 
         <CartPanel
           side="right"
+          :theme-key="activeSceneKey"
           :items="rightCart"
           :count="getCartCount('right')"
           :tips-type="rightCartTipsType"
@@ -282,6 +287,13 @@ const SCENES = {
       '/images/ui/b/shell-dish-tray.png',
       '/images/ui/c/transition/ocean-animals.png'
     ]
+  },
+  'midnight-station': {
+    // Phase 01 intentionally uses a CSS/SVG-ready scene with no placeholder
+    // raster background. Later art can be added without changing the theme
+    // contract or the scene switch flow.
+    background: '',
+    assets: []
   }
 }
 const FALLBACK_SCENE_KEY = 'zhenxian'
@@ -299,7 +311,7 @@ let sceneTransitionRun = 0
 const applySceneTheme = (sceneKey) => {
   const scene = SCENES[sceneKey] || SCENES[FALLBACK_SCENE_KEY]
   document.documentElement.style.setProperty('--theme-key', sceneKey)
-  document.documentElement.style.setProperty('--theme-bg', `url(${scene.background})`)
+  document.documentElement.style.setProperty('--theme-bg', scene.background ? `url(${scene.background})` : 'none')
   document.documentElement.setAttribute('data-theme', sceneKey)
   localStorage.setItem('selectedThemeKey', sceneKey)
 }

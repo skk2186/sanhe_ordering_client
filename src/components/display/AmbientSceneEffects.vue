@@ -36,7 +36,10 @@ const EVENT_LIBRARY = {
     { type: 'bubble-cluster', duration: 4800, left: 16, top: 63 },
     { type: 'fish-shadow', duration: 3600, left: 78, top: 49 },
     { type: 'caustic', duration: 4000, left: 40, top: 34 }
-  ]
+  ],
+  // Phase 01 keeps the station space quiet. The rail geometry itself is the
+  // ambient identity; signal choreography is reserved for a later phase.
+  'midnight-station': []
 }
 
 const themeKey = ref('zhenxian')
@@ -78,6 +81,7 @@ const scheduleNext = (delay = Math.round(Math.random() * 3000)) => {
 const playNextEvent = () => {
   if (props.paused || reducedMotion.value) return
   const candidates = EVENT_LIBRARY[themeKey.value] || EVENT_LIBRARY.zhenxian
+  if (!candidates.length) return
   const event = candidates[Math.floor(Math.random() * candidates.length)]
   activeEvent.value = { ...event, id: ++eventId }
   eventTimer = window.setTimeout(() => {
