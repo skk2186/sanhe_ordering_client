@@ -1,6 +1,11 @@
 <template>
-  <div v-if="visible" class="sushi-navigation-overlay">
+  <div v-if="visible" class="sushi-navigation-overlay" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }">
     <div class="navigation-container">
+      <header v-if="themeKey === 'midnight-station'" class="station-navigation-header">
+        <span class="station-navigation-header__route">ROUTE MENU</span>
+        <strong>{{ $t('common.menu') }}</strong>
+        <span class="station-navigation-header__hint">{{ $t('menu.backToConveyor') }}</span>
+      </header>
       <!-- 底部功能区容器 -->
       <div class="bottom-section-navigation">
         <!-- 左侧购物车 -->
@@ -11,6 +16,7 @@
             :count="getCartCount('left')"
             :tips-type="props.leftTipsType"
             :submitting="props.submittingSide === 'left'"
+            :theme-key="themeKey"
             @place-order="handlePlaceOrder"
             @remove="handleRemoveFromCart"
             @increase="handleIncreaseQuantity"
@@ -41,6 +47,7 @@
             :count="getCartCount('right')"
             :tips-type="props.rightTipsType"
             :submitting="props.submittingSide === 'right'"
+            :theme-key="themeKey"
             @place-order="handlePlaceOrder"
             @remove="handleRemoveFromCart"
             @increase="handleIncreaseQuantity"
@@ -56,10 +63,10 @@
         <div class="loading-content">
           <div class="sushi-loading">
             <div class="sushi-plate">
-              <div class="sushi-item sushi-1">🍣</div>
-              <div class="sushi-item sushi-2">🍱</div>
-              <div class="sushi-item sushi-3">🍤</div>
-              <div class="sushi-item sushi-4">🥢</div>
+            <span class="sushi-item sushi-1" aria-hidden="true"></span>
+              <span class="sushi-item sushi-2" aria-hidden="true"></span>
+              <span class="sushi-item sushi-3" aria-hidden="true"></span>
+              <span class="sushi-item sushi-4" aria-hidden="true"></span>
             </div>
             <div class="loading-waves">
               <div class="wave wave-1"></div>
@@ -112,7 +119,12 @@
                 v-if="item.type === 'filter'"
                 class="menu-item filter-item"
                 :class="{ 'active-filter': activeFilter === item.id }"
+                role="button"
+                tabindex="0"
+                :aria-pressed="activeFilter === item.id"
                 @click="handleFilterClick(item.id)"
+                @keydown.enter.prevent="handleFilterClick(item.id)"
+                @keydown.space.prevent="handleFilterClick(item.id)"
               >
                 <div class="item-image filter-image">
                   <div class="filter-content">
@@ -137,7 +149,12 @@
                 v-else
                 class="menu-item"
                 :class="{ 'sold-out': !item.available }"
+                role="button"
+                tabindex="0"
+                :aria-disabled="!item.available"
                 @click="addToCart(item, $event)"
+                @keydown.enter.prevent="addToCart(item, $event)"
+                @keydown.space.prevent="addToCart(item, $event)"
               >
                 <div class="item-image">
                   <img :src="item.image || DEFAULT_DISH_IMAGE" :alt="item.name" @error="handleImageError" />
@@ -218,6 +235,10 @@ const props = defineProps({
   submittingSide: {
     type: String,
     default: null
+  },
+  themeKey: {
+    type: String,
+    default: 'zhenxian'
   }
 })
 
@@ -496,7 +517,10 @@ const addToCart = (item, event) => {
   if (isDragging.value || dragState.hasMoved || !item.available) {
     return
   }
-  const side = event.clientX < window.innerWidth / 2 ? 'left' : 'right'
+  const clientX = Number.isFinite(event?.clientX) && event.clientX > 0
+    ? event.clientX
+    : event?.currentTarget?.getBoundingClientRect?.().left + (event?.currentTarget?.getBoundingClientRect?.().width || 0) / 2
+  const side = clientX < window.innerWidth / 2 ? 'left' : 'right'
   emit('add-to-cart', item, side)
 }
 
@@ -1195,6 +1219,317 @@ onUnmounted(() => {
 
 .navigation-return-actions .return-btn {
   margin: 0;
+}
+
+/* Midnight Station route menu: a compact dish directory, not a second
+   dashboard. The existing drag/filter/cart flow stays intact. */
+.sushi-navigation-overlay.is-midnight-station {
+  color: var(--station-text-primary);
+  background: var(--station-background-deep);
+
+  .navigation-container {
+    background: var(--station-background-deep);
+  }
+
+  .station-navigation-header {
+    position: relative;
+    z-index: 12;
+    height: 58px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--station-border);
+    background: var(--station-background);
+
+    strong {
+      color: var(--station-text-primary);
+      font-family: var(--station-font-brand);
+      font-size: var(--station-size-scene-title);
+      font-weight: 600;
+    }
+  }
+
+  .station-navigation-header__route,
+  .station-navigation-header__hint {
+    color: var(--station-accent);
+    font-family: var(--station-font-number);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .station-navigation-header__hint {
+    margin-left: auto;
+    color: var(--station-text-secondary);
+    font-family: var(--station-font-ui);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .infinite-menu-container {
+    background: var(--station-background-deep);
+  }
+
+  .menu-content {
+    padding: 34px 42px 240px;
+  }
+
+  .menu-items-grid {
+    gap: 26px 30px;
+    padding: 8px;
+  }
+
+  .menu-item {
+    width: 198px;
+    height: 246px;
+    border: 0;
+    outline: none;
+    transition: transform var(--station-motion-fast) var(--station-easing-standard), opacity var(--station-motion-fast) ease;
+
+    &:hover,
+    &:focus-visible { transform: translateY(-4px); }
+
+    &:focus-visible { outline: 2px solid var(--station-accent); outline-offset: 5px; }
+  }
+
+  .item-image {
+    width: 178px;
+    height: 156px;
+    overflow: visible;
+    border: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 43%, var(--station-surface-elevated) 0 55%, var(--station-surface-muted) 56% 65%, rgba(32, 39, 37, 0.7) 66% 70%, transparent 71%);
+    filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.28));
+
+    img {
+      width: 122px;
+      height: 112px;
+      margin-top: -3px;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      object-fit: cover;
+      clip-path: ellipse(47% 43% at 50% 50%);
+    }
+  }
+
+  .item-info {
+    width: 160px;
+    min-height: 54px;
+    height: auto;
+    box-sizing: border-box;
+    margin-top: 3px;
+    padding: 7px 10px 8px;
+    align-items: flex-start;
+    text-align: left;
+    background: var(--station-surface);
+    border: 0;
+    border-left: 3px solid var(--station-primary);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.18);
+  }
+
+  .item-name {
+    width: 100%;
+    overflow: hidden;
+    color: var(--station-text-on-surface);
+    font-family: var(--station-font-ui);
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .item-price {
+    margin-top: 3px;
+    color: var(--station-primary-strong);
+    font-family: var(--station-font-number);
+    font-size: 13px;
+  }
+
+  .add-overlay {
+    top: 54px;
+    left: 50%;
+    width: 42px;
+    height: 42px;
+    opacity: 0;
+    border: 2px solid var(--station-accent);
+    border-radius: 50%;
+    background: var(--station-primary-strong);
+    transform: translateX(-50%);
+    transition: opacity var(--station-motion-fast) ease, transform var(--station-motion-fast) var(--station-easing-standard);
+
+    .add-icon { color: var(--station-text-primary); font-size: 22px; }
+  }
+
+  .menu-item:hover .add-overlay,
+  .menu-item:focus-visible .add-overlay { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+
+  .filter-item {
+    .filter-image {
+      width: 168px;
+      height: 146px;
+      border: 1px solid var(--station-border);
+      border-radius: 50%;
+      background: var(--station-secondary);
+      color: var(--station-text-primary);
+    }
+
+    .filter-content { font-family: var(--station-font-ui); }
+    .filter-name { font-size: 16px; }
+    .filter-keyword { color: var(--station-text-secondary); }
+
+    &.active-filter .filter-image,
+    &:hover .filter-image { border-color: var(--station-accent); box-shadow: none; }
+
+    .filter-arrow { right: 6px; bottom: 8px; }
+    .arrow-circle { width: 30px; height: 30px; background: var(--station-primary); }
+  }
+
+  .new-badge {
+    top: 14px;
+    left: 18px;
+    padding: 4px 7px;
+    color: var(--station-text-primary);
+    background: var(--station-primary);
+    border-radius: var(--station-radius-ticket);
+    font-family: var(--station-font-number);
+  }
+
+  .sold-out-overlay {
+    width: 122px;
+    height: 112px;
+    margin: auto;
+    border-radius: 50%;
+    background: rgba(14, 18, 17, 0.62);
+    color: var(--station-text-primary);
+    font-family: var(--station-font-number);
+  }
+
+  .bottom-section-navigation {
+    height: 213px;
+    background: var(--station-background);
+    border-top: 1px solid var(--station-border);
+  }
+
+  .bottom-left,
+  .bottom-right {
+    height: 100%;
+    padding: 8px 12px 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .navigation-return-actions {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    z-index: 15;
+    transform: translateX(-50%);
+  }
+
+  .return-btn {
+    min-width: 164px;
+    min-height: 48px;
+    padding: 10px 18px;
+    color: var(--station-text-on-surface);
+    background: var(--station-surface);
+    background-image: none;
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-control);
+    box-shadow: none;
+    font-family: var(--station-font-ui);
+    font-size: var(--station-size-ticket);
+    text-shadow: none;
+    transition: background-color var(--station-motion-fast) ease, transform var(--station-motion-instant) ease;
+
+    &:hover,
+    &:focus-visible { background: var(--station-surface-elevated); transform: none; }
+
+    &:active { transform: translateY(1px); }
+  }
+
+  .navigation-return-actions > .return-btn:not(.return-btn--back) {
+    color: var(--station-text-primary);
+    background: var(--station-primary);
+    border-color: var(--station-accent);
+  }
+
+  .loading-overlay {
+    inset: 58px 0 213px;
+    background: var(--station-background-deep);
+    backdrop-filter: none;
+  }
+
+  .loading-content {
+    padding: 28px 34px;
+    background: var(--station-surface-elevated);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e2);
+  }
+
+  .sushi-loading { margin-bottom: 22px; }
+  .sushi-plate {
+    width: 110px;
+    height: 82px;
+    background: var(--station-surface-muted);
+    border: 2px solid var(--station-border);
+    border-radius: 50%;
+    box-shadow: inset 0 -9px 0 rgba(32, 39, 37, 0.15);
+    animation: none;
+  }
+
+  .sushi-item {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--station-primary);
+    border-radius: 50%;
+    background: var(--station-surface-elevated);
+    animation: station-route-pulse 1.3s ease-in-out infinite;
+  }
+
+  .sushi-1 { transform: translateX(-30px); }
+  .sushi-2 { transform: translateX(-10px); animation-delay: 160ms; }
+  .sushi-3 { transform: translateX(10px); animation-delay: 320ms; }
+  .sushi-4 { transform: translateX(30px); animation-delay: 480ms; }
+  .loading-waves { bottom: -14px; }
+  .wave { width: 28px; height: 2px; border-radius: 0; background: var(--station-accent); animation: station-route-line 1.4s ease-in-out infinite; }
+  .loading-text h3 { color: var(--station-text-on-surface); text-shadow: none; font-family: var(--station-font-brand); }
+  .loading-text p,
+  .progress-text { color: var(--station-text-muted); }
+  .progress-bar { height: 5px; border-radius: 0; background: var(--station-surface-muted); box-shadow: none; }
+  .progress-fill { border-radius: 0; background: var(--station-primary); box-shadow: none; }
+
+  .navigation-state {
+    inset: 58px 0 213px;
+    color: var(--station-text-primary);
+    background: var(--station-background-deep);
+
+    p { font-family: var(--station-font-ui); }
+  }
+}
+
+@keyframes station-route-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.86); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes station-route-line {
+  0%, 100% { opacity: 0.35; transform: scaleX(0.65); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sushi-navigation-overlay.is-midnight-station .sushi-item,
+  .sushi-navigation-overlay.is-midnight-station .wave { animation: none; }
+  .sushi-navigation-overlay.is-midnight-station .menu-item,
+  .sushi-navigation-overlay.is-midnight-station .add-overlay { transition: none; }
 }
 
 // 响应式设计

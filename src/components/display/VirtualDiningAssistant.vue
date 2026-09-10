@@ -2,6 +2,7 @@
   <section
     class="assistant-recommendation-rail"
     :class="[`is-${phase}`, { 'has-recommendations': recommendations.length > 0 && !watchingPromo, 'is-watching-promo': watchingPromo, 'is-midnight-station': themeKey === 'midnight-station' }]"
+    :data-station-phase="stationPhase"
     :style="recommendationRailStyle"
     aria-live="polite"
   >
@@ -21,8 +22,10 @@
           class="recommendation-card"
           :class="{
             'is-sold-out': item.available === false,
-            'is-selected': selectedItemId === item.id
+            'is-selected': selectedItemId === item.id,
+            'is-primary': index === 0
           }"
+          :data-recommendation-index="index"
           type="button"
           role="listitem"
           :disabled="item.available === false"
@@ -41,8 +44,10 @@
 
     <aside class="virtual-assistant">
       <div class="assistant-bubble" role="status">
+        <span class="station-concierge-kicker">STATION CONCIERGE</span>
         <strong>{{ $t('assistant.name') }}</strong>
         <span>{{ statusText }}</span>
+        <span class="station-concierge-signal" aria-hidden="true"><i></i><i></i><i></i></span>
       </div>
 
       <button
@@ -588,6 +593,18 @@ const statusText = computed(() => {
     return message === key ? t('assistant.errors.service_unavailable') : message
   }
   return t('assistant.greeting')
+})
+
+// Presentation-only mapping: the recognition state machine remains unchanged,
+// while the station surface gets six readable service states.
+const stationPhase = computed(() => {
+  if (props.watchingPromo) return 'recommending'
+  if (phase.value === 'error') return 'error'
+  if (phase.value === 'listening' || phase.value === 'connecting') return 'listening'
+  if (phase.value === 'processing') return 'thinking'
+  if (phase.value === 'result' && props.matchCount > 0) return 'recommending'
+  if (props.feedbackMessage && !active.value) return 'success'
+  return 'idle'
 })
 
 const buttonLabel = computed(() => monitoring.value
@@ -1265,5 +1282,131 @@ onUnmounted(() => {
   }
 
   .sound-level i { background: var(--station-primary); }
+
+  .assistant-bubble {
+    position: relative;
+    min-width: 166px;
+    padding: 9px 12px 10px;
+    align-content: start;
+    gap: 3px;
+    background: var(--station-surface-elevated);
+    border: 1px solid var(--station-border);
+    border-left: 3px solid var(--station-primary);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: var(--station-shadow-e1);
+
+    .station-concierge-kicker {
+      color: var(--station-text-muted);
+      font-family: var(--station-font-number);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      line-height: 1.1;
+    }
+
+    strong { font-size: 14px; }
+
+    > span:not(.station-concierge-kicker):not(.station-concierge-signal) {
+      color: var(--station-text-on-surface);
+      font-size: var(--station-size-assistant);
+      line-height: 1.3;
+    }
+  }
+
+  .station-concierge-signal {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: inline-flex;
+    gap: 3px;
+
+    i {
+      width: 5px;
+      height: 5px;
+      display: block;
+      background: var(--station-border);
+      border-radius: 50%;
+    }
+  }
+
+  &[data-station-phase='listening'] .station-concierge-signal i,
+  &[data-station-phase='connecting'] .station-concierge-signal i {
+    background: var(--station-primary);
+  }
+
+  &[data-station-phase='thinking'] .station-concierge-signal i {
+    background: var(--station-accent);
+  }
+
+  &[data-station-phase='recommending'] .station-concierge-signal i {
+    background: var(--station-success);
+  }
+
+  &[data-station-phase='success'] .station-concierge-signal i { background: var(--station-success); }
+  &[data-station-phase='error'] .station-concierge-signal i { background: var(--station-error); }
+  &[data-station-phase='success'] .assistant-bubble { border-left-color: var(--station-success); }
+  &[data-station-phase='error'] .assistant-bubble { border-left-color: var(--station-error); }
+
+  .recommendation-lane {
+    padding: 10px 12px 8px;
+    border-left: 1px solid var(--station-paper-line-soft);
+  }
+
+  .recommendation-lane__header {
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--station-paper-line-soft);
+
+    strong { letter-spacing: 0.08em; }
+  }
+
+  .recommendation-list {
+    gap: 8px;
+    padding: 8px 0 3px;
+  }
+
+  .recommendation-card {
+    height: 92px;
+    padding: 6px 8px 6px 38px;
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 8px;
+    border-radius: var(--station-radius-ticket);
+    box-shadow: none;
+    transition: border-color var(--station-motion-fast) var(--station-easing-standard),
+      background-color var(--station-motion-fast) var(--station-easing-standard),
+      transform var(--station-motion-fast) var(--station-easing-standard);
+
+    img {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      border: 3px solid var(--station-surface-muted);
+      object-fit: cover;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--station-surface-elevated);
+      box-shadow: none;
+    }
+
+    &.is-primary { border-left: 3px solid var(--station-primary); }
+    &.is-selected { background: var(--station-accent-soft); }
+  }
+
+  .recommendation-number {
+    left: 8px;
+    width: 22px;
+    height: 22px;
+    color: var(--station-text-primary);
+    background: var(--station-secondary);
+    border-radius: 50%;
+    font-family: var(--station-font-number);
+    font-size: 11px;
+  }
+
+  .assistant-character {
+    .assistant-halo { background: transparent; border-color: var(--station-accent); }
+    &:hover .assistant-halo { background: var(--station-accent-soft); }
+  }
 }
 </style>

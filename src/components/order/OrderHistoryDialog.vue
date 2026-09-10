@@ -1,21 +1,21 @@
 <template>
-  <div v-if="visible" class="overlay">
+  <div v-if="visible" class="overlay" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }" role="dialog" aria-modal="true" :aria-label="title || $t('common.orderHistory')">
 
     <!-- 表格容器 -->
     <div class="ordering-modal-frame">
       <div class="btn-container" v-for="(item, index) in ['left', 'right']" :style="'order:'+ (item === 'right' ? 3: 1) + ';'">
-      <div class="scroll-btn uptop-btn" :title="$t('order.backTop')" @click="scrollToTop">
+      <button type="button" class="scroll-btn uptop-btn" :aria-label="$t('order.backTop')" :title="$t('order.backTop')" @click="scrollToTop">
           <img alt="" src="/images/arrow1.png"  @dragstart.prevent @dragover.prevent>
-        </div>
-      <div class="scroll-btn up-btn" :title="$t('order.up')" @click="scrollUp">
+        </button>
+      <button type="button" class="scroll-btn up-btn" :aria-label="$t('order.up')" :title="$t('order.up')" @click="scrollUp">
           <img alt="" src="/images/arrow2.png"  @dragstart.prevent @dragover.prevent>
-        </div>
-      <div class="scroll-btn down-btn" :title="$t('order.down')" @click="scrollDown">
+        </button>
+      <button type="button" class="scroll-btn down-btn" :aria-label="$t('order.down')" :title="$t('order.down')" @click="scrollDown">
           <img alt="" src="/images/arrow2.png" style="transform: rotate(180deg)"  @dragstart.prevent @dragover.prevent>
-        </div>
-      <div class="scroll-btn downtop-btn" :title="$t('order.bottom')" @click="scrollToBottom">
+        </button>
+      <button type="button" class="scroll-btn downtop-btn" :aria-label="$t('order.bottom')" :title="$t('order.bottom')" @click="scrollToBottom">
           <img alt="" src="/images/arrow1.png" style="transform: rotate(180deg)"  @dragstart.prevent @dragover.prevent>
-        </div>
+        </button>
       </div>
 
       <div class="ordering-modal" style="order: 2">
@@ -46,6 +46,11 @@
               <td>¥{{ (item.price * item.quantity).toFixed(2) }}</td>
             </tr>
           </table>
+          <div v-if="!orderItems.length" class="history-empty-state" role="status">
+            <span class="history-empty-state__plate" aria-hidden="true"></span>
+            <strong>{{ $t('order.empty') }}</strong>
+            <span>{{ $t('common.orderHistory') }}</span>
+          </div>
 
         </div>
 
@@ -72,10 +77,10 @@
 
 
   <!-- 结账弹窗 -->
-  <div v-if="dealImageVisible" class="overlay">
+  <div v-if="dealImageVisible" class="overlay" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }" role="dialog" aria-modal="true" :aria-label="$t('order.historyCheckout')">
     <div class="popup-content deal-popup">
       <div class="popup-message">
-        <h2>💰 {{ $t('order.historyCheckout') }}</h2>
+        <h2><span aria-hidden="true">¥</span> {{ $t('order.historyCheckout') }}</h2>
         <div class="deal-amount">¥{{ totalAmount.toFixed(2) }}</div>
         <p>{{ $t('order.historyAmount') }}</p>
       </div>
@@ -95,7 +100,8 @@ import { useI18n } from '@/i18n'
 const props = defineProps({
   modelValue: {type: Boolean, default: false},
   items: {type: Array, default: () => []},
-  title: {type: String, default: ''}
+  title: {type: String, default: ''},
+  themeKey: {type: String, default: 'zhenxian'}
 })
 const { t } = useI18n()
 const emit = defineEmits(['update:modelValue', 'call-waiter'])
@@ -496,6 +502,188 @@ const confirmDeal = () => {
 
 .deal-popup .popup-content {
   min-width: 500px;
+}
+
+/* Midnight Station: ticket ledger surface. The history data and checkout
+   events remain unchanged; only the material and hierarchy are themed. */
+.overlay.is-midnight-station {
+  background: rgba(14, 18, 17, 0.86);
+  color: var(--station-text-on-surface);
+  backdrop-filter: none;
+
+  .ordering-modal-frame { gap: 18px; }
+
+  .btn-container {
+    gap: 10px;
+    margin: 0;
+  }
+
+  .scroll-btn {
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-control);
+    background: var(--station-surface-muted);
+    box-shadow: none;
+    transition: background-color var(--station-motion-fast) ease, transform var(--station-motion-instant) ease;
+
+    &:hover,
+    &:focus-visible { background: var(--station-surface-elevated); transform: none; }
+
+    &:active { transform: translateY(1px); box-shadow: var(--station-shadow-pressed); }
+
+    img { width: 24px; height: 24px; object-fit: contain; }
+  }
+
+  .ordering-modal {
+    width: min(1000px, calc(100vw - 180px));
+  }
+
+  .table-container {
+    width: 100%;
+    height: min(600px, 58vh);
+    background: var(--station-surface-elevated);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e2);
+    scrollbar-color: var(--station-primary) var(--station-surface-muted);
+  }
+
+  .order-table {
+    color: var(--station-text-on-surface);
+    font-family: var(--station-font-ui);
+    font-size: clamp(14px, 1vw, 20px);
+    border: 0;
+
+    th {
+      color: var(--station-text-primary);
+      background: var(--station-secondary);
+      border-color: var(--station-border);
+      font-family: var(--station-font-number);
+      font-size: var(--station-size-ticket);
+      letter-spacing: 0.04em;
+    }
+
+    td {
+      border-color: var(--station-border);
+      border-right: 0;
+    }
+
+    tr:nth-child(even) { background: rgba(216, 209, 194, 0.32); }
+    tr:hover { background: var(--station-accent-soft); }
+  }
+
+  .status {
+    display: inline-block;
+    min-width: 64px;
+    padding: 5px 8px;
+    border-radius: var(--station-radius-ticket);
+    font-family: var(--station-font-number);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .status.delivered { color: var(--station-text-on-surface); background: rgba(142, 175, 120, 0.45); }
+  .status.preparing { color: var(--station-text-on-surface); background: rgba(211, 154, 69, 0.42); }
+  .status.pending { color: var(--station-text-primary); background: var(--station-primary-strong); }
+
+  .history-empty-state {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 8px;
+    color: var(--station-text-muted);
+    font-family: var(--station-font-ui);
+
+    strong { color: var(--station-text-on-surface); font-size: 20px; }
+    span:last-child { font-size: 14px; }
+  }
+
+  .history-empty-state__plate {
+    width: 78px;
+    height: 48px;
+    border: 2px solid var(--station-border);
+    border-radius: 50%;
+    background: var(--station-surface-muted);
+    box-shadow: inset 0 -8px 0 rgba(32, 39, 37, 0.12);
+  }
+
+  .modal-footer {
+    margin-top: 0;
+    padding: 14px 18px;
+    color: var(--station-text-on-surface);
+    background: var(--station-surface);
+    border-top: 1px solid var(--station-border);
+  }
+
+  .total-name,
+  .total-amount { color: var(--station-text-on-surface); font-family: var(--station-font-number); }
+  .total-amount { color: var(--station-primary-strong); }
+
+  .action-bar {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    gap: 12px;
+    background: var(--station-surface);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e1);
+  }
+
+  .close-btn,
+  .call-btn,
+  .deal-btn {
+    min-width: 150px;
+    min-height: 48px;
+    padding: 10px 18px;
+    color: var(--station-text-on-surface);
+    background: var(--station-surface-muted);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-control);
+    font-family: var(--station-font-ui);
+    font-size: var(--station-size-button);
+    transition: background-color var(--station-motion-fast) ease, transform var(--station-motion-instant) ease;
+
+    &:hover,
+    &:focus-visible { background: var(--station-surface-elevated); transform: none; }
+    &:active { transform: translateY(1px); }
+  }
+
+  .deal-btn { color: var(--station-text-primary); background: var(--station-primary); border-color: var(--station-accent); }
+
+  .deal-popup .popup-content {
+    min-width: min(500px, calc(100vw - 48px));
+    padding: 30px;
+    background: var(--station-surface-elevated);
+    border: 1px solid var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e3);
+  }
+
+  .popup-message h2 { color: var(--station-text-on-surface); font-family: var(--station-font-brand); }
+  .popup-message p { color: var(--station-text-muted); }
+  .deal-amount { color: var(--station-primary-strong); text-shadow: none; font-family: var(--station-font-number); }
+  .confirm-deal,
+  .close-popup { min-height: 48px; border-radius: var(--station-radius-control); font-family: var(--station-font-ui); }
+  .confirm-deal { background: var(--station-success); color: var(--station-text-on-surface); }
+  .close-popup { background: var(--station-secondary); }
+}
+
+@media (max-width: 900px) {
+  .overlay.is-midnight-station .ordering-modal { width: calc(100vw - 112px); }
+  .overlay.is-midnight-station .ordering-modal-frame { gap: 8px; }
+  .overlay.is-midnight-station .btn-container { margin: 0; }
+  .overlay.is-midnight-station .action-bar { flex-wrap: wrap; gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay.is-midnight-station .scroll-btn,
+  .overlay.is-midnight-station .close-btn,
+  .overlay.is-midnight-station .call-btn,
+  .overlay.is-midnight-station .deal-btn { transition: none; }
 }
 
 </style>

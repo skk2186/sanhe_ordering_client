@@ -14,7 +14,11 @@
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
         :class="tipsType"
+        role="button"
+        tabindex="0"
         @click="handleTipsClick"
+        @keydown.enter.prevent="handleTipsClick"
+        @keydown.space.prevent="handleTipsClick"
     >
       <span
         v-if="themeKey === 'midnight-station' && tipsType === 'order_meal'"
@@ -30,7 +34,10 @@
       <div :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]" type="button"
           :style="'order: ' + (side ==='left' ? '1' : '0') "
           :aria-label="`${$t('common.placeOrder')}-${side}`" :aria-disabled="submitting"
-          :title="$t('common.placeOrder')" @click="!submitting && $emit('place-order', side)">
+          :title="$t('common.placeOrder')" role="button" tabindex="0"
+          @click="!submitting && $emit('place-order', side)"
+          @keydown.enter.prevent="!submitting && $emit('place-order', side)"
+          @keydown.space.prevent="!submitting && $emit('place-order', side)">
         <span v-if="themeKey === 'midnight-station' && submitting" class="station-departure-signal" aria-hidden="true">ROUTE</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'success'" class="station-departure-signal is-success" aria-hidden="true">ACCEPTED</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'error'" class="station-departure-signal is-error" aria-hidden="true">CHECK</span>
@@ -54,7 +61,11 @@
         :data-station-cart-side="side"
         :data-station-cart-index="index"
       >
-        <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" @click="$emit('select', side, index)">
+        <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" tabindex="0"
+          :aria-label="item ? item.name || item.storeName : $t('common.emptySlot')"
+          @click="$emit('select', side, index)"
+          @keydown.enter.prevent="$emit('select', side, index)"
+          @keydown.space.prevent="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
             <img :src="item.image" :alt="item.name" />
           </div>
@@ -589,6 +600,7 @@ onUnmounted(() => {
 /* Midnight Station foundation: the two carts become seat ticket racks while
    keeping the existing four-slot structure and all event handlers intact. */
 .cart-section.is-midnight-station {
+  box-sizing: border-box;
   color: var(--station-text-primary);
   background: var(--station-background-deep);
   border: 1px solid var(--station-border);
@@ -961,5 +973,95 @@ onUnmounted(() => {
   }
 
   .cart-section.is-midnight-station .station-removed-ticket { opacity: 0; }
+}
+
+/* Phase 03 polish: keep the seat rack tactile without turning every slot into
+   another heavy card. Plates are circular; the ticket is the information layer. */
+.cart-section.is-midnight-station {
+  .item-circle {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 42%, var(--station-surface-elevated) 0 57%, var(--station-surface-muted) 58% 66%, rgba(32, 39, 37, 0.78) 67% 71%, transparent 72%);
+    border: 0;
+    box-shadow: 0 9px 9px rgba(0, 0, 0, 0.24);
+
+    &:hover,
+    &:focus-within { transform: translateY(-3px); box-shadow: 0 13px 12px rgba(0, 0, 0, 0.3); }
+    &:focus-visible { outline: 2px solid var(--station-accent); outline-offset: 4px; }
+
+    &.empty-item {
+      background: radial-gradient(circle at 50% 42%, var(--station-paper-ghost) 0 57%, transparent 58% 100%);
+      border: 1px dashed var(--station-border);
+      box-shadow: none;
+    }
+  }
+
+  .item-info {
+    width: 112px;
+    box-sizing: border-box;
+    margin-top: -10px;
+    overflow: visible;
+    border: 0;
+    border-left: 3px solid var(--station-primary);
+    border-radius: var(--station-radius-ticket);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .item-controls {
+    height: 42px;
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  .item-controls .minus-btn,
+  .item-controls .plus-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    border-radius: var(--station-radius-small);
+    font-size: 20px;
+  }
+
+  .circle-close-btn {
+    width: 44px;
+    height: 44px;
+    top: -12px;
+    right: -12px;
+    border-radius: 50%;
+    font-size: 22px;
+  }
+
+  .item-name-area { min-height: 26px; padding-inline: 8px; }
+}
+
+@media (min-width: 769px) and (max-width: 1920px) {
+  .cart-section.is-midnight-station {
+    .item-group { height: 132px; }
+    .cart-item { height: 132px; }
+
+    .item-circle {
+      width: 72px;
+      height: 72px;
+    }
+
+    .item-info { width: 96px; }
+    .order-btn { height: 132px; flex-basis: 132px; }
+    .item-controls { height: 44px; }
+
+    .item-controls .minus-btn,
+    .item-controls .plus-btn {
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+    }
+
+    .circle-close-btn {
+      width: 44px;
+      height: 44px;
+      top: -8px;
+      right: -8px;
+    }
+  }
 }
 </style>

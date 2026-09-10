@@ -122,6 +122,38 @@ html[data-theme='midnight-station'] .conveyor-display > * {
   position: relative;
 }
 
+/* The display shell gives direct children a layout position. Overlays are the
+   intentional exception: keep their viewport layer above the station scene. */
+html[data-theme='midnight-station'] .conveyor-display > .sushi-navigation-overlay.is-midnight-station {
+  position: fixed;
+  inset: 0;
+  z-index: 1900;
+}
+
+html[data-theme='midnight-station'] .conveyor-display > .overlay.is-midnight-station {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  transform: none;
+}
+
+html[data-theme='midnight-station'] .el-dialog.luxury-settings-dialog.is-midnight-station {
+  max-height: calc(100vh - 48px);
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+html[data-theme='midnight-station'] .el-dialog.luxury-settings-dialog.is-midnight-station .el-dialog__header .el-dialog__title {
+  color: var(--station-text-primary);
+  font-family: var(--station-font-brand);
+}
+
+html[data-theme='midnight-station'] .el-dialog.luxury-settings-dialog.is-midnight-station .el-dialog__body {
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
+  scrollbar-color: var(--station-primary) var(--station-surface-muted);
+}
+
 html[data-theme='midnight-station'] .conveyor-display::before,
 html[data-theme='midnight-station'] .conveyor-display::after {
   position: absolute;
@@ -177,6 +209,10 @@ html[data-theme='midnight-station'] .brand-table {
 html[data-theme='midnight-station'] .assistant-slot {
   background: rgba(236, 229, 214, 0.08);
   border-left: 1px solid rgba(236, 229, 214, 0.16);
+}
+
+html[data-theme='midnight-station'] .top-progress {
+  width: min(820px, calc(100vw - 520px));
 }
 
 html[data-theme='midnight-station'] .bottom-section {

@@ -39,6 +39,10 @@
               v-for="item in themeItem"
               :key="item.key"
               @click="selectTheme(item)"
+              @keydown.enter.prevent="selectTheme(item)"
+              @keydown.space.prevent="selectTheme(item)"
+              role="button"
+              tabindex="0"
               :class="{
                 'theme-card--active': selectedThemeKey === item.key,
                 'theme-card--disabled': themeChanging,
@@ -162,6 +166,10 @@
                   class="direction-card"
                   :class="{ 'direction-card--active': beltDirection === 'left' }"
                   @click="setBeltDirection('left')"
+                  @keydown.enter.prevent="setBeltDirection('left')"
+                  @keydown.space.prevent="setBeltDirection('left')"
+                  role="button"
+                  tabindex="0"
               >
                 <div class="direction-icon">←</div>
                 <div class="direction-label">{{ copy.moveLeft }}</div>
@@ -175,6 +183,10 @@
                   class="direction-card"
                   :class="{ 'direction-card--active': beltDirection === 'right' }"
                   @click="setBeltDirection('right')"
+                  @keydown.enter.prevent="setBeltDirection('right')"
+                  @keydown.space.prevent="setBeltDirection('right')"
+                  role="button"
+                  tabindex="0"
               >
                 <div class="direction-icon">→</div>
                 <div class="direction-label">{{ copy.moveRight }}</div>
@@ -1172,6 +1184,35 @@ initBeltSettings()
   .direction-card--active .direction-label { color: var(--station-primary); }
   .direction-card .direction-check { background: var(--station-primary); border-radius: var(--station-radius-small); }
   .settings-close { background: var(--station-primary); border-radius: var(--station-radius-control); box-shadow: var(--station-shadow-e1); }
+
+  .theme-card,
+  .direction-card {
+    cursor: pointer;
+    transition: border-color var(--station-motion-fast) ease, background-color var(--station-motion-fast) ease;
+
+    &:focus-visible {
+      outline: 2px solid var(--station-accent);
+      outline-offset: 3px;
+    }
+  }
+
+  .theme-card__key {
+    color: var(--station-text-muted);
+    font-family: var(--station-font-number);
+    letter-spacing: 0.04em;
+  }
+
+  .direction-card {
+    &:hover { border-color: var(--station-hover); }
+    &--active:hover { border-color: var(--station-primary); }
+  }
+
+  .el-button:focus-visible,
+  .el-slider:focus-visible,
+  .el-switch:focus-visible {
+    outline: 2px solid var(--station-accent);
+    outline-offset: 2px;
+  }
 }
 
 @media (max-width: 768px) {

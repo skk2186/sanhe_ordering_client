@@ -157,6 +157,7 @@
       :left-tips-type="leftCartTipsType"
       :right-tips-type="rightCartTipsType"
       :submitting-side="submittingSide"
+      :theme-key="activeSceneKey"
       @close="showSushiNavigation = false"
       @retry="fetchSushiData"
       @add-to-cart="handleNavigationAddToCart"
@@ -169,6 +170,7 @@
     <OrderHistoryDialog
       v-model="orderHistoryVisible"
       :items="orderHistoryItems"
+      :theme-key="activeSceneKey"
       @call-waiter="callWaiter"
       :title="$t('common.orderHistory')"
     />
@@ -176,13 +178,15 @@
     <!-- 呼叫店员确认弹窗 -->
     <el-dialog
       v-model="callWaiterConfirmVisible"
+      class="call-waiter-dialog"
+      :class="{ 'is-midnight-station': activeSceneKey === 'midnight-station' }"
       :title="$t('common.callWaiter')"
       width="400px"
       :show-close="false"
       center
     >
       <div class="call-waiter-confirm">
-        <div class="confirm-icon">🔔</div>
+        <el-icon class="confirm-icon" aria-hidden="true"><Bell /></el-icon>
         <div class="confirm-message">
           <h3>{{ $t('display.confirmCallWaiter') }}</h3>
           <p>{{ $t('display.waiterComing') }}</p>
@@ -225,7 +229,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Loading, Refresh } from '@element-plus/icons-vue'
+import { Bell, Loading, Refresh } from '@element-plus/icons-vue'
 
 import MenuView from '@/views/customer/MenuView.vue'
 import SushiNavigation from '@/components/menu/SushiNavigation.vue'
@@ -1789,6 +1793,23 @@ onUnmounted(() => {
   font-size: 34px;
 }
 
+.conveyor-display.is-midnight-station {
+  .product-state {
+    color: var(--station-text-primary);
+    background: var(--station-overlay-deep);
+    border-color: var(--station-border);
+    border-radius: var(--station-radius-panel);
+    box-shadow: var(--station-shadow-e1);
+
+    p { font-family: var(--station-font-ui); }
+  }
+
+  .confirm-icon {
+    color: var(--station-primary);
+    font-size: 42px;
+  }
+}
+
 .bottom-left, .bottom-right {
   position: relative;
   display: flex;
@@ -1896,6 +1917,48 @@ onUnmounted(() => {
     padding: 10px 20px 20px;
     border-top: 1px solid #f0f0f0;
   }
+}
+
+:deep(.call-waiter-dialog.is-midnight-station) {
+  border: 1px solid var(--station-border);
+  border-radius: var(--station-radius-panel);
+  background: var(--station-surface-elevated);
+  box-shadow: var(--station-shadow-e3);
+
+  .el-dialog__header {
+    background: var(--station-background-deep);
+    border-bottom-color: var(--station-border);
+
+    .el-dialog__title { color: var(--station-text-primary); font-family: var(--station-font-brand); }
+  }
+
+  .el-dialog__body { background: var(--station-surface-elevated); }
+  .el-dialog__footer { background: var(--station-surface); border-top-color: var(--station-border); }
+
+  .call-waiter-confirm {
+    padding: 18px 0;
+    color: var(--station-text-on-surface);
+
+    .confirm-icon { color: var(--station-primary); }
+    .confirm-message h3 { color: var(--station-text-on-surface); font-family: var(--station-font-brand); }
+    .confirm-message p { color: var(--station-text-muted); }
+  }
+
+  .dialog-footer .el-button {
+    min-height: 48px;
+    border-radius: var(--station-radius-control);
+    font-family: var(--station-font-ui);
+  }
+
+  .dialog-footer .el-button--primary {
+    color: var(--station-text-primary);
+    background: var(--station-primary);
+    border-color: var(--station-accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conveyor-display.is-midnight-station .confirm-icon { animation: none; }
 }
 
 /* 原版底部组件使用 827/790px 固定画布；移动端仅等比例收紧尺寸，

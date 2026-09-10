@@ -1,24 +1,24 @@
 <template>
   <div class="bottom-center" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }">
     <div class="center-layout">
-      <div class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')"></div>
+      <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')"></button>
       <div class="center-functions">
         <div class="function-row first-row">
-          <div class="function-btn navigation-btn" type="button"
+          <button class="function-btn navigation-btn" type="button"
               :aria-label="$t('common.search')" @click="$emit('open-navigation')">
-          </div>
-          <div class="function-btn checkout-btn" type="button"
+          </button>
+          <button class="function-btn checkout-btn" type="button"
               :aria-label="$t('common.orderHistory')" @click="$emit('open-order-history')">
-          </div>
+          </button>
         </div>
         <div class="function-row second-row">
-          <div class="function-btn settings-btn" type="button" :aria-label="$t('common.systemSettings')"
-              @click="$emit('open-settings')"></div>
-          <div class="function-btn waiter-btn" type="button" :aria-label="$t('common.callWaiter')"
-              @click="$emit('call-waiter')"></div>
+          <button class="function-btn settings-btn" type="button" :aria-label="$t('common.systemSettings')"
+              @click="$emit('open-settings')"></button>
+          <button class="function-btn waiter-btn" type="button" :aria-label="$t('common.callWaiter')"
+              @click="$emit('call-waiter')"></button>
         </div>
       </div>
-      <div class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right')"></div>
+      <button class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right')"></button>
     </div>
   </div>
 </template>
@@ -60,6 +60,15 @@ defineEmits([
   height: 217px;
   width: 790px;
 
+}
+
+.menu-btn,
+.function-btn {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 @media (min-width: 769px) and (max-width: 1920px) {
@@ -131,6 +140,7 @@ defineEmits([
     border: 1px solid var(--station-border);
     border-radius: var(--station-radius-control);
     box-shadow: var(--station-shadow-e0);
+    appearance: none;
     transition: background-color var(--station-motion-fast) ease,
       border-color var(--station-motion-fast) ease,
       transform var(--station-motion-instant) ease,
@@ -185,6 +195,21 @@ defineEmits([
   .waiter-btn {
     border-color: var(--station-primary);
     &::after { color: var(--station-primary-strong); }
+  }
+
+  .menu-btn,
+  .function-btn {
+    background-color: var(--station-paper-ghost);
+    box-shadow: none;
+
+    &::after { color: var(--station-text-primary); }
+  }
+
+  .menu-btn { background-color: var(--station-secondary); }
+  .function-btn:hover,
+  .function-btn:focus-visible {
+    background-color: var(--station-surface);
+    &::after { color: var(--station-text-on-surface); }
   }
 }
 

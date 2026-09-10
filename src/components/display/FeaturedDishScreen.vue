@@ -10,7 +10,54 @@
       <span class="featured-screen__rope featured-screen__rope--left" aria-hidden="true"></span>
       <span class="featured-screen__rope featured-screen__rope--right" aria-hidden="true"></span>
 
-      <div class="featured-screen__body">
+      <div v-if="themeKey === 'midnight-station'" class="featured-screen__body station-ad-board">
+        <button type="button" class="featured-screen__close" :aria-label="t('common.close')" @click="emit('close')">
+          <el-icon><Close /></el-icon>
+        </button>
+
+        <header class="station-ad-board__masthead">
+          <span>{{ t('display.promoBadge') }}</span>
+          <strong>PLATFORM 03</strong>
+        </header>
+
+        <div class="station-ad-board__content">
+          <figure class="featured-screen__media station-ad-board__media">
+            <span class="featured-screen__badge">TODAY SPECIAL</span>
+            <img
+              v-if="!isVideoPlaying"
+              class="featured-screen__poster"
+              :src="promo.posterImage"
+              :alt="getName(item)"
+              @error="handlePosterError"
+            />
+            <video
+              ref="videoRef"
+              class="featured-screen__video"
+              :class="{ 'is-visible': isVideoPlaying }"
+              :src="promo.videoSrc"
+              :poster="posterSource"
+              muted
+              autoplay
+              playsinline
+              preload="auto"
+              @canplay="handleCanPlay"
+              @playing="isVideoPlaying = true"
+              @ended="handleEnded"
+              @error="handleVideoError"
+              @click="retryPlay"
+            ></video>
+          </figure>
+
+          <div class="station-ad-board__copy">
+            <span class="station-ad-board__route">ROUTE 03 · FEATURED DISH</span>
+            <h2>{{ getName(item) }}</h2>
+            <strong class="station-ad-board__price">¥{{ Number(item?.price || 0).toFixed(2) }}</strong>
+            <p v-if="getDescription(item)">{{ getDescription(item) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="featured-screen__body">
         <button type="button" class="featured-screen__close" :aria-label="t('common.close')" @click="emit('close')">
           <el-icon><Close /></el-icon>
         </button>
@@ -74,6 +121,7 @@ const promo = computed(() => findPromoForItem(props.item))
 const posterSource = computed(() => (posterBroken.value ? '' : promo.value?.posterImage || ''))
 
 const getName = (item) => item?.name || item?.storeName || item?.productName || t('common.unknown')
+const getDescription = (item) => item?.description || item?.desc || item?.remark || ''
 const clearTimers = () => {
   window.clearTimeout(endTimer)
   window.clearTimeout(fallbackTimer)
@@ -317,5 +365,118 @@ onUnmounted(clearTimers)
   border-color: var(--station-accent);
   border-radius: var(--station-radius-small);
   box-shadow: none;
+}
+
+.is-midnight-station .station-ad-board {
+  width: min(780px, calc(100vw - 48px));
+  padding: 18px;
+  background: var(--station-surface-elevated);
+  border-color: var(--station-border);
+  border-radius: var(--station-radius-panel);
+  box-shadow: var(--station-shadow-e3);
+}
+
+.station-ad-board__masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 38px 10px 4px;
+  border-bottom: 1px solid var(--station-border);
+  color: var(--station-primary-strong);
+  font-family: var(--station-font-number);
+  font-size: var(--station-size-ticket);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+
+  strong {
+    color: var(--station-text-muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+.station-ad-board__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(190px, 0.65fr);
+  align-items: center;
+  gap: 18px;
+  padding-top: 16px;
+}
+
+.is-midnight-station .station-ad-board__media {
+  min-height: 250px;
+  aspect-ratio: 16 / 10;
+  border-color: var(--station-border);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e1);
+}
+
+.station-ad-board__copy {
+  min-width: 0;
+  padding: 4px 8px 8px 16px;
+  border-left: 1px solid var(--station-border);
+
+  h2 {
+    margin: 8px 0 6px;
+    color: var(--station-text-on-surface);
+    font-family: var(--station-font-brand);
+    font-size: clamp(24px, 2vw, 34px);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 12px 0 0;
+    color: var(--station-text-muted);
+    font-family: var(--station-font-ui);
+    font-size: var(--station-size-body);
+    line-height: 1.6;
+  }
+}
+
+.station-ad-board__route {
+  color: var(--station-primary);
+  font-family: var(--station-font-number);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.station-ad-board__price {
+  color: var(--station-primary-strong);
+  font-family: var(--station-font-number);
+  font-size: var(--station-size-price);
+  letter-spacing: 0.04em;
+}
+
+.is-midnight-station .station-ad-board__media .featured-screen__badge {
+  top: 10px;
+  left: 10px;
+  border-radius: var(--station-radius-ticket);
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .station-ad-board__content { grid-template-columns: 1fr; }
+  .station-ad-board__copy { padding: 4px 0 0; border-left: 0; }
+  .is-midnight-station .station-ad-board__media { min-height: 180px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-midnight-station .station-ad-board { transform: none !important; }
+}
+
+.is-midnight-station.promo-screen-enter-active {
+  transition: transform 620ms var(--station-easing-enter);
+}
+
+.is-midnight-station.promo-screen-leave-active {
+  transition: transform 360ms var(--station-easing-exit);
+}
+
+.is-midnight-station.promo-screen-enter-from,
+.is-midnight-station.promo-screen-leave-to {
+  transform: translateX(-50%) translate3d(38%, -112%, 0) rotate(1deg);
 }
 </style>
