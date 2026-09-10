@@ -7,9 +7,14 @@
       :data-station-transfer-id="ghost.id"
       :style="ghost.style"
     >
-      <span class="station-cart-transfer__rule"></span>
-      <span class="station-cart-transfer__name">{{ ghost.name }}</span>
-      <span class="station-cart-transfer__meta">BOARDING</span>
+      <span class="station-cart-transfer__plate" aria-hidden="true">
+        <span class="station-cart-transfer__plate-surface"></span>
+        <span class="station-cart-transfer__plate-rim"></span>
+      </span>
+      <span class="station-cart-transfer__ticket">
+        <span class="station-cart-transfer__name">{{ ghost.name }}</span>
+        <span class="station-cart-transfer__meta">BOARDING</span>
+      </span>
     </div>
   </div>
 </template>
@@ -169,28 +174,61 @@ onUnmounted(() => {
 .station-cart-transfer {
   position: fixed;
   z-index: 1;
-  display: grid;
-  align-content: center;
-  gap: 2px;
-  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   box-sizing: border-box;
   overflow: hidden;
   color: var(--station-text-on-surface);
-  background: var(--station-surface-elevated);
-  border: 1px solid var(--station-accent);
-  border-radius: var(--station-radius-ticket);
-  box-shadow: var(--station-shadow-e2);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   transform-origin: center center;
   will-change: transform, opacity;
 }
 
-.station-cart-transfer__rule {
+.station-cart-transfer__plate {
+  position: relative;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 30px;
+  display: block;
+  border-radius: 50%;
+  background: var(--station-surface-elevated);
+  box-shadow: 0 5px 0 var(--station-surface-muted), 0 8px 10px rgb(8 12 10 / 0.36);
+  transform: perspective(360px) rotateX(10deg);
+}
+
+.station-cart-transfer__plate-surface,
+.station-cart-transfer__plate-rim {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 9px;
-  height: 1px;
-  background: var(--station-border);
+  inset: 4px;
+  display: block;
+  border-radius: 50%;
+}
+
+.station-cart-transfer__plate-surface {
+  background: radial-gradient(ellipse at 50% 32%, rgb(255 255 255 / 0.72), transparent 48%), var(--station-surface-muted);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.58);
+}
+
+.station-cart-transfer__plate-rim {
+  border: 2px solid var(--station-surface);
+}
+
+.station-cart-transfer__ticket {
+  min-width: 54px;
+  max-width: 78px;
+  padding: 5px 6px 4px;
+  display: grid;
+  gap: 2px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface-elevated);
+  border-inline-start: 3px solid var(--station-primary);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e1);
+  transform: rotate(-2deg);
 }
 
 .station-cart-transfer__name,
@@ -201,16 +239,15 @@ onUnmounted(() => {
 }
 
 .station-cart-transfer__name {
-  margin-top: 4px;
   font-family: var(--station-font-ui);
-  font-size: var(--station-size-ticket);
+  font-size: 10px;
   font-weight: 700;
 }
 
 .station-cart-transfer__meta {
   color: var(--station-primary);
   font-family: var(--station-font-number);
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.1em;
 }

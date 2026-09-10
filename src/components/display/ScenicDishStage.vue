@@ -51,6 +51,10 @@
     </header>
 
     <div ref="tideStageRef" class="tide-stage">
+      <StationPlatformScene
+        v-if="themeKey === 'midnight-station'"
+      />
+
       <div class="tide-current tide-current--back" aria-hidden="true"></div>
       <div class="tide-current tide-current--middle" aria-hidden="true"></div>
       <div class="tide-current tide-current--front" aria-hidden="true"></div>
@@ -132,6 +136,15 @@
                   class="station-dish-stamp"
                   aria-hidden="true"
                 >BOARDING</span>
+                <span v-if="themeKey === 'midnight-station'" class="station-dish-plate" aria-hidden="true">
+                  <span class="station-dish-plate__surface"></span>
+                  <span class="station-dish-plate__rim"></span>
+                  <span class="station-dish-plate__contact-shadow"></span>
+                </span>
+                <span v-if="themeKey === 'midnight-station'" class="station-dish-cradle" aria-hidden="true">
+                  <i class="station-dish-cradle__wheel station-dish-cradle__wheel--left"></i>
+                  <i class="station-dish-cradle__wheel station-dish-cradle__wheel--right"></i>
+                </span>
                 <img
                   class="tide-dish__shell"
                   src="/images/ui/b/shell-dish-tray.png"
@@ -143,7 +156,7 @@
                 <div class="tide-dish__image">
                   <img :src="getImage(entry.item)" :alt="getName(entry.item)" @error="handleImageError" />
                 </div>
-                <div class="tide-dish__copy">
+                <div class="tide-dish__copy station-dish-ticket">
                   <h3>{{ getName(entry.item) }}</h3>
                   <strong>¥{{ formatPrice(entry.item.price) }}</strong>
                 </div>
@@ -176,6 +189,7 @@ import AmbientSceneEffects from '@/components/display/AmbientSceneEffects.vue'
 import BeachBoatPass from '@/components/display/BeachBoatPass.vue'
 import SeaTurtlePass from '@/components/display/SeaTurtlePass.vue'
 import StageSplashLayer from '@/components/display/StageSplashLayer.vue'
+import StationPlatformScene from '@/components/display/midnight/StationPlatformScene.vue'
 import { findPromoForItem } from '@/config/promoContent'
 
 const props = defineProps({
@@ -939,6 +953,7 @@ watch(streamCycleItems, () => {
   stationFocusMetricsDirty = true
   cacheStationFocusMetrics()
 })
+
 watch([themeKey, () => props.entryRevision], randomizeSpecialEventOffset)
 // 切换场景后船/海龟元素整体更换，同样重建缓存
 watch(themeKey, () => {
@@ -1998,103 +2013,11 @@ onUnmounted(() => {
   padding-top: clamp(76px, 8vh, 126px);
 }
 
-.scenic-dish-stage.is-midnight-station .tide-dish {
-  height: clamp(200px, 11vw, 286px);
-  padding: 12px 14px 13px;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 7px;
-  color: var(--station-text-on-surface);
-  background: var(--station-surface);
-  border: 1px solid var(--station-border);
-  border-radius: var(--station-radius-panel);
-  box-shadow: var(--station-shadow-e1);
-  animation: none;
-  will-change: auto;
-  transition: border-color var(--station-motion-fast) ease,
-    box-shadow var(--station-motion-fast) ease,
-    transform var(--station-motion-fast) var(--station-easing-standard);
-}
-
 .scenic-dish-stage.is-midnight-station .tide-dish::after,
 .scenic-dish-stage.is-midnight-station .tide-dish__shell,
 .scenic-dish-stage.is-midnight-station .tide-dish__beach-board,
 .scenic-dish-stage.is-midnight-station .tide-dish__chef-tray {
   display: none;
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish:hover,
-.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
-  border-color: var(--station-primary);
-  box-shadow: var(--station-shadow-e2);
-  transform: translateY(-3px);
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
-  outline: 3px solid var(--station-accent);
-  outline-offset: 3px;
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__image,
-.scenic-dish-stage.is-midnight-station .tide-dish__copy {
-  transform: none;
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__image {
-  width: clamp(136px, 7vw, 220px);
-  border: 4px solid var(--station-surface-elevated);
-  border-radius: 50%;
-  background: var(--station-surface-elevated);
-  box-shadow: var(--station-shadow-e1);
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish:hover .tide-dish__image,
-.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .tide-dish__image {
-  filter: brightness(1.04);
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__copy {
-  width: 100%;
-  min-height: 36px;
-  box-sizing: border-box;
-  padding: 5px 7px;
-  gap: 8px;
-  color: var(--station-text-on-surface);
-  background: var(--station-surface-elevated);
-  border-top: 1px solid var(--station-border);
-  border-radius: var(--station-radius-ticket);
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__copy h3 {
-  color: var(--station-text-on-surface);
-  font-family: var(--station-font-ui);
-  font-size: var(--station-size-dish-name);
-  font-weight: 700;
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__copy strong {
-  color: var(--station-primary-strong);
-  font-family: var(--station-font-number);
-  font-size: var(--station-size-price);
-}
-
-.scenic-dish-stage.is-midnight-station .tide-dish__ai {
-  top: 10px;
-  right: 10px;
-  width: auto;
-  height: auto;
-  padding: 4px 6px;
-  color: var(--station-text-primary);
-  background: var(--station-secondary);
-  border: 1px solid var(--station-accent);
-  border-radius: var(--station-radius-ticket);
-  font-family: var(--station-font-number);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-}
-
-.scenic-dish-stage.is-midnight-station .tide-slot.is-recommended .tide-dish {
-  border-color: var(--station-accent);
-  box-shadow: inset 0 0 0 2px var(--station-accent-inset), var(--station-shadow-e1);
 }
 
 .scenic-dish-stage.is-midnight-station .tide-dish__soldout {
@@ -2122,8 +2045,6 @@ onUnmounted(() => {
     flex-basis: 330px;
   }
 
-  .scenic-dish-stage.is-midnight-station .tide-dish { height: 286px; }
-  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 220px; }
   .scenic-dish-stage.is-midnight-station .tide-categories button { min-height: 52px; }
 }
 
@@ -2134,8 +2055,6 @@ onUnmounted(() => {
     padding-top: 78px;
   }
 
-  .scenic-dish-stage.is-midnight-station .tide-dish { height: 198px; }
-  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 138px; }
   .scenic-dish-stage.is-midnight-station .tide-categories button { min-height: 46px; padding-inline: 14px; }
 }
 
@@ -2146,22 +2065,10 @@ onUnmounted(() => {
     padding-top: 56px;
   }
 
-  .scenic-dish-stage.is-midnight-station .tide-dish {
-    height: 184px;
-    padding: 8px 9px 10px;
-  }
-
-  .scenic-dish-stage.is-midnight-station .tide-dish__image { width: 120px; }
-  .scenic-dish-stage.is-midnight-station .tide-dish__copy { min-height: 31px; gap: 4px; }
-  .scenic-dish-stage.is-midnight-station .tide-dish__copy h3 { max-width: 82px; font-size: 12px; }
-  .scenic-dish-stage.is-midnight-station .tide-dish__copy strong { font-size: 13px; }
   .scenic-dish-stage.is-midnight-station .tide-pause { width: 44px; height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scenic-dish-stage.is-midnight-station .tide-dish,
-  .scenic-dish-stage.is-midnight-station .tide-dish:hover,
-  .scenic-dish-stage.is-midnight-station .tide-dish:focus-visible,
   .scenic-dish-stage.is-midnight-station .tide-categories button:hover,
   .scenic-dish-stage.is-midnight-station .tide-categories button:focus-visible,
   .scenic-dish-stage.is-midnight-station .tide-pause:hover,
@@ -2363,6 +2270,338 @@ onUnmounted(() => {
 
   .scenic-dish-stage.is-midnight-station .tide-dish.is-station-pressed {
     transform: translateY(1px) scale(0.985);
+  }
+}
+
+/* Phase 02R visual redesign: the Midnight stage is an architectural space,
+   not a set of decorative dividers. The stream remains the interaction model;
+   this layer supplies the canopy, columns, platform floor and one physical
+   service rail behind the dishes. */
+.scenic-dish-stage.is-midnight-station .tide-stage {
+  perspective: 900px;
+  background: var(--station-background-deep);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stage::before,
+.scenic-dish-stage.is-midnight-station .tide-stage::after,
+.scenic-dish-stage.is-midnight-station .tide-current {
+  display: none;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-stream {
+  z-index: 4;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
+  padding-top: clamp(84px, 11vh, 132px);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish {
+  height: clamp(226px, 14vw, 286px);
+  padding: 0;
+  display: block;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--station-text-on-surface);
+  transform-origin: 50% 74%;
+  transition: transform var(--station-motion-fast) var(--station-easing-standard);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: translateY(-4px);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible {
+  outline: 3px solid var(--station-accent);
+  outline-offset: 5px;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__shell,
+.scenic-dish-stage.is-midnight-station .tide-dish__beach-board,
+.scenic-dish-stage.is-midnight-station .tide-dish__chef-tray {
+  display: none;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  z-index: 1;
+  width: 88%;
+  height: 132px;
+  display: block;
+  border-radius: 50%;
+  background: var(--station-surface-elevated);
+  box-shadow: 0 10px 0 var(--station-surface-muted), 0 17px 20px rgba(8, 12, 10, 0.38);
+  transform: translateX(-50%) perspective(720px) rotateX(9deg);
+  transform-origin: center bottom;
+  transition: transform var(--station-motion-fast) var(--station-easing-standard),
+    box-shadow var(--station-motion-fast) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate__surface {
+  position: absolute;
+  inset: 10px;
+  display: block;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255, 255, 255, 0.72), transparent 46%),
+    radial-gradient(ellipse at 50% 64%, var(--station-surface-muted) 0 52%, #C2B6A1 68%, #A99D89 100%);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.62), inset 0 -8px 12px rgba(32, 39, 37, 0.18);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate__rim {
+  position: absolute;
+  inset: 5px;
+  display: block;
+  border: 4px solid var(--station-surface);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(109, 119, 107, 0.52);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate__contact-shadow {
+  position: absolute;
+  left: 11%;
+  right: 11%;
+  bottom: -27px;
+  height: 30px;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(8, 12, 10, 0.48), transparent 69%);
+  filter: blur(2px);
+  opacity: 0.9;
+  transform: rotateX(52deg);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .station-dish-plate,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-dish-plate {
+  box-shadow: 0 13px 0 var(--station-surface-muted), 0 22px 24px rgba(8, 12, 10, 0.46);
+  transform: translateX(-50%) perspective(720px) rotateX(9deg) scale(1.015);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle {
+  position: absolute;
+  left: 50%;
+  top: 151px;
+  z-index: 2;
+  width: 70%;
+  height: 26px;
+  display: block;
+  border-top: 3px solid #8B938B;
+  border-bottom: 3px solid #3B4740;
+  border-radius: 48%;
+  background: linear-gradient(180deg, #8E9890, #29352F 58%, #161D1A);
+  box-shadow: 0 5px 0 rgba(14, 18, 17, 0.46), inset 0 2px 0 rgba(247, 242, 232, 0.3);
+  transform: translateX(-50%) perspective(700px) rotateX(26deg);
+  transition: border-color var(--station-motion-fast) ease,
+    filter var(--station-motion-fast) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle::before,
+.scenic-dish-stage.is-midnight-station .station-dish-cradle::after {
+  position: absolute;
+  top: 5px;
+  width: 20%;
+  height: 7px;
+  content: '';
+  border-radius: 50%;
+  background: #121815;
+  box-shadow: inset 0 2px 0 rgba(211, 169, 78, 0.34);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle::before { left: 8%; }
+.scenic-dish-stage.is-midnight-station .station-dish-cradle::after { right: 8%; }
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel {
+  position: absolute;
+  top: 16px;
+  width: 9px;
+  height: 9px;
+  display: block;
+  border: 2px solid #8B938B;
+  border-radius: 50%;
+  background: #151A19;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel--left { left: 20%; }
+.scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel--right { right: 20%; }
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .station-dish-cradle,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-dish-cradle {
+  border-top-color: var(--station-accent);
+  filter: brightness(1.08);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__image {
+  position: absolute;
+  left: 50%;
+  top: 29px;
+  z-index: 4;
+  width: 60%;
+  height: 108px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(32, 39, 37, 0.42);
+  border-radius: 48% 52% 45% 55%;
+  background: var(--station-surface-elevated);
+  box-shadow: 0 4px 8px rgba(14, 18, 17, 0.24), 0 0 0 3px rgba(247, 242, 232, 0.54);
+  transform: translateX(-50%) perspective(720px) rotateX(8deg) rotate(-1deg);
+  transition: transform var(--station-motion-fast) var(--station-easing-standard),
+    filter var(--station-motion-fast) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .tide-dish__image,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .tide-dish__image {
+  filter: brightness(1.05);
+  transform: translateX(-50%) perspective(720px) rotateX(8deg) rotate(-1deg) translateY(-2px);
+}
+
+.scenic-dish-stage.is-midnight-station .station-platform-marker {
+  left: 19%;
+  right: 19%;
+  bottom: 27px;
+  z-index: 0;
+  height: 3px;
+  opacity: 0.34;
+  background: var(--station-accent);
+  transform: scaleX(0.48);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-slot[data-station-focus] .station-platform-marker,
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .station-platform-marker,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-platform-marker {
+  opacity: 0.95;
+  transform: scaleX(1);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-ticket {
+  position: absolute;
+  left: 56%;
+  top: 171px;
+  z-index: 6;
+  width: 94px;
+  min-height: 38px;
+  padding: 7px 8px 6px;
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  color: var(--station-text-on-surface);
+  background: var(--station-surface-elevated);
+  border: 1px solid var(--station-border);
+  border-inline-start: 4px solid var(--station-primary);
+  border-radius: var(--station-radius-ticket);
+  box-shadow: var(--station-shadow-e1);
+  transform: rotate(-1.5deg);
+  transition: border-color var(--station-motion-fast) ease,
+    transform var(--station-motion-fast) var(--station-easing-standard),
+    box-shadow var(--station-motion-fast) ease;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-ticket::before {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  width: 20px;
+  height: 2px;
+  content: '';
+  background: var(--station-accent);
+  opacity: 0.75;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-ticket h3 {
+  max-width: 78px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--station-text-on-surface);
+  font-family: var(--station-font-ui);
+  font-size: clamp(11px, 0.72vw, 14px);
+  font-weight: 700;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-ticket strong {
+  color: var(--station-primary-strong);
+  font-family: var(--station-font-number);
+  font-size: clamp(14px, 0.9vw, 18px);
+  line-height: 1;
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish:hover .station-dish-ticket,
+.scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-dish-ticket {
+  border-color: var(--station-accent);
+  box-shadow: var(--station-shadow-e2);
+  transform: translate(4px, -2px) rotate(-1.5deg);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__ai {
+  top: 12px;
+  right: 14%;
+  z-index: 8;
+  width: auto;
+  height: auto;
+  min-height: 26px;
+  padding: 5px 7px;
+  color: var(--station-text-primary);
+  background: var(--station-secondary);
+  border: 1px solid var(--station-accent);
+  border-radius: 2px 2px 2px 10px;
+  font-family: var(--station-font-number);
+  font-size: 0;
+  letter-spacing: 0.06em;
+  transform: rotate(3deg);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish__ai::after {
+  content: 'AI PICK';
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-stamp {
+  top: auto;
+  left: auto;
+  right: 8px;
+  bottom: 45px;
+  z-index: 10;
+  padding: 4px 6px;
+  color: var(--station-text-primary);
+  background: var(--station-primary);
+  border: 1px solid var(--station-accent);
+  border-radius: var(--station-radius-ticket);
+  font-family: var(--station-font-number);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  transform: rotate(-7deg);
+}
+
+.scenic-dish-stage.is-midnight-station .tide-dish.is-station-pressed {
+  transform: translateY(1px) scale(0.985) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-dish-stage.is-midnight-station .station-dish-plate,
+  .scenic-dish-stage.is-midnight-station .station-dish-cradle,
+  .scenic-dish-stage.is-midnight-station .tide-dish__image,
+  .scenic-dish-stage.is-midnight-station .station-dish-ticket {
+    transition: none;
   }
 }
 </style>
