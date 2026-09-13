@@ -10,6 +10,14 @@
     <!-- 顶部工作区：单条主题横幅三区（品牌 / 投碟进度 / 小禾），背景透明透出页面背景。 -->
     <div class="top-section">
       <div class="top-scene-banner">
+        <div class="station-top-atmosphere" aria-hidden="true">
+          <span class="station-top-atmosphere__moon"></span>
+          <span class="station-top-atmosphere__skyline"></span>
+          <span class="station-top-atmosphere__wires"></span>
+          <span class="station-top-atmosphere__platform"></span>
+          <span class="station-top-atmosphere__light station-top-atmosphere__light--one"></span>
+          <span class="station-top-atmosphere__light station-top-atmosphere__light--two"></span>
+        </div>
         <div class="brand-lockup">
           <span class="brand-kicker">AI DINING TABLE</span>
           <strong>{{ $t('menu.brand') }}</strong>
@@ -108,7 +116,7 @@
             @select="selectCartSlot"
             @close-tips="closeCartFullTips('left')"
           />
-          <MenuView  v-if="menuVisibility.left" side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
+          <MenuView v-if="menuVisibility.left" side="left" :theme-key="activeSceneKey" @close="closeDetailMenu('left')" @add-to-cart="addSpecificItem" />
       </div>
 
       <!-- 中间功能按钮区 -->
@@ -140,7 +148,7 @@
           @close-tips="closeCartFullTips('right')"
         />
 
-        <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
+        <MenuView v-if="menuVisibility.right" side="right" :theme-key="activeSceneKey" @close="closeDetailMenu('right')" @add-to-cart="addSpecificItem" />
       </div>
     </div>
 
@@ -329,6 +337,18 @@ const applySceneTheme = (sceneKey) => {
   localStorage.setItem('selectedThemeKey', sceneKey)
 }
 
+// The curtain is opaque while tokens swap. Suppressing descendant transitions
+// for two frames prevents every surface from interpolating simultaneously.
+const applySceneThemeAtomically = async (sceneKey) => {
+  const root = document.documentElement
+  root.classList.add('is-theme-token-swap')
+  void root.offsetHeight
+  applySceneTheme(sceneKey)
+  await nextTick()
+  await new Promise(resolve => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)))
+  root.classList.remove('is-theme-token-swap')
+}
+
 applySceneTheme(activeSceneKey.value)
 
 const waitForSceneFrame = (duration) => new Promise((resolve) => {
@@ -379,7 +399,7 @@ const handleThemeChange = async (theme) => {
   if (run !== sceneTransitionRun) return
 
   activeSceneKey.value = nextSceneKey
-  applySceneTheme(nextSceneKey)
+  await applySceneThemeAtomically(nextSceneKey)
   sceneRevision.value += 1
   await nextTick()
 
@@ -1041,8 +1061,17 @@ const addToCart = (item, side, uiMeta = {}) => {
 // }
 
 // 功能按钮
-const openDetailMenu = (side) => {
+const menuTriggerBySide = { left: null, right: null }
+
+const openDetailMenu = (side, event) => {
+  menuTriggerBySide[side] = event?.currentTarget || document.activeElement
   menuVisibility.value[side] = !menuVisibility.value[side];
+}
+
+const closeDetailMenu = async (side) => {
+  menuVisibility.value[side] = false
+  await nextTick()
+  menuTriggerBySide[side]?.focus?.({ preventScroll: true })
 }
 
 const addSpecificItem = (item, side) => {
@@ -1648,6 +1677,111 @@ onUnmounted(() => {
 .assistant-slot :deep(.assistant-bubble) { width: fit-content; max-width: min(100%, 420px); min-height: 0; height: auto; justify-self: end; padding: 8px 12px; }
 .assistant-slot :deep(.assistant-bubble strong) { font-size: 15px; }
 .assistant-slot :deep(.assistant-bubble span) { font-size: 14px; }
+
+.station-top-atmosphere { display: none; }
+
+.conveyor-display.is-midnight-station .station-top-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(224, 196, 124, 0.12), transparent 18%),
+    linear-gradient(180deg, rgba(7, 13, 18, 0.94), rgba(18, 28, 30, 0.76) 66%, rgba(43, 47, 39, 0.52));
+}
+
+.station-top-atmosphere__moon {
+  position: absolute;
+  top: 12%;
+  left: 71%;
+  width: 34px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f0d991;
+  box-shadow: 0 0 24px rgba(240, 217, 145, 0.28);
+  opacity: 0.72;
+}
+
+.station-top-atmosphere__moon::after {
+  position: absolute;
+  inset: -3px -7px 3px 7px;
+  content: '';
+  border-radius: inherit;
+  background: #0b1216;
+}
+
+.station-top-atmosphere__skyline {
+  position: absolute;
+  inset: 34% -2% 12% 36%;
+  opacity: 0.44;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 26px, rgba(224, 176, 75, 0.58) 27px 29px, transparent 30px 45px),
+    linear-gradient(163deg, transparent 0 34%, #10191b 35% 100%);
+  clip-path: polygon(0 55%, 5% 39%, 9% 48%, 14% 28%, 18% 44%, 24% 34%, 29% 52%, 34% 22%, 39% 46%, 45% 35%, 49% 56%, 55% 31%, 62% 49%, 68% 26%, 72% 45%, 79% 33%, 85% 53%, 91% 29%, 96% 42%, 100% 25%, 100% 100%, 0 100%);
+}
+
+.station-top-atmosphere__wires {
+  position: absolute;
+  left: 27%;
+  right: -3%;
+  top: 22%;
+  height: 42%;
+  border-top: 1px solid rgba(164, 184, 175, 0.28);
+  border-bottom: 1px solid rgba(164, 184, 175, 0.16);
+  transform: skewY(-1.8deg);
+}
+
+.station-top-atmosphere__wires::before,
+.station-top-atmosphere__wires::after {
+  position: absolute;
+  top: -18px;
+  bottom: -24px;
+  width: 2px;
+  content: '';
+  background: rgba(100, 116, 108, 0.38);
+  box-shadow: 10px 0 0 rgba(8, 14, 15, 0.48);
+}
+.station-top-atmosphere__wires::before { left: 18%; }
+.station-top-atmosphere__wires::after { right: 22%; }
+
+.station-top-atmosphere__platform {
+  position: absolute;
+  inset: auto 0 0;
+  height: 23%;
+  background:
+    linear-gradient(90deg, transparent 0 7%, rgba(211, 169, 78, 0.62) 7.2% 7.8%, transparent 8% 92%, rgba(211, 169, 78, 0.62) 92.2% 92.8%, transparent 93%),
+    linear-gradient(180deg, rgba(71, 83, 76, 0.58), rgba(10, 15, 15, 0.84));
+  border-top: 1px solid rgba(211, 169, 78, 0.38);
+}
+
+.station-top-atmosphere__light {
+  position: absolute;
+  top: 45%;
+  width: 18%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 210, 112, 0.8), transparent);
+  filter: blur(1px);
+  opacity: 0.4;
+}
+.station-top-atmosphere__light--one { left: 35%; }
+.station-top-atmosphere__light--two { right: 8%; top: 62%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .conveyor-display.is-midnight-station .station-top-atmosphere__light {
+    animation: station-top-light-pass 8s linear infinite;
+    will-change: transform, opacity;
+  }
+  .conveyor-display.is-midnight-station .station-top-atmosphere__light--two { animation-delay: -4.6s; }
+}
+
+@keyframes station-top-light-pass {
+  0%, 18% { opacity: 0; transform: translate3d(-35%, 0, 0) scaleX(0.7); }
+  30%, 60% { opacity: 0.48; }
+  74%, 100% { opacity: 0; transform: translate3d(210%, 0, 0) scaleX(1.18); }
+}
 
 .middle-section {
   min-height: 0;

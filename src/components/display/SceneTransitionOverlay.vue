@@ -69,11 +69,37 @@ const bubbleStyle = (index) => ({
   pointer-events: auto;
 }
 
+/* These tokens live on the incoming curtain itself. When entering Midnight
+   Station the document still owns the previous theme until the screen is
+   covered, so relying on html[data-theme] here would make the curtain clear. */
+.scene-transition-overlay.is-midnight-station {
+  --station-background: #151a19;
+  --station-background-deep: #0e1211;
+  --station-surface: #ece5d6;
+  --station-surface-muted: #d8d1c2;
+  --station-primary: #a63d32;
+  --station-primary-strong: #7e2c28;
+  --station-secondary: #31584d;
+  --station-accent: #d3a94e;
+  --station-text-primary: #f6f0e5;
+  --station-text-on-surface: #202725;
+  --station-border: #6d776b;
+  --station-radius-ticket: 3px;
+  --station-shadow-e2: 0 10px 22px rgba(14, 18, 17, .32);
+  --station-font-brand: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
+  --station-font-number: 'Roboto Mono', 'IBM Plex Mono', Consolas, monospace;
+  --station-easing-standard: cubic-bezier(.22, .72, .24, 1);
+  --station-easing-enter: cubic-bezier(.18, .76, .2, 1);
+  --station-easing-exit: cubic-bezier(.55, 0, .72, .24);
+}
+
 .scene-transition-curtain {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  will-change: clip-path, opacity;
+  background: #0e1211;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .transition-collage { position: absolute; inset: 0; overflow: hidden; }
@@ -163,11 +189,18 @@ const bubbleStyle = (index) => ({
 }
 
 .is-covering.is-midnight-station .scene-transition-curtain {
+  transform-origin: center bottom;
   animation: station-cover 1650ms var(--station-easing-exit, cubic-bezier(0.55, 0, 0.72, 0.24)) both;
 }
 
 .is-revealing.is-midnight-station .scene-transition-curtain {
+  transform-origin: center top;
   animation: station-reveal 900ms var(--station-easing-enter, cubic-bezier(0.18, 0.76, 0.2, 1)) both;
+}
+
+.is-covered.is-midnight-station .scene-transition-curtain {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scaleY(1);
 }
 
 .is-covered .scene-transition-curtain {
@@ -457,15 +490,15 @@ const bubbleStyle = (index) => ({
 }
 
 @keyframes station-cover {
-  from { clip-path: inset(100% 0 0 0); }
-  58% { clip-path: inset(9% 0 9% 0); }
-  to { clip-path: inset(0); }
+  from { opacity: .86; transform: translate3d(0, 8%, 0) scaleY(0); }
+  58% { opacity: 1; transform: translate3d(0, 0, 0) scaleY(.92); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scaleY(1); }
 }
 
 @keyframes station-reveal {
-  from { clip-path: inset(0); }
-  34% { clip-path: inset(0 0 0 0); }
-  to { clip-path: inset(0 0 100% 0); }
+  from { opacity: 1; transform: translate3d(0, 0, 0) scaleY(1); }
+  34% { opacity: 1; transform: translate3d(0, 0, 0) scaleY(.98); }
+  to { opacity: .82; transform: translate3d(0, -4%, 0) scaleY(0); }
 }
 
 @keyframes transition-bubble-rise {
@@ -500,6 +533,8 @@ const bubbleStyle = (index) => ({
   .is-covering.is-midnight-station .scene-transition-curtain,
   .is-covered.is-midnight-station .scene-transition-curtain {
     clip-path: inset(0) !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
   .is-covering.is-midnight-station .station-transition-sign,
   .is-covered.is-midnight-station .station-transition-sign {
@@ -521,6 +556,8 @@ const bubbleStyle = (index) => ({
   }
   .is-revealing.is-midnight-station .scene-transition-curtain {
     clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    transform: scaleY(0) !important;
   }
   .is-revealing.is-midnight-station .station-transition-sign,
   .is-revealing.is-midnight-station .station-transition-rails,

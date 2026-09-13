@@ -11,11 +11,19 @@
     ]"
   >
 
+    <div v-if="themeKey === 'midnight-station'" class="station-cart-scenery" aria-hidden="true">
+      <span class="station-cart-scenery__lamp"></span>
+      <span class="station-cart-scenery__ticket">SEAT {{ side === 'left' ? 'A' : 'B' }} · 03</span>
+      <span class="station-cart-scenery__counter"></span>
+      <span class="station-cart-scenery__steam"></span>
+    </div>
+
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
         :class="tipsType"
-        role="button"
-        tabindex="0"
+        :role="tipsType === 'out_meal' ? 'button' : 'status'"
+        :tabindex="tipsType === 'out_meal' ? 0 : -1"
+        :aria-label="tipsType === 'out_meal' ? $t('common.close') : undefined"
         @click="handleTipsClick"
         @keydown.enter.prevent="handleTipsClick"
         @keydown.space.prevent="handleTipsClick"
@@ -30,21 +38,19 @@
       <!-- out_meal 提示：点击任意位置关闭 -->
     </div>
 
-    <div class="item-group" v-if="!tipsType">
-      <div :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]" type="button"
+    <div class="item-group" :class="{ 'has-status-overlay': Boolean(tipsType) }">
+      <button :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]" type="button"
           :style="'order: ' + (side ==='left' ? '1' : '0') "
-          :aria-label="`${$t('common.placeOrder')}-${side}`" :aria-disabled="submitting"
-          :title="$t('common.placeOrder')" role="button" tabindex="0"
-          @click="!submitting && $emit('place-order', side)"
-          @keydown.enter.prevent="!submitting && $emit('place-order', side)"
-          @keydown.space.prevent="!submitting && $emit('place-order', side)">
+          :aria-label="`${$t('common.placeOrder')}-${side}`" :disabled="submitting"
+          :title="$t('common.placeOrder')"
+          @click="$emit('place-order', side)">
         <span v-if="themeKey === 'midnight-station'" class="order-action-label">{{ $t('common.placeOrder') }}</span>
         <span v-if="themeKey === 'midnight-station' && submitting" class="station-departure-signal" aria-hidden="true">ROUTE</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'success'" class="station-departure-signal is-success" aria-hidden="true">ACCEPTED</span>
         <span v-else-if="themeKey === 'midnight-station' && orderFeedback === 'error'" class="station-departure-signal is-error" aria-hidden="true">CHECK</span>
         <el-icon v-if="submitting" class="submitting-icon"><Loading /></el-icon>
         <div v-else class="order-progress">{{ count }}/4</div>
-      </div>
+      </button>
 
       <!-- 购物车圆形显示 -->
       <div
@@ -712,7 +718,7 @@ onUnmounted(() => {
     }
 
     &:active:not(.empty-btn) {
-      transform: translateY(1px);
+      transform: scale(0.96);
       box-shadow: var(--station-shadow-pressed);
     }
 
@@ -735,7 +741,7 @@ onUnmounted(() => {
 
     &:hover,
     &:focus-visible { background: var(--station-primary); transform: none; }
-    &:active { transform: translateY(1px); }
+    &:active { transform: scale(0.96); }
   }
 
   .order-btn {
@@ -755,7 +761,7 @@ onUnmounted(() => {
       transform: translateY(-1px);
     }
 
-    &:active { transform: translateY(1px); box-shadow: var(--station-shadow-pressed); }
+    &:active { transform: scale(0.96); box-shadow: var(--station-shadow-pressed); }
 
     .order-action-label {
       position: absolute;
@@ -975,6 +981,7 @@ onUnmounted(() => {
 @media (prefers-reduced-motion: reduce) {
   .cart-section.is-midnight-station .tips-overlay.out_meal,
   .cart-section.is-midnight-station .tips-overlay.order_meal,
+  .cart-section.is-midnight-station .item-image.w3-animate-top,
   .cart-section.is-midnight-station .cart-item.is-station-receiving .item-circle,
   .cart-section.is-midnight-station .cart-item.is-station-quantity-changing .quantity-display,
   .cart-section.is-midnight-station .station-removed-ticket,
@@ -993,11 +1000,98 @@ onUnmounted(() => {
 /* Phase 03 polish: keep the seat rack tactile without turning every slot into
    another heavy card. Plates are circular; the ticket is the information layer. */
 .cart-section.is-midnight-station {
+  isolation: isolate;
+  overflow: visible;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .035), transparent 28%),
+    repeating-linear-gradient(90deg, transparent 0 54px, rgba(236, 229, 214, .025) 55px 56px),
+    var(--station-background-deep);
+  box-shadow: inset 0 3px 0 rgba(211, 169, 78, .14), var(--station-shadow-e1);
+
+  &::after {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 8px;
+    z-index: -1;
+    height: 7px;
+    content: '';
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(211, 169, 78, .24), transparent 72%);
+    pointer-events: none;
+  }
+
+  .station-cart-scenery {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .station-cart-scenery__lamp {
+    position: absolute;
+    top: 14px;
+    width: 28px;
+    height: 42px;
+    border: 2px solid #765d31;
+    border-radius: 3px 3px 10px 10px;
+    background: linear-gradient(180deg, #f4dc8d, #b76736);
+    box-shadow: 0 0 22px rgba(226, 178, 80, .3);
+    opacity: .74;
+  }
+  &.cart-section--left .station-cart-scenery__lamp { left: 12px; transform: rotate(-3deg); }
+  &.cart-section--right .station-cart-scenery__lamp { right: 12px; transform: rotate(3deg); }
+
+  .station-cart-scenery__ticket {
+    position: absolute;
+    top: 9px;
+    padding: 3px 7px;
+    color: rgba(239, 218, 168, .72);
+    border: 1px dashed rgba(211, 169, 78, .4);
+    border-radius: 2px;
+    font-family: var(--station-font-number);
+    font-size: 8px;
+    letter-spacing: .12em;
+  }
+  &.cart-section--left .station-cart-scenery__ticket { right: 12px; transform: rotate(1.5deg); }
+  &.cart-section--right .station-cart-scenery__ticket { left: 12px; transform: rotate(-1.5deg); }
+
+  .station-cart-scenery__counter {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 14px;
+    height: 34px;
+    border-top: 2px solid rgba(159, 170, 161, .34);
+    background: linear-gradient(180deg, rgba(75, 88, 80, .18), rgba(8, 12, 11, .52));
+    transform: perspective(420px) rotateX(60deg);
+    transform-origin: center bottom;
+  }
+
+  .station-cart-scenery__steam {
+    position: absolute;
+    bottom: 28px;
+    width: 54px;
+    height: 80px;
+    opacity: .2;
+    background:
+      radial-gradient(ellipse at 50% 85%, rgba(224, 229, 215, .48), transparent 38%),
+      radial-gradient(ellipse at 24% 44%, rgba(224, 229, 215, .36), transparent 32%),
+      radial-gradient(ellipse at 68% 16%, rgba(224, 229, 215, .32), transparent 30%);
+    filter: blur(4px);
+  }
+  &.cart-section--left .station-cart-scenery__steam { right: 5%; }
+  &.cart-section--right .station-cart-scenery__steam { left: 5%; }
+
   .item-circle {
     width: 112px;
     height: 112px;
     border-radius: 50%;
-    background: radial-gradient(circle at 50% 42%, var(--station-surface-elevated) 0 57%, var(--station-surface-muted) 58% 66%, rgba(32, 39, 37, 0.78) 67% 71%, transparent 72%);
+    background:
+      radial-gradient(circle at 42% 24%, rgba(255, 255, 255, .78), transparent 20%),
+      radial-gradient(circle at 50% 42%, var(--station-surface-elevated) 0 54%, var(--station-surface-muted) 55% 63%, #837a69 64% 68%, rgba(32, 39, 37, 0.78) 69% 72%, transparent 73%);
     border: 0;
     box-shadow: 0 9px 9px rgba(0, 0, 0, 0.24);
 
@@ -1020,8 +1114,11 @@ onUnmounted(() => {
     border: 0;
     border-left: 3px solid var(--station-primary);
     border-radius: var(--station-radius-ticket);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 0 #8f8471, 0 8px 10px rgba(0, 0, 0, 0.22);
+    transform: rotate(-.35deg);
   }
+
+  .cart-item:nth-of-type(even) .item-info { transform: rotate(.45deg) translateY(2px); }
 
   .item-controls {
     height: 42px;
@@ -1045,9 +1142,32 @@ onUnmounted(() => {
     right: -12px;
     border-radius: 50%;
     font-size: 22px;
+    box-shadow: 0 3px 0 #57201d, 0 5px 8px rgba(0, 0, 0, .28);
   }
 
   .item-name-area { min-height: 26px; padding-inline: 8px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cart-section.is-midnight-station .item-image.w3-animate-top {
+    animation: station-cart-item-enter var(--station-motion-receive) var(--station-easing-enter) both;
+    will-change: transform, opacity;
+  }
+
+  .cart-section.is-midnight-station .station-cart-scenery__steam {
+    animation: station-cart-steam 7s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+}
+
+@keyframes station-cart-item-enter {
+  from { opacity: .36; transform: translate3d(0, -12px, 0) scale(.94); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes station-cart-steam {
+  0%, 100% { opacity: .1; transform: translate3d(0, 8px, 0) scale(.88); }
+  50% { opacity: .24; transform: translate3d(5px, -7px, 0) scale(1.05); }
 }
 
 @media (min-width: 769px) and (max-width: 1920px) {

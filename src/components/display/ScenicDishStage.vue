@@ -87,7 +87,8 @@
               :key="`${cycleIndex}-${entry.kind}-${entry.instanceIndex}-${getItemKey(entry.item, entry.sourceIndex)}`"
               class="tide-slot"
               :class="{
-                'is-queue-event': entry.kind === 'event',
+                'is-queue-event': entry.kind !== 'dish',
+                'is-station-node': entry.kind === 'station-node',
                 'is-sold-out': entry.kind === 'dish' && !isAvailable(entry.item),
                 'is-recommended': entry.kind === 'dish' && recommendationIds.has(String(entry.item.id))
               }"
@@ -95,8 +96,14 @@
               :data-station-entry-key="getEntryKey(entry, cycleIndex)"
               :style="entry.style"
             >
+              <div v-if="entry.kind === 'station-node'" class="station-route-node" aria-hidden="true">
+                <span class="station-route-node__signal"><i></i><i></i><i></i></span>
+                <strong>{{ entry.label }}</strong>
+                <small>点検区間 · ROUTE 03</small>
+                <span class="station-route-node__switch"></span>
+              </div>
               <BeachBoatPass
-                v-if="entry.kind === 'event' && themeKey === 'zhenxian'"
+                v-else-if="entry.kind === 'event' && themeKey === 'zhenxian'"
                 :direction="direction"
                 :promo-item="promoTriggerItem"
                 :promo-content="promoTrigger"
@@ -111,22 +118,22 @@
                 @dish-click="emitDishClick"
                 @featured-promo="emitFeaturedPromo"
               />
-              <article
+              <button
                 v-else
+                type="button"
                 class="tide-dish"
                 :class="{
                   'is-station-pressed': themeKey === 'midnight-station' && pressedDishKey === getEntryKey(entry, cycleIndex),
                   'is-station-stamped': themeKey === 'midnight-station' && selectedDishKey === getEntryKey(entry, cycleIndex)
                 }"
                 :data-station-entry-key="getEntryKey(entry, cycleIndex)"
-                :tabindex="isAvailable(entry.item) ? 0 : -1"
+                :disabled="!isAvailable(entry.item)"
                 :aria-label="`${getName(entry.item)} ¥${formatPrice(entry.item.price)}`"
                 @pointerdown="handleDishPointerDown(getEntryKey(entry, cycleIndex), $event)"
                 @pointerup="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
                 @pointercancel="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
                 @pointerleave="handleDishPointerUp(getEntryKey(entry, cycleIndex))"
                 @click="handleDishClick(entry.item, $event, getEntryKey(entry, cycleIndex))"
-                @keydown.enter.prevent="handleDishClick(entry.item, $event, getEntryKey(entry, cycleIndex))"
               >
                 <span v-if="recommendationIds.has(String(entry.item.id))" class="tide-dish__ai">AI</span>
                 <span v-if="!isAvailable(entry.item)" class="tide-dish__soldout">{{ t('common.soldOut') }}</span>
@@ -139,9 +146,13 @@
                 <span v-if="themeKey === 'midnight-station'" class="station-dish-plate" aria-hidden="true">
                   <span class="station-dish-plate__surface"></span>
                   <span class="station-dish-plate__rim"></span>
+                  <span class="station-dish-plate__well"></span>
+                  <span class="station-dish-plate__glaze"></span>
                   <span class="station-dish-plate__contact-shadow"></span>
                 </span>
                 <span v-if="themeKey === 'midnight-station'" class="station-dish-cradle" aria-hidden="true">
+                  <i class="station-dish-cradle__contact"></i>
+                  <i class="station-dish-cradle__signal"></i>
                   <i class="station-dish-cradle__wheel station-dish-cradle__wheel--left"></i>
                   <i class="station-dish-cradle__wheel station-dish-cradle__wheel--right"></i>
                 </span>
@@ -160,7 +171,7 @@
                   <h3>{{ getName(entry.item) }}</h3>
                   <strong>¥{{ formatPrice(entry.item.price) }}</strong>
                 </div>
-              </article>
+              </button>
             </div>
           </div>
         </div>
@@ -489,7 +500,28 @@ const streamCycleItems = computed(() => {
       }
     }
   })
-  if (!list.length || activeCategoryId.value !== 'all' || themeKey.value === 'midnight-station') return entries
+  if (themeKey.value === 'midnight-station') {
+    const nodePositions = [Math.min(8, entries.length), Math.min(3, entries.length)]
+    nodePositions.forEach((position, nodeIndex) => {
+      entries.splice(position, 0, {
+        kind: 'station-node',
+        item: null,
+        sourceIndex: `station-node-${nodeIndex}`,
+        instanceIndex: `station-node-${nodeIndex}`,
+        label: `MILE ${String((nodeIndex + 1) * 3).padStart(2, '0')}`,
+        lane: 'middle',
+        style: {
+          '--station-lane-y': '4px',
+          '--station-lane-scale': .92,
+          '--station-lane-opacity': .9,
+          '--station-lane-brightness': 1,
+          '--station-lane-z': 2
+        }
+      })
+    })
+    return entries
+  }
+  if (!list.length || activeCategoryId.value !== 'all') return entries
   const eventIndex = Math.min(specialEventOffset.value, entries.length)
   const eventWave = WAVE_PROFILE[(eventIndex + 2) % WAVE_PROFILE.length]
   entries.splice(eventIndex, 0, {
@@ -2299,6 +2331,83 @@ onUnmounted(() => {
   z-index: 4;
 }
 
+.scenic-dish-stage.is-midnight-station .tide-slot.is-station-node {
+  position: relative;
+  z-index: 3;
+  width: clamp(126px, 7.5vw, 176px);
+  flex-basis: clamp(126px, 7.5vw, 176px);
+  padding-top: clamp(176px, 19vh, 224px);
+}
+
+.scenic-dish-stage.is-midnight-station .station-route-node {
+  position: relative;
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 12px 10px 52px;
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  color: var(--station-text-primary);
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, .06), transparent 42%),
+    linear-gradient(180deg, #26332e, #111816);
+  border: 1px solid var(--station-accent-line-strong);
+  border-radius: 4px 4px 12px 4px;
+  box-shadow: 0 8px 0 #080d0b, 0 14px 18px rgba(0, 0, 0, .36);
+  transform: perspective(500px) rotateX(4deg);
+}
+
+.scenic-dish-stage.is-midnight-station .station-route-node strong,
+.scenic-dish-stage.is-midnight-station .station-route-node small {
+  font-family: var(--station-font-number);
+  white-space: nowrap;
+}
+.scenic-dish-stage.is-midnight-station .station-route-node strong {
+  color: var(--station-accent);
+  font-size: 14px;
+  letter-spacing: .1em;
+}
+.scenic-dish-stage.is-midnight-station .station-route-node small {
+  color: var(--station-text-secondary);
+  font-size: 8px;
+  letter-spacing: .06em;
+}
+
+.scenic-dish-stage.is-midnight-station .station-route-node__signal {
+  position: absolute;
+  left: 11px;
+  top: 13px;
+  width: 28px;
+  padding: 6px 4px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  border: 1px solid #657269;
+  border-radius: 4px;
+  background: #070b0a;
+}
+.scenic-dish-stage.is-midnight-station .station-route-node__signal i {
+  width: 10px;
+  height: 10px;
+  display: block;
+  border-radius: 50%;
+  background: #26312d;
+  box-shadow: inset 0 1px 2px #000;
+}
+.scenic-dish-stage.is-midnight-station .station-route-node__signal i:nth-child(2) { background: var(--station-accent); box-shadow: 0 0 8px rgba(211, 169, 78, .62); }
+.scenic-dish-stage.is-midnight-station .station-route-node__switch {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -15px;
+  height: 5px;
+  border: 1px solid #839087;
+  border-radius: 50%;
+  background: #1b2521;
+  box-shadow: 0 4px 0 #080c0b;
+}
+
 .scenic-dish-stage.is-midnight-station .tide-slot:not(.is-queue-event) {
   padding-top: clamp(84px, 11vh, 132px);
 }
@@ -2345,9 +2454,14 @@ onUnmounted(() => {
   height: 132px;
   display: block;
   border-radius: 50%;
-  background: var(--station-surface-elevated);
-  box-shadow: 0 10px 0 var(--station-surface-muted), 0 17px 20px rgba(8, 12, 10, 0.38);
-  transform: translateX(-50%) perspective(720px) rotateX(9deg);
+  background:
+    linear-gradient(180deg, #fffaf0 0 42%, #d1c5ad 66%, #8d836f 100%);
+  box-shadow:
+    0 4px 0 #eee5d1,
+    0 10px 0 #a79b85,
+    0 14px 0 #554f44,
+    0 21px 24px rgba(4, 8, 7, 0.5);
+  transform: translateX(-50%) perspective(720px) rotateX(12deg);
   transform-origin: center bottom;
   transition: transform var(--station-motion-fast) var(--station-easing-standard),
     box-shadow var(--station-motion-fast) ease;
@@ -2359,18 +2473,41 @@ onUnmounted(() => {
   display: block;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse at 50% 38%, rgba(255, 255, 255, 0.72), transparent 46%),
-    radial-gradient(ellipse at 50% 64%, var(--station-surface-muted) 0 52%, #C2B6A1 68%, #A99D89 100%);
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.62), inset 0 -8px 12px rgba(32, 39, 37, 0.18);
+    radial-gradient(ellipse at 42% 24%, rgba(255, 255, 255, 0.92), transparent 24%),
+    radial-gradient(ellipse at 50% 62%, #eee6d5 0 48%, #c7baa0 64%, #8d826e 100%);
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.72), inset 0 -10px 14px rgba(32, 39, 37, 0.2);
 }
 
 .scenic-dish-stage.is-midnight-station .station-dish-plate__rim {
   position: absolute;
   inset: 5px;
   display: block;
-  border: 4px solid var(--station-surface);
+  border: 4px solid #f4ecd9;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px rgba(109, 119, 107, 0.52);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate__well {
+  position: absolute;
+  inset: 22px 17%;
+  display: block;
+  border: 2px solid rgba(100, 91, 73, 0.28);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, .08) 0 54%, rgba(91, 81, 65, .12) 56% 100%);
+  box-shadow: inset 0 5px 9px rgba(78, 68, 53, .18), 0 1px rgba(255, 255, 255, .7);
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-plate__glaze {
+  position: absolute;
+  left: 19%;
+  top: 16px;
+  width: 40%;
+  height: 18px;
+  display: block;
+  border-radius: 50%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .7), transparent);
+  opacity: .72;
+  transform: rotate(-8deg);
 }
 
 .scenic-dish-stage.is-midnight-station .station-dish-plate__contact-shadow {
@@ -2389,8 +2526,8 @@ onUnmounted(() => {
 
 .scenic-dish-stage.is-midnight-station .tide-dish:hover .station-dish-plate,
 .scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-dish-plate {
-  box-shadow: 0 13px 0 var(--station-surface-muted), 0 22px 24px rgba(8, 12, 10, 0.46);
-  transform: translateX(-50%) perspective(720px) rotateX(9deg) scale(1.015);
+  box-shadow: 0 5px 0 #eee5d1, 0 11px 0 #a79b85, 0 15px 0 #554f44, 0 25px 28px rgba(4, 8, 7, .56);
+  transform: translateX(-50%) perspective(720px) rotateX(12deg) translateY(-2px) scale(1.012);
 }
 
 .scenic-dish-stage.is-midnight-station .station-dish-cradle {
@@ -2398,15 +2535,17 @@ onUnmounted(() => {
   left: 50%;
   top: 151px;
   z-index: 2;
-  width: 70%;
-  height: 26px;
+  width: 72%;
+  height: 30px;
   display: block;
-  border-top: 3px solid #8B938B;
-  border-bottom: 3px solid #3B4740;
-  border-radius: 48%;
-  background: linear-gradient(180deg, #8E9890, #29352F 58%, #161D1A);
-  box-shadow: 0 5px 0 rgba(14, 18, 17, 0.46), inset 0 2px 0 rgba(247, 242, 232, 0.3);
-  transform: translateX(-50%) perspective(700px) rotateX(26deg);
+  border-top: 3px solid #a4aea6;
+  border-bottom: 4px solid #111815;
+  border-radius: 42% 42% 22% 22%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 11%, rgba(211, 169, 78, .26) 11.5% 12.5%, transparent 13% 25%),
+    linear-gradient(180deg, #87938b 0 18%, #3a4841 22% 55%, #141b18 100%);
+  box-shadow: 0 6px 0 rgba(4, 8, 7, 0.64), 0 12px 16px rgba(4, 8, 7, .42), inset 0 2px 0 rgba(247, 242, 232, 0.34);
+  transform: translateX(-50%) perspective(700px) rotateX(28deg);
   transition: border-color var(--station-motion-fast) ease,
     filter var(--station-motion-fast) ease;
 }
@@ -2428,17 +2567,42 @@ onUnmounted(() => {
 
 .scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel {
   position: absolute;
-  top: 16px;
-  width: 9px;
-  height: 9px;
+  top: 19px;
+  width: 11px;
+  height: 11px;
   display: block;
   border: 2px solid #8B938B;
   border-radius: 50%;
-  background: #151A19;
+  background: conic-gradient(from 20deg, #151a19 0 20%, #d3a94e 21% 29%, #151a19 30% 70%, #7e8d84 71% 80%, #151a19 81%);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, .65);
 }
 
 .scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel--left { left: 20%; }
 .scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel--right { right: 20%; }
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle__contact {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: -11px;
+  height: 7px;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(219, 178, 82, .52), rgba(0, 0, 0, 0) 72%);
+  opacity: .64;
+}
+
+.scenic-dish-stage.is-midnight-station .station-dish-cradle__signal {
+  position: absolute;
+  right: 10%;
+  top: 8px;
+  width: 7px;
+  height: 7px;
+  display: block;
+  border-radius: 50%;
+  background: var(--station-success);
+  box-shadow: 0 0 7px rgba(142, 175, 120, .72);
+}
 
 .scenic-dish-stage.is-midnight-station .tide-dish:hover .station-dish-cradle,
 .scenic-dish-stage.is-midnight-station .tide-dish:focus-visible .station-dish-cradle {
@@ -2600,12 +2764,37 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-midnight-station .tide-dish.is-station-pressed {
-  transform: translateY(1px) scale(0.985) !important;
+  transform: translateY(1px) scale(0.96) !important;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .scenic-dish-stage.is-midnight-station .tide-dish {
+    animation: station-carriage-roll var(--bob-duration) ease-in-out var(--float-delay) infinite;
+  }
+
+  .scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel {
+    animation: station-carriage-wheel 1.8s linear infinite;
+  }
+
+  .scenic-dish-stage.is-midnight-station .station-dish-cradle__contact {
+    animation: station-contact-breathe 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes station-carriage-roll {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(.15deg); }
+  38% { transform: translate3d(0, -2px, 0) rotate(-.2deg); }
+  58% { transform: translate3d(0, 1px, 0) rotate(.12deg); }
+}
+
+@keyframes station-carriage-wheel { to { transform: rotate(360deg); } }
+@keyframes station-contact-breathe { 0%, 100% { opacity: .42; transform: scaleX(.88); } 50% { opacity: .72; transform: scaleX(1); } }
 
 @media (prefers-reduced-motion: reduce) {
   .scenic-dish-stage.is-midnight-station .station-dish-plate,
   .scenic-dish-stage.is-midnight-station .station-dish-cradle,
+  .scenic-dish-stage.is-midnight-station .station-dish-cradle__wheel,
+  .scenic-dish-stage.is-midnight-station .station-dish-cradle__contact,
   .scenic-dish-stage.is-midnight-station .tide-dish__image,
   .scenic-dish-stage.is-midnight-station .station-dish-ticket {
     transition: none;

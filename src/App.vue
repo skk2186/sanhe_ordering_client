@@ -56,6 +56,16 @@ window.addEventListener('offline', () => {
 </script>
 
 <style lang="scss">
+:root {
+  background: #0e1211;
+}
+
+html.is-theme-token-swap *,
+html.is-theme-token-swap *::before,
+html.is-theme-token-swap *::after {
+  transition: none !important;
+}
+
 .app-container {
   width: 100%;
   min-height: 100vh;

@@ -19,6 +19,7 @@ html[data-theme='midnight-station'] {
   --station-primary-strong: #7E2C28;
   --station-secondary: #31584D;
   --station-accent: #D3A94E;
+  --station-accent-bright: #F0D477;
   --station-text-primary: #F6F0E5;
   --station-text-on-surface: #202725;
   --station-text-secondary: #BEB8AA;
@@ -41,6 +42,10 @@ html[data-theme='midnight-station'] {
   --station-accent-line: rgba(211, 169, 78, 0.38);
   --station-accent-line-strong: rgba(211, 169, 78, 0.78);
   --station-accent-inset: rgba(211, 169, 78, 0.42);
+  --station-metal-highlight: #AAB4AC;
+  --station-metal-mid: #59665D;
+  --station-metal-deep: #171E1A;
+  --station-window-warm: rgba(239, 190, 91, 0.48);
   --station-secondary-soft: rgba(49, 88, 77, 0.12);
   --station-veil-deep: rgba(14, 18, 17, 0.96);
   --station-veil-mid: rgba(14, 18, 17, 0.7);
@@ -217,6 +222,34 @@ html[data-theme='midnight-station'] .top-progress {
 
 html[data-theme='midnight-station'] .bottom-section {
   gap: 30px;
+  position: relative;
+  background:
+    linear-gradient(90deg, transparent 0 3%, rgba(211, 169, 78, .4) 3.1% 3.35%, transparent 3.5% 96.5%, rgba(211, 169, 78, .4) 96.65% 96.9%, transparent 97%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 96px),
+    linear-gradient(180deg, rgba(50, 63, 57, .58), rgba(17, 24, 21, .92) 20%, #0d1210 100%);
+  border-top: 1px solid rgba(211, 169, 78, .38);
+  box-shadow: inset 0 8px 22px rgba(0, 0, 0, .34);
+}
+
+html[data-theme='midnight-station'] .bottom-section::before {
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  top: 8px;
+  height: 4px;
+  content: '';
+  background: repeating-linear-gradient(90deg, var(--station-accent) 0 34px, #202a26 34px 68px);
+  opacity: .45;
+  pointer-events: none;
+}
+
+html[data-theme='midnight-station'] ::-webkit-scrollbar-track { background: #111816; }
+html[data-theme='midnight-station'] ::-webkit-scrollbar-thumb { background: #786a43; }
+
+html[data-theme='midnight-station'] button:focus-visible,
+html[data-theme='midnight-station'] [role='button']:focus-visible {
+  outline: 2px solid var(--station-accent-bright);
+  outline-offset: 3px;
 }
 
 @media (max-width: 768px) {

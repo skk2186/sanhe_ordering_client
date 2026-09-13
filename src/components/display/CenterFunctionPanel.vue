@@ -1,7 +1,8 @@
 <template>
   <div class="bottom-center" :class="{ 'is-midnight-station': themeKey === 'midnight-station' }">
+    <span v-if="themeKey === 'midnight-station'" class="station-console-label" aria-hidden="true">STATION SERVICE · 03</span>
     <div class="center-layout">
-      <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left')">
+      <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'left', $event)">
         <el-icon class="function-glyph" aria-hidden="true"><Menu /></el-icon>
         <span class="function-label">{{ $t('common.menu') }}</span>
       </button>
@@ -31,7 +32,7 @@
           </button>
         </div>
       </div>
-      <button class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right')">
+      <button class="menu-btn right-menu" type="button" :aria-label="$t('common.menu')" @click="$emit('open-detail-menu', 'right', $event)">
         <el-icon class="function-glyph" aria-hidden="true"><Menu /></el-icon>
         <span class="function-label">{{ $t('common.menu') }}</span>
       </button>
@@ -144,13 +145,47 @@ defineEmits([
 /* Midnight Station control console. The existing buttons and emitted events
    remain unchanged; only their presentation becomes a compact station desk. */
 .bottom-center.is-midnight-station {
-  background: var(--station-background-deep);
+  position: relative;
+  padding-top: 22px;
+  background:
+    radial-gradient(circle at 50% 110%, rgba(211, 169, 78, .15), transparent 46%),
+    linear-gradient(180deg, #17211e, var(--station-background-deep));
   border: 1px solid var(--station-border);
   border-radius: var(--station-radius-panel);
-  box-shadow: var(--station-shadow-e1);
+  box-shadow: inset 0 3px 0 rgba(211, 169, 78, .13), var(--station-shadow-e1);
+
+  &::before,
+  &::after {
+    position: absolute;
+    bottom: 10px;
+    width: 26px;
+    height: 26px;
+    content: '';
+    border: 1px solid rgba(211, 169, 78, .42);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--station-accent) 0 12%, #27342f 14% 48%, #0b100e 50%);
+    box-shadow: 0 0 12px rgba(211, 169, 78, .12);
+    pointer-events: none;
+  }
+  &::before { left: 10px; }
+  &::after { right: 10px; }
+
+  .station-console-label {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    color: var(--station-accent);
+    font-family: var(--station-font-number);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
 
   .center-layout {
     gap: var(--station-space-2);
+    height: calc(100% - 10px);
   }
 
   .menu-btn,
@@ -177,7 +212,7 @@ defineEmits([
 
     &:active {
       background-color: var(--station-surface-muted);
-      transform: translateY(1px);
+      transform: scale(0.96);
       box-shadow: var(--station-shadow-pressed);
     }
   }
@@ -233,12 +268,20 @@ defineEmits([
   .menu-btn,
   .function-btn {
     background-color: var(--station-paper-ghost);
-    box-shadow: none;
+    box-shadow: inset 0 1px 0 rgba(247, 242, 232, .08), 0 3px 0 rgba(0, 0, 0, .28);
 
     &::after { color: var(--station-text-primary); }
   }
 
-  .menu-btn { background-color: var(--station-secondary); }
+  .menu-btn {
+    background:
+      linear-gradient(155deg, rgba(255, 255, 255, .08), transparent 42%),
+      var(--station-secondary);
+    border-radius: 8px 3px 8px 3px;
+  }
+  .left-menu { transform: rotate(-.6deg); }
+  .right-menu { transform: rotate(.6deg); }
+  .function-btn:nth-child(2) { border-radius: 3px 8px 3px 8px; }
   .function-btn:hover,
   .function-btn:focus-visible {
     background-color: var(--station-surface);
