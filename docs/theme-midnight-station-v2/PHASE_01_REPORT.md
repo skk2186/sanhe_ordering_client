@@ -3,9 +3,11 @@
 ## 1. 状态摘要
 
 - 当前分支：`themev2`
-- 当前 HEAD：`a9331f281ee8752c70b4ccf6665aa678dc91c237`
-- 正式基线：`master` / `b1a9028a460592fa2e0f76d5265a60f02f1647a6`
-- 失败案例：`themev1` / `1fc5e9cba14c068b617b1ef899c8093d70549263`
+- Phase01 implementation base / pre-report HEAD：`a9331f281ee8752c70b4ccf6665aa678dc91c237`
+- Phase01 reviewed commit：`fcb7640030084c443dc2fd9cdd31efcb888fae37`
+- master baseline：`b1a90285f904c505b9f293ebfa858cee18e8da75`
+- themev1 audit target：`1fc5e9ce7465ba06d851dd89f6cfa3c24e4aef1c`
+- documentation-fix commit：本报告随本次文档修复提交更新；最终 SHA 见交付记录（避免在提交内容中自引用）
 - 本阶段类型：研究、审计、视觉基准、资产规划和可实现性验证
 - 业务组件改动：无
 - 旧主题改动：无

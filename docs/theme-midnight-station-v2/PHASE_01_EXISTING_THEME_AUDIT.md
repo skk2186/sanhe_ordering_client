@@ -5,9 +5,10 @@
 - 仓库：`skk2186/sanhe_ordering_client`
 - 工作分支：`themev2`
 - 本轮只读参考：`master`、`themev1`
-- 正式基线：`master`（`b1a9028a460592fa2e0f76d5265a60f02f1647a6`）
-- 失败案例：`themev1`（`1fc5e9cba14c068b617b1ef899c8093d70549263`）
-- V2 起始 HEAD：`a9331f281ee8752c70b4ccf6665aa678dc91c237`
+- master baseline：`b1a90285f904c505b9f293ebfa858cee18e8da75`
+- themev1 audit target：`1fc5e9ce7465ba06d851dd89f6cfa3c24e4aef1c`
+- Phase01 implementation base / pre-report HEAD：`a9331f281ee8752c70b4ccf6665aa678dc91c237`
+- Phase01 reviewed commit：`fcb7640030084c443dc2fd9cdd31efcb888fae37`
 
 实际阅读了下列组件的模板、脚本、样式和资源引用，而不是只检查文件名：
 
