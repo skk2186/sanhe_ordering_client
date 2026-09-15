@@ -297,7 +297,8 @@ const SCENES = {
       '/images/ui/midnight-station/special-express-body-v2.webp',
       '/images/ui/midnight-station/special-express-lower-mask.webp',
       '/images/ui/midnight-station/special-wheel.webp',
-      '/images/ui/midnight-station/special-driving-rod.webp'
+      '/images/ui/midnight-station/special-driving-rod.webp',
+      '/images/ui/midnight-station/platform-service-counter-v1.png'
     ]
   }
 }
@@ -1641,6 +1642,65 @@ onUnmounted(() => {
 .bottom-section {
   position: relative;
   z-index: 10;
+}
+
+/* Midnight-only outer facilities. The static station remains background-v3;
+   these surfaces are deliberately compact so they read as mounted equipment. */
+[data-theme="midnight-station"] .conveyor-display {
+  color: #fff0c2;
+  background-color: #07111d;
+
+  .top-scene-banner {
+    gap: clamp(14px, 1vw, 28px);
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .top-scene-banner::before { display: none; }
+
+  .brand-lockup {
+    align-self: center;
+    max-width: 500px;
+    min-height: 112px;
+    box-sizing: border-box;
+    padding: 16px 28px 16px 34px;
+    border: 1px solid rgba(204, 159, 81, .78);
+    border-left: 9px solid #29483d;
+    border-radius: 3px;
+    background: linear-gradient(105deg, rgba(18, 37, 33, .94), rgba(12, 25, 24, .88));
+    box-shadow: inset 0 2px 0 rgba(255, 226, 150, .14), 0 7px 16px rgba(0, 0, 0, .35);
+  }
+  .brand-kicker { color: #d99b4a; font-size: clamp(13px, .7vw, 17px); letter-spacing: .18em; }
+  .brand-lockup strong { color: #fff1c8; font-size: clamp(30px, 1.65vw, 40px); letter-spacing: .03em; }
+  .brand-table { color: #e5d7bc; font-size: clamp(17px, .88vw, 22px); letter-spacing: .08em; }
+
+  .top-progress { align-self: center; display: grid; place-items: center; }
+  .top-progress :deep(.is-midnight-progress) {
+    width: min(1040px, 100%) !important;
+    height: 112px;
+    min-height: 0;
+    flex: 0 0 auto;
+    aspect-ratio: 1040 / 112 !important;
+  }
+  .assistant-slot { align-self: center; min-width: 0; padding: 0; }
+
+  .middle-section > .product-state {
+    color: #2d2a20;
+    background: #e5d7bc;
+    border-color: #9e7a43;
+    border-radius: 3px;
+    backdrop-filter: none;
+  }
+}
+
+@media (min-width: 1921px) {
+  [data-theme="midnight-station"] .conveyor-display {
+    .top-scene-banner { grid-template-columns: minmax(470px, .7fr) minmax(760px, 1.05fr) minmax(960px, 1.25fr); }
+    .brand-lockup { max-width: 570px; min-height: 136px; padding: 19px 32px 18px 38px; }
+    .assistant-slot :deep(.assistant-recommendation-rail) { margin-right: 10px; }
+    .top-progress :deep(.is-midnight-progress) { height: 124px; aspect-ratio: 1040 / 124 !important; }
+  }
 }
 
 .middle-section > .product-state {

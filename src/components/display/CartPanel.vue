@@ -1,5 +1,5 @@
 <template>
-  <div class="cart-section">
+  <div class="cart-section is-midnight-cart">
 
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
@@ -10,17 +10,22 @@
     </div>
 
     <div class="item-group" v-if="!tipsType">
-      <div :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]" type="button"
+      <button :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]"
           :style="'order: ' + (side ==='left' ? '1' : '0') "
-          :aria-label="`${$t('common.placeOrder')}-${side}`" :aria-disabled="submitting"
-          :title="$t('common.placeOrder')" @click="!submitting && $emit('place-order', side)">
+          :aria-label="`${$t('common.placeOrder')}-${side}`" :disabled="submitting"
+          :title="$t('common.placeOrder')" @click="$emit('place-order', side)">
         <el-icon v-if="submitting" class="submitting-icon"><Loading /></el-icon>
-        <div v-else class="order-progress">{{ count }}/4</div>
-      </div>
+        <template v-else>
+          <span class="order-label">{{ $t('common.placeOrder') }}</span>
+          <span class="order-progress">{{ count }}/4</span>
+          <span class="order-total">¥ {{ totalPrice }}</span>
+        </template>
+      </button>
 
       <!-- 购物车圆形显示 -->
       <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" :class="'cart-item cart-item-'+side">
-        <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" @click="$emit('select', side, index)">
+        <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" role="button" tabindex="0"
+          @click="$emit('select', side, index)" @keydown.enter="$emit('select', side, index)" @keydown.space.prevent="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
             <img :src="item.image" :alt="item.name" />
           </div>
@@ -68,6 +73,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['place-order', 'remove', 'increase', 'decrease', 'select', 'close-tips'])
+const totalPrice = computed(() => props.items.reduce((total, item) => {
+  if (!item) return total
+  const unit = Number(item.price ?? item.storePrice ?? item.unitPrice ?? 0)
+  return total + unit * Number(item.quantity ?? 0)
+}, 0).toFixed(2))
 
 // 处理提示点击事件
 const handleTipsClick = () => {
@@ -397,6 +407,87 @@ const handleTipsClick = () => {
 }
 
 .w3-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
+
+/* Midnight Station: the carts are staffed luggage / meal-ticket counters.
+   Every selector is rooted at the document theme so legacy skins stay intact. */
+[data-theme="midnight-station"] .is-midnight-cart {
+  padding: clamp(17px, 1.15vw, 24px) clamp(20px, 1.4vw, 30px) 14px;
+  overflow: visible;
+  background: url('/images/ui/midnight-station/platform-service-counter-v1.png') center / 100% 128% no-repeat;
+
+  .item-group {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(10px, .95vw, 26px);
+  }
+
+  .cart-item {
+    width: clamp(112px, 7.3vw, 146px);
+    height: 175px;
+    gap: 0;
+  }
+
+  .item-circle {
+    width: clamp(88px, 5.8vw, 116px);
+    height: clamp(72px, 4.6vw, 92px);
+    box-sizing: border-box;
+    border: 2px solid rgba(209, 168, 91, .64);
+    border-radius: 8px 8px 5px 5px;
+    background: linear-gradient(180deg, rgba(9, 26, 27, .92), rgba(31, 54, 48, .88));
+    box-shadow: inset 0 2px 0 rgba(255, 229, 164, .12), 0 7px 10px rgba(0, 0, 0, .3);
+
+    &:hover { transform: translateY(-2px); box-shadow: inset 0 2px 0 rgba(255, 229, 164, .18), 0 10px 16px rgba(0, 0, 0, .42); }
+    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
+    &.empty-item::after { color: rgba(242, 201, 120, .62); font-size: 28px; }
+  }
+
+  .item-image img { width: 88%; height: 88%; object-fit: contain; }
+  .circle-close-btn {
+    top: -12px; right: -12px; width: 32px; height: 32px;
+    border: 2px solid #e5d7bc; border-radius: 50%;
+    background: #6f302b; color: #fff6df; box-shadow: 0 3px 7px rgba(0, 0, 0, .45);
+    &:hover:not(:disabled) { background: #8c3d34; transform: scale(1.06); }
+    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 2px; }
+  }
+
+  .item-info {
+    width: calc(100% - 2px);
+    margin-top: -3px;
+    border: 1px solid rgba(79, 57, 35, .7);
+    border-radius: 0 0 5px 5px;
+    background: #e5d7bc;
+    box-shadow: 0 4px 7px rgba(0, 0, 0, .25);
+  }
+  .item-name-area { height: 32px; padding: 1px 6px; line-height: 30px; color: #2b2921; font-size: clamp(15px, .9vw, 22px); font-weight: 800; }
+  .item-controls { height: 34px; padding: 0 7px; color: #172924; }
+  .quantity-display { min-width: 2ch; font-size: clamp(17px, 1vw, 24px); font-weight: 900; }
+  .item-controls .minus-btn,
+  .item-controls .plus-btn {
+    width: 30px; height: 28px; border: 1px solid #5b452d; border-radius: 3px;
+    background: linear-gradient(#d9b56b, #a97936); color: #1a241f; font-size: 19px;
+    box-shadow: inset 0 1px 0 rgba(255, 239, 185, .65);
+    &:hover:not(.empty-btn) { background: linear-gradient(#f2c978, #bd8436); transform: translateY(-1px); }
+    &:focus-visible { outline: 3px solid #203833; outline-offset: 2px; }
+  }
+
+  .order-btn {
+    width: clamp(112px, 7vw, 138px); height: 158px; box-sizing: border-box; padding: 12px 8px 10px;
+    display: grid; place-content: center; gap: 5px;
+    border: 2px solid #c89b50; border-radius: 5px;
+    color: #fff1c8; background: linear-gradient(145deg, #28443b, #102620 58%, #1e332c);
+    box-shadow: inset 0 2px 0 rgba(255, 225, 153, .18), 0 7px 12px rgba(0, 0, 0, .35);
+    font-family: inherit; cursor: pointer;
+    &:hover:not(:disabled) { transform: translateY(-2px); border-color: #f2c978; }
+    &:active:not(:disabled) { transform: translateY(1px); }
+    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
+    &:disabled { cursor: wait; opacity: .68; }
+  }
+  .order-label { font-size: clamp(18px, 1.1vw, 26px); font-weight: 900; letter-spacing: .06em; }
+  .order-progress { position: static; padding: 0; font-size: clamp(19px, 1.15vw, 28px); font-weight: 800; line-height: 1; }
+  .order-total { color: #e5d7bc; font-size: clamp(14px, .8vw, 19px); font-weight: 700; }
+}
 
 @media (min-width: 769px) and (max-width: 1920px) {
   .cart-section {

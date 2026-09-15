@@ -270,14 +270,50 @@ const flickSamples = []
 // cycleWidth 缓存：避免滚动循环每帧读 offsetWidth 触发强制同步布局
 let streamCycleWidth = 0
 let streamResizeObserver = null
+let streamResizeTimer = 0
+let streamGeometryRatio = null
 
 const invalidateCycleWidth = () => {
   streamCycleWidth = 0
 }
 
 const observeStreamSize = () => {
-  if (!streamResizeObserver || !streamRef.value) return
-  streamResizeObserver.observe(streamRef.value)
+  if (!streamResizeObserver) return
+  if (streamRef.value) streamResizeObserver.observe(streamRef.value)
+  if (tideStageRef.value) streamResizeObserver.observe(tideStageRef.value)
+}
+
+/* A device-toolbar resize changes the clamp()-driven slot widths. The old
+   implementation only invalidated the cache, so a scrollLeft from the old
+   cycle could point into the blank area of the new three-cycle track. Keep
+   the modulo position, then remap it after the layout has settled. */
+const queueStreamGeometryRecalculation = () => {
+  const stream = streamRef.value
+  if (!stream) return
+  if (streamGeometryRatio === null) {
+    const previousCycleWidth = streamCycleWidth || getStreamCycleWidth()
+    if (previousCycleWidth > 0) {
+      const previousOffset = ((stream.scrollLeft % previousCycleWidth) + previousCycleWidth) % previousCycleWidth
+      streamGeometryRatio = previousOffset / previousCycleWidth
+    } else {
+      streamGeometryRatio = 0
+    }
+  }
+  invalidateCycleWidth()
+  window.clearTimeout(streamResizeTimer)
+  streamResizeTimer = window.setTimeout(() => {
+    window.requestAnimationFrame(() => {
+      const currentStream = streamRef.value
+      const currentCycleWidth = getStreamCycleWidth()
+      if (currentStream && currentCycleWidth > 0) {
+        currentStream.scrollLeft = currentCycleWidth + currentCycleWidth * (streamGeometryRatio ?? 0)
+        normalizeStreamPosition()
+        lastScrollSample = null
+        lastFrameTime = performance.now()
+      }
+      streamGeometryRatio = null
+    })
+  }, 90)
 }
 
 // 高采样率触控屏上指针事件可能被合并下发，用 getCoalescedEvents 补全中间点，
@@ -870,8 +906,8 @@ onMounted(() => {
   randomizeSpecialEventOffset()
   triggerSceneEntry()
   if (window.ResizeObserver) {
-    // 容器尺寸变化（含窗口缩放）会使 clamp() 槽距变化，届时失效循环宽度缓存
-    streamResizeObserver = new ResizeObserver(() => { invalidateCycleWidth() })
+    // 容器尺寸变化（含 Device Toolbar 手动 viewport）会重建 clamp() 槽距。
+    streamResizeObserver = new ResizeObserver(queueStreamGeometryRecalculation)
     observeStreamSize()
   }
   resetStreamPosition()
@@ -882,6 +918,7 @@ onMounted(() => {
 onUnmounted(() => {
   streamResizeObserver?.disconnect()
   streamResizeObserver = null
+  window.clearTimeout(streamResizeTimer)
   window.cancelAnimationFrame(streamFrameId)
   window.clearTimeout(categoryClickTimer)
   window.clearTimeout(streamClickTimer)
@@ -941,13 +978,29 @@ onUnmounted(() => {
   display: none;
 }
 
+.scenic-dish-stage.is-midnight-theme .tide-toolbar {
+  bottom: 6px;
+  min-height: 62px;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(213, 163, 77, .62);
+  border-bottom: 1px solid rgba(3, 13, 13, .82);
+  background: linear-gradient(90deg, rgba(11, 28, 27, .84), rgba(28, 52, 45, .74), rgba(11, 28, 27, .84));
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .35);
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-categories {
+  gap: 7px;
+  padding: 0;
+}
+
 .scenic-dish-stage.is-midnight-theme .tide-categories button,
 .scenic-dish-stage.is-midnight-theme .tide-pause {
   color: #fff5df;
   background: rgba(16, 27, 36, .94);
   border-color: rgba(217, 155, 74, .72);
-  border-radius: 6px;
-  box-shadow: 0 7px 15px rgba(1, 7, 12, .44);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 225, 149, .12), 0 5px 11px rgba(1, 7, 12, .44);
   backdrop-filter: none;
 }
 
@@ -964,6 +1017,8 @@ onUnmounted(() => {
 .scenic-dish-stage.is-midnight-theme .tide-categories button.is-active {
   color: #07111d;
   background: #d99b4a;
+  border-color: #f2c978;
+  box-shadow: inset 0 1px 0 rgba(255, 247, 201, .7), 0 0 0 2px rgba(7, 17, 29, .56);
 }
 
 @keyframes scenic-stage-enter {
