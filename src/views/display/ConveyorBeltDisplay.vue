@@ -61,6 +61,11 @@
         @paused-change="assistantStreamPaused = $event"
         @featured-promo="handleFeaturedPromo"
       />
+      <div
+        v-if="activeSceneKey === 'midnight-station'"
+        class="midnight-foreground-occlusion"
+        aria-hidden="true"
+      ></div>
       <div v-if="productsLoading || productsError || !displaySushiData.length" class="product-state" role="status">
         <el-icon v-if="productsLoading" class="product-state-icon is-loading"><Loading /></el-icon>
         <template v-else-if="productsError">
@@ -287,8 +292,10 @@ const SCENES = {
     background: '/images/ui/midnight-station/background-v2.png',
     assets: [
       '/images/ui/midnight-station/background-v2.png',
+      '/images/ui/midnight-station/background-v2-foreground.png',
       '/images/ui/midnight-station/delivery-trolley.webp',
-      '/images/ui/midnight-station/special-express.webp'
+      '/images/ui/midnight-station/special-express.webp',
+      '/images/ui/midnight-station/special-wheel.webp'
     ]
   }
 }
@@ -1616,6 +1623,23 @@ onUnmounted(() => {
 }
 
 .middle-section :deep(.scenic-dish-stage) { height: 100%; }
+
+.midnight-foreground-occlusion {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  background: url('/images/ui/midnight-station/background-v2-foreground.png') center/cover no-repeat;
+  pointer-events: none;
+}
+
+.middle-section > :deep(.featured-dish-screen) {
+  z-index: 8;
+}
+
+.bottom-section {
+  position: relative;
+  z-index: 10;
+}
 
 .middle-section > .product-state {
   inset: 70px auto auto 50%;

@@ -10,6 +10,18 @@
         src="/images/ui/midnight-station/special-express.webp"
         alt=""
       />
+      <div class="midnight-express-pass__running-gear">
+        <img
+          v-for="wheel in wheels"
+          :key="wheel.id"
+          class="midnight-express-pass__wheel"
+          :class="wheel.kind"
+          :style="{ left: `${wheel.x}%`, top: `${wheel.y}%` }"
+          src="/images/ui/midnight-station/special-wheel.webp"
+          alt=""
+        />
+        <span class="midnight-express-pass__coupling-rod" aria-hidden="true"></span>
+      </div>
       <span class="midnight-express-pass__headlamp"></span>
       <span class="midnight-express-pass__window-glow"></span>
       <span v-for="index in 4" :key="index" class="midnight-express-pass__mist" :class="`mist-${index}`"></span>
@@ -31,6 +43,19 @@
 
 <script setup>
 import { computed } from 'vue'
+
+// One component is one complete train: a single locomotive followed by one
+// dining car. The eight wheel positions map to the existing one-piece artwork.
+const wheels = [
+  { id: 'loco-1', x: 6.7, y: 81.3, kind: 'is-driving' },
+  { id: 'loco-2', x: 15.4, y: 81.3, kind: 'is-driving' },
+  { id: 'loco-3', x: 26.2, y: 81.3, kind: 'is-driving' },
+  { id: 'loco-4', x: 33.9, y: 81.3, kind: 'is-driving' },
+  { id: 'car-1', x: 46.3, y: 81.5, kind: 'is-carriage' },
+  { id: 'car-2', x: 54.1, y: 81.5, kind: 'is-carriage' },
+  { id: 'car-3', x: 79.7, y: 81.5, kind: 'is-carriage' },
+  { id: 'car-4', x: 87.7, y: 81.5, kind: 'is-carriage' }
+]
 
 const props = defineProps({
   direction: { type: String, default: 'left' },
@@ -57,8 +82,8 @@ const handlePromoClick = () => {
 .midnight-express-pass {
   position: relative;
   width: 100%;
-  height: clamp(280px, 9.5vw, 380px);
-  margin-top: clamp(-120px, -3.2vw, -56px);
+  height: clamp(330px, 11.2vw, 430px);
+  margin-top: calc(clamp(78px, 4.66vw, 179px) * -1);
   pointer-events: none;
 }
 
@@ -80,7 +105,51 @@ const handlePromoClick = () => {
   user-select: none;
 }
 
+.midnight-express-pass__running-gear {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  aspect-ratio: 2172 / 481;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.midnight-express-pass__wheel {
+  position: absolute;
+  width: 5.1%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  transform: translate(-50%, -50%) rotate(var(--midnight-wheel-angle, 0deg));
+  filter: brightness(.82) saturate(.72) drop-shadow(0 2px 2px rgba(0, 0, 0, .5));
+  will-change: transform;
+}
+
+.midnight-express-pass__wheel.is-carriage {
+  width: 4.25%;
+  filter: brightness(.72) saturate(.58) drop-shadow(0 2px 2px rgba(0, 0, 0, .5));
+}
+
+/* This compact overlay provides the moving linkage; the body and its material
+   detail remain the raster train asset. */
+.midnight-express-pass__coupling-rod {
+  position: absolute;
+  left: 6.4%;
+  top: 80.7%;
+  width: 27.8%;
+  height: 2.25%;
+  border: 1px solid rgba(247, 196, 105, .72);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d1a04d 0%, #665533 45%, #231f18 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .65), inset 0 1px rgba(255, 229, 172, .35);
+  transform: translate3d(var(--midnight-rod-x, 0), var(--midnight-rod-y, 0), 0);
+  will-change: transform;
+}
+
 .is-reversed .midnight-express-pass__train {
+  transform: scaleX(-1);
+}
+
+.is-reversed .midnight-express-pass__running-gear {
   transform: scaleX(-1);
 }
 
@@ -212,5 +281,6 @@ const handlePromoClick = () => {
   .midnight-express-pass__window-glow,
   .midnight-express-pass__mist { animation: none; }
   .midnight-express-pass__mist { display: none; }
+  .midnight-express-pass__running-gear { display: none; }
 }
 </style>

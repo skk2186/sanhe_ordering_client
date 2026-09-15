@@ -257,6 +257,7 @@ let streamFrameId = 0
 let lastFrameTime = 0
 let inertiaVelocity = 0
 let inertiaTimeConstant = INERTIA_TAU_BASE
+let midnightWheelAngle = 0
 // (timeStamp, clientX) 采样环，只保留最近 FLICK_SAMPLE_WINDOW_MS 内的样本
 const flickSamples = []
 // cycleWidth 缓存：避免滚动循环每帧读 offsetWidth 触发强制同步布局
@@ -487,6 +488,21 @@ const normalizeStreamPosition = () => {
   }
 }
 
+// The express does not own horizontal motion. Translate the exact scroll delta
+// already produced by this stage into running-gear state, so auto travel,
+// pointer drag, wheel input, inertia, pause and direction always agree.
+const advanceMidnightRunningGear = (scrollDelta) => {
+  const stream = streamRef.value
+  if (!stream || themeKey.value !== 'midnight-station' || reducedMotion.value || !scrollDelta) return
+  // scrollLeft increasing moves scene content left; a left-moving wheel turns
+  // counter-clockwise. 5.6deg/px matches the rendered driving-wheel scale.
+  midnightWheelAngle = (midnightWheelAngle - scrollDelta * 5.6) % 360
+  const radians = midnightWheelAngle * Math.PI / 180
+  stream.style.setProperty('--midnight-wheel-angle', `${midnightWheelAngle.toFixed(2)}deg`)
+  stream.style.setProperty('--midnight-rod-x', `${(Math.cos(radians) * 3.2).toFixed(2)}px`)
+  stream.style.setProperty('--midnight-rod-y', `${(Math.sin(radians) * 2.1).toFixed(2)}px`)
+}
+
 const resetStreamPosition = async () => {
   await nextTick()
   const stream = streamRef.value
@@ -600,6 +616,7 @@ const runStreamFrame = (time) => {
 
   if (stream) {
     if (streamDrag.pendingScrollLeft !== null) {
+      advanceMidnightRunningGear(streamDrag.pendingScrollLeft - stream.scrollLeft)
       stream.scrollLeft = streamDrag.pendingScrollLeft
       streamDrag.pendingScrollLeft = null
       normalizeStreamPosition()
@@ -610,7 +627,11 @@ const runStreamFrame = (time) => {
     // never fights the conveyor's own motion.
     if (!isStreamDragging.value && streamDrag.pointerId === null) {
       let scrollDelta = 0
-      if (Math.abs(inertiaVelocity) > INERTIA_STOP_VELOCITY) {
+      if (streamMotionPaused.value) {
+        // A paused railway has no residual coasting and therefore no wheel or
+        // connecting-rod motion. User-driven dragging remains available.
+        inertiaVelocity = 0
+      } else if (Math.abs(inertiaVelocity) > INERTIA_STOP_VELOCITY) {
         scrollDelta += inertiaVelocity * deltaSeconds
         // v ← sign(v)·(|v|·e^(-dt/τ) − μ·dt)，τ 由松手初速决定：慢甩停得快，快甩滑得远
         const magnitude = Math.abs(inertiaVelocity) * Math.exp(-deltaSeconds / inertiaTimeConstant)
@@ -628,7 +649,10 @@ const runStreamFrame = (time) => {
         scrollDelta += directionFactor * 42 * normalizedSpeed.value * widthScale * deltaSeconds
       }
 
-      if (scrollDelta) stream.scrollLeft += scrollDelta
+      if (scrollDelta) {
+        advanceMidnightRunningGear(scrollDelta)
+        stream.scrollLeft += scrollDelta
+      }
       normalizeStreamPosition()
     }
   }
@@ -761,6 +785,7 @@ const handleStreamWheel = (event) => {
   if (!horizontalDelta) return
   if (event.cancelable) event.preventDefault()
   inertiaVelocity = 0
+  advanceMidnightRunningGear(horizontalDelta)
   stream.scrollLeft += horizontalDelta
   normalizeStreamPosition()
 }
@@ -1784,8 +1809,8 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-slot.is-queue-event {
-  width: clamp(1100px, 38vw, 1480px);
-  flex-basis: clamp(1100px, 38vw, 1480px);
+  width: clamp(1320px, 44vw, 1700px);
+  flex-basis: clamp(1320px, 44vw, 1700px);
   padding-top: var(--midnight-rail-drop);
 }
 
