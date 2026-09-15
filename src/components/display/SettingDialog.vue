@@ -280,10 +280,11 @@ const copy = computed(() => ({
   close: t('common.close')
 }))
 
-// 展示版只开放主题 B、C；主题 A 的旧缓存会在初始化时回退到主题 B。
+// 展示版开放两套既有主题与 Midnight Station；主题 A 的旧缓存仍回退到主题 B。
 const themeItem = [
   { title: "蜡笔小新·海滩", img: "/images/ui/b/background.png", key: 'zhenxian'},
-  { title: "海底贝壳", img: "/images/ui/c/background.png", key: 'xiaoxin' }
+  { title: "海底贝壳", img: "/images/ui/c/background.png", key: 'xiaoxin' },
+  { title: "午夜月台", img: "/images/ui/midnight-station/background-v2.png", key: 'midnight-station' }
 ]
 const availableThemeKeys = new Set(themeItem.map(item => item.key))
 const fallbackThemeKey = 'zhenxian'

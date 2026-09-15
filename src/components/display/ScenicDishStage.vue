@@ -8,6 +8,7 @@
       'is-chef-theme': themeKey === 'ailaotou',
       'is-beach-theme': themeKey === 'zhenxian',
       'is-underwater-theme': themeKey === 'xiaoxin',
+      'is-midnight-theme': themeKey === 'midnight-station',
       'is-scene-entering': sceneEntryActive
     }"
     :style="stageTimingStyle"
@@ -94,6 +95,24 @@
                 @dish-click="emitDishClick"
                 @featured-promo="emitFeaturedPromo"
               />
+              <MidnightExpressPass
+                v-else-if="entry.kind === 'event' && themeKey === 'midnight-station'"
+                :direction="direction"
+                :paused="streamMotionPaused || isStreamDragging"
+                :promo-item="promoTriggerItem"
+                :promo-content="promoTrigger"
+                @featured-promo="emitFeaturedPromo"
+              />
+              <MidnightDishTrolley
+                v-else-if="themeKey === 'midnight-station'"
+                :item="entry.item"
+                :direction="direction"
+                :recommended="recommendationIds.has(String(entry.item.id))"
+                :selected="selectedItemId !== null && String(entry.item.id) === String(selectedItemId)"
+                :sold-out="!isAvailable(entry.item)"
+                :paused="streamMotionPaused || isStreamDragging"
+                @dish-click="emitDishClick"
+              />
               <article
                 v-else
                 class="tide-dish"
@@ -148,6 +167,8 @@ import AmbientSceneEffects from '@/components/display/AmbientSceneEffects.vue'
 import BeachBoatPass from '@/components/display/BeachBoatPass.vue'
 import SeaTurtlePass from '@/components/display/SeaTurtlePass.vue'
 import StageSplashLayer from '@/components/display/StageSplashLayer.vue'
+import MidnightDishTrolley from '@/components/display/midnight/MidnightDishTrolley.vue'
+import MidnightExpressPass from '@/components/display/midnight/MidnightExpressPass.vue'
 import { findPromoForItem } from '@/config/promoContent'
 
 const props = defineProps({
@@ -853,6 +874,46 @@ onUnmounted(() => {
 .scenic-dish-stage.is-underwater-theme .tide-current::after {
   opacity: 0.72;
   filter: hue-rotate(14deg) saturate(0.8);
+}
+
+.scenic-dish-stage.is-midnight-theme {
+  --sea: #07111d;
+  --deep-sea: #203833;
+  --foam: #e5d7bc;
+  --sand: #f2c978;
+  --coral: #8c3d34;
+  --ink: #fff5df;
+  --stream-gap: clamp(72px, 3vw, 118px);
+  --midnight-rail-drop: clamp(230px, 24vh, 266px);
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-current {
+  display: none;
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-categories button,
+.scenic-dish-stage.is-midnight-theme .tide-pause {
+  color: #fff5df;
+  background: rgba(16, 27, 36, .94);
+  border-color: rgba(217, 155, 74, .72);
+  border-radius: 6px;
+  box-shadow: 0 7px 15px rgba(1, 7, 12, .44);
+  backdrop-filter: none;
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-categories button:hover,
+.scenic-dish-stage.is-midnight-theme .tide-categories button:focus-visible,
+.scenic-dish-stage.is-midnight-theme .tide-pause:hover,
+.scenic-dish-stage.is-midnight-theme .tide-pause:focus-visible {
+  color: #07111d;
+  background: #f2c978;
+  outline: 3px solid #fff5df;
+  outline-offset: 2px;
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-categories button.is-active {
+  color: #07111d;
+  background: #d99b4a;
 }
 
 @keyframes scenic-stage-enter {
@@ -1711,5 +1772,49 @@ onUnmounted(() => {
 
 .scenic-dish-stage .tide-slot:not(.is-queue-event) .tide-dish {
   animation: dish-bob var(--bob-duration) ease-in-out var(--float-delay) infinite;
+}
+
+/* Midnight Station uses the single, nearly horizontal delivery rail already
+   painted into background-v2.png. Only slot geometry changes; scrollLeft stays
+   the sole horizontal motion source for dishes and the express event. */
+.scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) {
+  width: clamp(286px, 9.35vw, 360px);
+  flex-basis: clamp(286px, 9.35vw, 360px);
+  padding-top: var(--midnight-rail-drop);
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-slot.is-queue-event {
+  width: clamp(1100px, 38vw, 1480px);
+  flex-basis: clamp(1100px, 38vw, 1480px);
+  padding-top: var(--midnight-rail-drop);
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-toolbar {
+  width: min(1880px, calc(100% - 48px));
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-categories button {
+  min-height: 52px;
+  padding: 11px 24px;
+  font-size: clamp(18px, .62vw, 24px);
+}
+
+.scenic-dish-stage.is-midnight-theme .tide-pause {
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
+}
+
+@media (min-width: 1921px) {
+  .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) {
+    width: 360px;
+    flex-basis: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) .tide-dish {
+    animation: none;
+  }
 }
 </style>

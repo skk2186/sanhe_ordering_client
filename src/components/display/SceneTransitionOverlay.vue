@@ -17,12 +17,23 @@
         <div class="beach-foam beach-foam--front"></div>
       </div>
 
-      <div v-else class="transition-collage transition-collage--ocean">
+      <div v-else-if="sceneKey === 'xiaoxin'" class="transition-collage transition-collage--ocean">
         <div class="underwater-light"></div>
         <div class="bubble-field">
           <span v-for="index in 12" :key="index" :style="bubbleStyle(index)"></span>
         </div>
         <span v-for="index in 7" :key="`animal-${index}`" class="ocean-animal-pile" :class="`ocean-animal-pile--${index}`" aria-hidden="true"></span>
+      </div>
+
+      <div v-else class="transition-collage transition-collage--midnight">
+        <div class="midnight-transition-light"></div>
+        <img
+          class="midnight-transition-train"
+          src="/images/ui/midnight-station/special-express.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <span v-for="index in 6" :key="`mist-${index}`" class="midnight-transition-mist" :class="`midnight-transition-mist--${index}`"></span>
       </div>
     </div>
   </div>
@@ -124,6 +135,12 @@ const bubbleStyle = (index) => ({
     linear-gradient(180deg, #168fbd 0%, #075c8f 48%, #063a70 100%);
 }
 
+.is-midnight-station .scene-transition-curtain {
+  background:
+    radial-gradient(circle at 52% 28%, rgba(217, 155, 74, .13), transparent 24%),
+    linear-gradient(180deg, #101b24 0%, #07111d 58%, #050b11 100%);
+}
+
 .is-covering.is-zhenxian .scene-transition-curtain {
   animation: beach-cover 1650ms cubic-bezier(0.52, 0.08, 0.22, 1) both;
 }
@@ -138,6 +155,14 @@ const bubbleStyle = (index) => ({
 
 .is-revealing.is-xiaoxin .scene-transition-curtain {
   animation: ocean-reveal 900ms cubic-bezier(0.42, 0, 0.18, 1) both;
+}
+
+.is-covering.is-midnight-station .scene-transition-curtain {
+  animation: midnight-cover 1650ms cubic-bezier(0.52, 0.08, 0.22, 1) both;
+}
+
+.is-revealing.is-midnight-station .scene-transition-curtain {
+  animation: midnight-reveal 900ms cubic-bezier(0.42, 0, 0.18, 1) both;
 }
 
 .is-covered .scene-transition-curtain {
@@ -182,6 +207,61 @@ const bubbleStyle = (index) => ({
   opacity: 0.7;
 }
 
+.midnight-transition-light {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 25%, rgba(242, 201, 120, .1) 48%, transparent 70%);
+  opacity: .8;
+}
+
+.midnight-transition-train {
+  position: absolute;
+  left: 50%;
+  bottom: 13%;
+  width: min(78vw, 2800px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 18px rgba(0, 0, 0, .68));
+  opacity: 0;
+  transform: translate3d(74vw, 0, 0);
+}
+
+.is-covering .midnight-transition-train {
+  animation: midnight-train-arrive 1650ms cubic-bezier(.18, .72, .24, 1) both;
+}
+
+.is-covered .midnight-transition-train {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.is-revealing .midnight-transition-train {
+  animation: midnight-train-depart 900ms ease-in both;
+}
+
+.midnight-transition-mist {
+  position: absolute;
+  bottom: 10%;
+  width: 18vw;
+  height: 5vw;
+  border-radius: 50%;
+  background: rgba(171, 190, 196, .13);
+  filter: blur(18px);
+  opacity: 0;
+}
+
+.midnight-transition-mist--1 { left: 8%; }
+.midnight-transition-mist--2 { left: 23%; }
+.midnight-transition-mist--3 { left: 38%; }
+.midnight-transition-mist--4 { left: 53%; }
+.midnight-transition-mist--5 { left: 68%; }
+.midnight-transition-mist--6 { left: 83%; }
+
+.is-covering .midnight-transition-mist,
+.is-covered .midnight-transition-mist {
+  opacity: .65;
+}
+
 .bubble-field span {
   position: absolute;
   left: var(--bubble-x);
@@ -214,6 +294,27 @@ const bubbleStyle = (index) => ({
   to { clip-path: circle(0 at 50% -10%); }
 }
 
+@keyframes midnight-cover {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes midnight-reveal {
+  from { clip-path: inset(0); }
+  to { clip-path: inset(0 0 0 100%); }
+}
+
+@keyframes midnight-train-arrive {
+  from { opacity: 0; transform: translate3d(74vw, 0, 0); }
+  18% { opacity: 1; }
+  to { opacity: 1; transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes midnight-train-depart {
+  from { opacity: 1; transform: translate3d(-50%, 0, 0); }
+  to { opacity: 0; transform: translate3d(-128vw, 0, 0); }
+}
+
 @keyframes transition-bubble-rise {
   0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.7); }
   18% { opacity: 0.82; }
@@ -235,5 +336,7 @@ const bubbleStyle = (index) => ({
 @media (prefers-reduced-motion: reduce) {
   .scene-transition-curtain { animation-duration: 1ms !important; }
   .bubble-field span { animation: none; }
+  .midnight-transition-train { animation-duration: 1ms !important; }
+  .midnight-transition-mist { display: none; }
 }
 </style>

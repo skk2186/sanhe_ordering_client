@@ -36,6 +36,11 @@ const EVENT_LIBRARY = {
     { type: 'bubble-cluster', duration: 4800, left: 16, top: 63 },
     { type: 'fish-shadow', duration: 3600, left: 78, top: 49 },
     { type: 'caustic', duration: 4000, left: 40, top: 34 }
+  ],
+  'midnight-station': [
+    { type: 'station-mist', duration: 6200, left: 24, top: 39 },
+    { type: 'station-mist', duration: 6800, left: 73, top: 41 },
+    { type: 'lamp-dust', duration: 5400, left: 53, top: 20 }
   ]
 }
 
@@ -142,6 +147,7 @@ onUnmounted(() => {
 .theme-ailaotou .ambient-event { color: rgba(255, 245, 220, 0.9); }
 .theme-zhenxian .ambient-event,
 .theme-xiaoxin .ambient-event { color: rgba(160, 225, 235, 0.88); }
+.theme-midnight-station .ambient-event { color: rgba(206, 218, 218, .32); }
 
 .ambient-event--steam {
   width: 108px;
@@ -253,6 +259,30 @@ onUnmounted(() => {
   animation-name: caustic-drift;
 }
 
+.ambient-event--station-mist {
+  width: min(32vw, 720px);
+  height: 56px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(190, 207, 210, .16);
+  filter: blur(18px);
+  opacity: 0;
+  animation-name: station-mist-drift;
+}
+
+.ambient-event--lamp-dust {
+  width: 260px;
+  height: 170px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 16% 68%, rgba(242, 201, 120, .48) 0 1px, transparent 2px),
+    radial-gradient(circle at 42% 32%, rgba(242, 201, 120, .36) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 57%, rgba(242, 201, 120, .42) 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 22%, rgba(242, 201, 120, .28) 0 1px, transparent 2px);
+  opacity: 0;
+  animation-name: lamp-dust-drift;
+}
+
 @keyframes steam-rise {
   0% { opacity: 0; transform: translate(-50%, -58%) scale(0.76); }
   22% { opacity: 0.92; }
@@ -302,6 +332,18 @@ onUnmounted(() => {
   0%, 100% { opacity: 0; transform: translate(-75%, -50%) rotate(-5deg); }
   38% { opacity: 0.7; }
   70% { opacity: 0.48; }
+}
+
+@keyframes station-mist-drift {
+  0% { opacity: 0; transform: translate(-64%, -50%) scaleX(.8); }
+  32% { opacity: .42; }
+  100% { opacity: 0; transform: translate(-28%, -58%) scaleX(1.16); }
+}
+
+@keyframes lamp-dust-drift {
+  0% { opacity: 0; transform: translate(-50%, -40%); }
+  28% { opacity: .58; }
+  100% { opacity: 0; transform: translate(-44%, -68%); }
 }
 
 @media (prefers-reduced-motion: reduce) {

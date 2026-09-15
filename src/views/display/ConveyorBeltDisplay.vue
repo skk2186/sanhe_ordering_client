@@ -282,6 +282,14 @@ const SCENES = {
       '/images/ui/b/shell-dish-tray.png',
       '/images/ui/c/transition/ocean-animals.png'
     ]
+  },
+  'midnight-station': {
+    background: '/images/ui/midnight-station/background-v2.png',
+    assets: [
+      '/images/ui/midnight-station/background-v2.png',
+      '/images/ui/midnight-station/delivery-trolley.webp',
+      '/images/ui/midnight-station/special-express.webp'
+    ]
   }
 }
 const FALLBACK_SCENE_KEY = 'zhenxian'
