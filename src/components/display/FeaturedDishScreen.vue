@@ -25,6 +25,7 @@
             @error="handlePosterError"
           />
           <video
+            v-if="promo.videoSrc"
             ref="videoRef"
             class="featured-screen__video"
             :class="{ 'is-visible': isVideoPlaying }"
@@ -70,7 +71,9 @@ let endTimer = 0
 let fallbackTimer = 0
 
 // 素材缺失时整个吊屏不渲染，父层也不会收到触发事件。
-const promo = computed(() => findPromoForItem(props.item))
+const promo = computed(() => findPromoForItem(props.item, {
+  allowItemPoster: props.themeKey === 'midnight-station'
+}))
 const posterSource = computed(() => (posterBroken.value ? '' : promo.value?.posterImage || ''))
 
 const getName = (item) => item?.name || item?.storeName || item?.productName || t('common.unknown')
@@ -132,7 +135,8 @@ watch(() => props.visible, async (visible) => {
   posterBroken.value = false
   isVideoPlaying.value = false
   await nextTick()
-  attemptPlay()
+  if (promo.value?.videoSrc) attemptPlay()
+  else startFallbackTimer()
 })
 
 onUnmounted(clearTimers)

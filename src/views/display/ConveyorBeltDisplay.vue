@@ -289,13 +289,15 @@ const SCENES = {
     ]
   },
   'midnight-station': {
-    background: '/images/ui/midnight-station/background-v2.png',
+    background: '/images/ui/midnight-station/background-v3-rear.png',
     assets: [
-      '/images/ui/midnight-station/background-v2.png',
-      '/images/ui/midnight-station/background-v2-foreground.png',
-      '/images/ui/midnight-station/delivery-trolley.webp',
-      '/images/ui/midnight-station/special-express.webp',
-      '/images/ui/midnight-station/special-wheel.webp'
+      '/images/ui/midnight-station/background-v3-rear.png',
+      '/images/ui/midnight-station/background-v3-foreground.png',
+      '/images/ui/midnight-station/delivery-trolley-body-v2.webp',
+      '/images/ui/midnight-station/special-express-body-v2.webp',
+      '/images/ui/midnight-station/special-express-lower-mask.webp',
+      '/images/ui/midnight-station/special-wheel.webp',
+      '/images/ui/midnight-station/special-driving-rod.webp'
     ]
   }
 }
@@ -1230,7 +1232,7 @@ const featuredPromoVisible = ref(false)
 let pendingFeaturedPromoItem = null
 
 const openFeaturedPromo = (item) => {
-  if (!item || !findPromoForItem(item)) return
+  if (!item || !findPromoForItem(item, { allowItemPoster: activeSceneKey.value === 'midnight-station' })) return
   featuredPromoItem.value = item
   featuredPromoVisible.value = true
 }
@@ -1628,7 +1630,7 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   z-index: 6;
-  background: url('/images/ui/midnight-station/background-v2-foreground.png') center/cover no-repeat;
+  background: url('/images/ui/midnight-station/background-v3-foreground.png') center/cover no-repeat;
   pointer-events: none;
 }
 

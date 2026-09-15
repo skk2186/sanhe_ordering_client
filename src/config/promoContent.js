@@ -18,14 +18,27 @@ export const PROMO_CONTENT = [
 
 const PROMO_FALLBACK_CLOSE_DELAY = 12000
 
-export const findPromoForItem = (item) => {
+const getItemImage = item => item?.image || item?.imageUrl || '/images/default-dish.jpg'
+
+export const createItemPromo = (item) => ({
+  id: `item-${String(item?.id ?? item?.productId ?? 'featured')}`,
+  triggerImage: getItemImage(item),
+  posterImage: getItemImage(item),
+  videoSrc: ''
+})
+
+export const findPromoForItem = (item, options = {}) => {
   if (!item) return null
   const productId = String(item.id ?? item.productId ?? '')
   const name = String(item.name || item.storeName || item.productName || '').toLowerCase()
-  return PROMO_CONTENT.find((promo) => {
+  const matched = PROMO_CONTENT.find((promo) => {
     if (promo.productIds?.map(String).includes(productId)) return true
     return (promo.nameKeywords || []).some((keyword) => keyword && name.includes(keyword.toLowerCase()))
   }) || null
+  // Midnight's dining car may feature the most popular real API item even
+  // when no bespoke video campaign exists. The poster remains that item's
+  // real image; legacy themes keep their exact-match behavior.
+  return matched || (options.allowItemPoster ? createItemPromo(item) : null)
 }
 
 export { PROMO_FALLBACK_CLOSE_DELAY }

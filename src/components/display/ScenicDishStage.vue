@@ -205,8 +205,14 @@ const getPopularity = item => Number(item?.salesCount ?? item?.sales ?? item?.so
 const availablePromoItems = computed(() => props.items
   .filter(item => isAvailable(item))
   .sort((left, right) => getPopularity(right) - getPopularity(left)))
-const promoTriggerItem = computed(() => availablePromoItems.value.find(item => findPromoForItem(item)) || null)
-const promoTrigger = computed(() => findPromoForItem(promoTriggerItem.value))
+const promoTriggerItem = computed(() => (
+  availablePromoItems.value.find(item => findPromoForItem(item))
+  || (themeKey.value === 'midnight-station' ? availablePromoItems.value[0] : null)
+  || null
+))
+const promoTrigger = computed(() => findPromoForItem(promoTriggerItem.value, {
+  allowItemPoster: themeKey.value === 'midnight-station'
+}))
 
 // 水花层只在带特殊事件的场景启用（沙滩=小新船，海底=海龟）
 const splashLayerEnabled = computed(() => themeKey.value === 'zhenxian' || themeKey.value === 'xiaoxin')
@@ -257,7 +263,8 @@ let streamFrameId = 0
 let lastFrameTime = 0
 let inertiaVelocity = 0
 let inertiaTimeConstant = INERTIA_TAU_BASE
-let midnightWheelAngle = 0
+let midnightExpressWheelAngle = 0
+let midnightTrolleyWheelAngle = 0
 // (timeStamp, clientX) 采样环，只保留最近 FLICK_SAMPLE_WINDOW_MS 内的样本
 const flickSamples = []
 // cycleWidth 缓存：避免滚动循环每帧读 offsetWidth 触发强制同步布局
@@ -410,7 +417,10 @@ const streamMotionPaused = computed(() => effectivePaused.value)
 
 const streamCycleItems = computed(() => {
   const list = orderedItems.value
-  const count = list.length ? Math.max(MIN_STREAM_ITEMS, list.length) : 0
+  // Midnight keeps ordinary trolleys as the dominant state. A longer visual
+  // cycle makes the full express occasional without changing the source list.
+  const cycleMultiplier = themeKey.value === 'midnight-station' ? 2 : 1
+  const count = list.length ? Math.max(MIN_STREAM_ITEMS, list.length) * cycleMultiplier : 0
   const entries = Array.from({ length: count }, (_, instanceIndex) => {
     const sourceIndex = instanceIndex % list.length
     const phase = instanceIndex * WAVE_PHASE_STEP
@@ -453,8 +463,11 @@ const streamCycleItems = computed(() => {
 })
 
 const randomizeSpecialEventOffset = () => {
-  // Keep the event random, but bring it forward often enough to be noticed.
-  specialEventOffset.value = 1 + Math.floor(Math.random() * 5)
+  // Keep legacy scene timing unchanged. Midnight appears after a meaningful
+  // run of ordinary deliveries instead of repeatedly filling the viewport.
+  specialEventOffset.value = themeKey.value === 'midnight-station'
+    ? 8 + Math.floor(Math.random() * 6)
+    : 1 + Math.floor(Math.random() * 5)
 }
 
 const bobDuration = computed(() => Math.round(
@@ -494,13 +507,25 @@ const normalizeStreamPosition = () => {
 const advanceMidnightRunningGear = (scrollDelta) => {
   const stream = streamRef.value
   if (!stream || themeKey.value !== 'midnight-station' || reducedMotion.value || !scrollDelta) return
-  // scrollLeft increasing moves scene content left; a left-moving wheel turns
-  // counter-clockwise. 5.6deg/px matches the rendered driving-wheel scale.
-  midnightWheelAngle = (midnightWheelAngle - scrollDelta * 5.6) % 360
-  const radians = midnightWheelAngle * Math.PI / 180
-  stream.style.setProperty('--midnight-wheel-angle', `${midnightWheelAngle.toFixed(2)}deg`)
-  stream.style.setProperty('--midnight-rod-x', `${(Math.cos(radians) * 3.2).toFixed(2)}px`)
-  stream.style.setProperty('--midnight-rod-y', `${(Math.sin(radians) * 2.1).toFixed(2)}px`)
+  // rotation = travelDistance / wheelRadius. Radius is inferred once from the
+  // stable viewport geometry; no per-wheel layout reads or extra RAF loops.
+  const viewportWidth = stream.clientWidth || 1440
+  const expressRadius = Math.min(48, Math.max(38, viewportWidth * .0125))
+  const trolleyRadius = Math.min(38, Math.max(29, viewportWidth * .0098))
+  const degreesPerRadian = 180 / Math.PI
+  midnightExpressWheelAngle = (
+    midnightExpressWheelAngle - (scrollDelta / expressRadius) * degreesPerRadian
+  ) % 360
+  midnightTrolleyWheelAngle = (
+    midnightTrolleyWheelAngle - (scrollDelta / trolleyRadius) * degreesPerRadian
+  ) % 360
+  const radians = midnightExpressWheelAngle * Math.PI / 180
+  stream.style.setProperty('--midnight-express-wheel-angle', `${midnightExpressWheelAngle.toFixed(2)}deg`)
+  stream.style.setProperty('--midnight-express-wheel-angle-reversed', `${(-midnightExpressWheelAngle).toFixed(2)}deg`)
+  stream.style.setProperty('--midnight-trolley-wheel-angle', `${midnightTrolleyWheelAngle.toFixed(2)}deg`)
+  // The rod follows the same eccentric crank pin as the driving wheels.
+  stream.style.setProperty('--midnight-rod-x', `${(Math.cos(radians) * 5.2).toFixed(2)}px`)
+  stream.style.setProperty('--midnight-rod-y', `${(Math.sin(radians) * 5.2).toFixed(2)}px`)
 }
 
 const resetStreamPosition = async () => {
@@ -909,7 +934,7 @@ onUnmounted(() => {
   --coral: #8c3d34;
   --ink: #fff5df;
   --stream-gap: clamp(72px, 3vw, 118px);
-  --midnight-rail-drop: clamp(230px, 24vh, 266px);
+  --midnight-rail-drop: clamp(210px, 22vh, 242px);
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-current {
@@ -1800,7 +1825,7 @@ onUnmounted(() => {
 }
 
 /* Midnight Station uses the single, nearly horizontal delivery rail already
-   painted into background-v2.png. Only slot geometry changes; scrollLeft stays
+   painted into background-v3. Only slot geometry changes; scrollLeft stays
    the sole horizontal motion source for dishes and the express event. */
 .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) {
   width: clamp(286px, 9.35vw, 360px);
@@ -1809,8 +1834,8 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-slot.is-queue-event {
-  width: clamp(1320px, 44vw, 1700px);
-  flex-basis: clamp(1320px, 44vw, 1700px);
+  width: clamp(1220px, 40vw, 1540px);
+  flex-basis: clamp(1220px, 40vw, 1540px);
   padding-top: var(--midnight-rail-drop);
 }
 

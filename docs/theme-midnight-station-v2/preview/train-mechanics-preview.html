@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Midnight train mechanics preview</title>
+  <style>
+    :root { color-scheme:dark; font-family:system-ui,sans-serif; background:#07111d; color:#e5d7bc; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:24px; background:#07111d; }
+    .controls { position:sticky; top:0; z-index:10; display:flex; gap:12px; align-items:center; padding:12px; background:#101b24; border:1px solid #5d6662; }
+    button,select { min-height:48px; padding:0 18px; color:#07111d; background:#f2c978; border:0; font-size:18px; font-weight:700; }
+    .track { position:relative; height:470px; overflow:hidden; margin-top:20px; background:linear-gradient(#0b1825 0 66%,#242a2e 66%); border-bottom:12px solid #5d6662; }
+    .train { --a:0deg; --ar:0deg; --rx:0px; --ry:0px; position:absolute; left:120px; bottom:4px; width:min(78vw,1540px); height:360px; }
+    .shadow { position:absolute; left:3%; right:3%; bottom:0; height:22px; background:radial-gradient(ellipse,rgba(0,0,0,.7),transparent 72%); }
+    .gear { position:absolute; inset:0; z-index:1; }
+    .wheel { position:absolute; bottom:1px; width:6.2%; transform:translateX(-50%) rotate(var(--a)); }
+    .wheel.car { bottom:5px; width:4.85%; }
+    .rod { position:absolute; left:6.3%; bottom:36px; width:29.2%; transform:translate(var(--rx),var(--ry)); }
+    .body,.mask { position:absolute; left:0; bottom:18px; width:100%; }
+    .body { z-index:3; }.mask { z-index:4; }
+    .trolley { position:absolute; left:8%; top:24px; width:340px; height:180px; }
+    .trolley .gear { left:50%; bottom:0; width:116%; height:72px; transform:translateX(-50%); }
+    .trolley .wheel { bottom:0; width:18%; }
+    .trolley .body { left:50%; bottom:17px; width:116%; transform:translateX(-50%); }
+    .paused * { animation-play-state:paused!important; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button id="toggle">暂停</button>
+    <button id="direction">方向：向左</button>
+    <label>速度 <select id="speed"><option value="0.55">慢</option><option value="1" selected>正常</option><option value="1.75">快</option></select></label>
+  </div>
+  <main class="track">
+    <div class="trolley">
+      <div class="gear"><img class="wheel" style="left:24%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel" style="left:76%" src="../../../public/images/ui/midnight-station/special-wheel.webp"></div>
+      <img class="body" src="../../../public/images/ui/midnight-station/delivery-trolley-body-v2.webp">
+    </div>
+    <div class="train" id="train">
+      <span class="shadow"></span>
+      <div class="gear">
+        <img class="wheel" style="left:7.7%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel" style="left:16.3%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel" style="left:27.2%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel" style="left:34.1%" src="../../../public/images/ui/midnight-station/special-wheel.webp">
+        <img class="wheel car" style="left:48.8%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel car" style="left:57.2%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel car" style="left:82.7%" src="../../../public/images/ui/midnight-station/special-wheel.webp"><img class="wheel car" style="left:91.1%" src="../../../public/images/ui/midnight-station/special-wheel.webp">
+        <img class="rod" src="../../../public/images/ui/midnight-station/special-driving-rod.webp">
+      </div>
+      <img class="body" src="../../../public/images/ui/midnight-station/special-express-body-v2.webp"><img class="mask" src="../../../public/images/ui/midnight-station/special-express-lower-mask.webp">
+    </div>
+  </main>
+  <script>
+    const train=document.querySelector('#train'),toggle=document.querySelector('#toggle'),directionButton=document.querySelector('#direction'),speedSelect=document.querySelector('#speed');
+    let paused=false,direction=-1,last=performance.now(),distance=0;
+    toggle.onclick=()=>{paused=!paused;toggle.textContent=paused?'继续':'暂停'};
+    directionButton.onclick=()=>{direction*=-1;directionButton.textContent=`方向：向${direction<0?'左':'右'}`};
+    const frame=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused)distance+=direction*100*Number(speedSelect.value)*dt;const a=distance/48*180/Math.PI,r=a*Math.PI/180;document.documentElement.style.setProperty('--a',`${a}deg`);document.documentElement.style.setProperty('--rx',`${Math.cos(r)*5.2}px`);document.documentElement.style.setProperty('--ry',`${Math.sin(r)*5.2}px`);train.style.transform=`translateX(${Math.sin(distance/780)*70}px)`;requestAnimationFrame(frame)};requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

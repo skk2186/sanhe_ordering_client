@@ -284,7 +284,7 @@ const copy = computed(() => ({
 const themeItem = [
   { title: "蜡笔小新·海滩", img: "/images/ui/b/background.png", key: 'zhenxian'},
   { title: "海底贝壳", img: "/images/ui/c/background.png", key: 'xiaoxin' },
-  { title: "午夜月台", img: "/images/ui/midnight-station/background-v2.png", key: 'midnight-station' }
+  { title: "午夜月台", img: "/images/ui/midnight-station/background-v3-rear.png", key: 'midnight-station' }
 ]
 const availableThemeKeys = new Set(themeItem.map(item => item.key))
 const fallbackThemeKey = 'zhenxian'
