@@ -2,7 +2,7 @@
   <div class="cart-section is-midnight-cart" :style="midnightCartStyle">
     <img
       class="midnight-cart-facility"
-      :src="`/images/ui/midnight-station/cart-counter-${side}-v2.png`"
+      :src="`/images/ui/midnight-station/cart-counter-${side}-v3.png`"
       alt=""
       aria-hidden="true"
     >
@@ -90,44 +90,81 @@ const totalPrice = computed(() => props.items.reduce((total, item) => {
 
 // Midnight assets contain fixed physical bays.  These normalized rectangles are
 // the single source of truth for all DOM content instead of visual nudging.
-const MIDNIGHT_CART_ANCHORS = {
+const rect = (x, y, width, height) => ({ x, y, width, height })
+
+// V3 uses final, fine-grained asset coordinates. Every visible datum and
+// control has its own physical rectangle; no child inset is used to guess it.
+const MIDNIGHT_CART_V3_ANCHORS = {
   left: {
-    slots: [
-      { x: 8.4, y: 31.5, width: 17.1, height: 34 },
-      { x: 25.8, y: 31.5, width: 17.1, height: 34 },
-      { x: 43.2, y: 31.5, width: 17.1, height: 34 },
-      { x: 60.6, y: 31.5, width: 17.1, height: 34 }
-    ],
-    order: { x: 78.1, y: 30.5, width: 17.2, height: 38 }
+    slots: [8.7, 25.1, 41.5, 57.9].map((x) => ({
+      imageRect: rect(x, 24.5, 14.7, 24.2),
+      nameRect: rect(x + .2, 49.5, 14.3, 7.3),
+      minusRect: rect(x + .2, 57.4, 4.25, 10.2),
+      quantityRect: rect(x + 5.05, 57.4, 4.6, 10.2),
+      plusRect: rect(x + 10.25, 57.4, 4.25, 10.2),
+      removeRect: rect(x + 11.4, 22.4, 3.5, 6.2)
+    })),
+    order: {
+      previewRect: rect(74.8, 23.4, 20.2, 29.8),
+      labelRect: rect(75.2, 54.1, 8.0, 11.5),
+      countRect: rect(83.8, 54.1, 5.4, 11.5),
+      totalRect: rect(89.7, 54.1, 6.1, 11.5),
+      buttonRect: rect(74.6, 22.8, 21.5, 44.0)
+    }
   },
   right: {
-    slots: [
-      { x: 24.1, y: 31.5, width: 17.1, height: 34 },
-      { x: 41.5, y: 31.5, width: 17.1, height: 34 },
-      { x: 58.9, y: 31.5, width: 17.1, height: 34 },
-      { x: 76.3, y: 31.5, width: 17.1, height: 34 }
-    ],
-    order: { x: 5.1, y: 30.5, width: 17.2, height: 38 }
+    slots: [27.0, 43.4, 59.8, 76.2].map((x) => ({
+      imageRect: rect(x, 24.5, 14.7, 24.2),
+      nameRect: rect(x + .2, 49.5, 14.3, 7.3),
+      minusRect: rect(x + .2, 57.4, 4.25, 10.2),
+      quantityRect: rect(x + 5.05, 57.4, 4.6, 10.2),
+      plusRect: rect(x + 10.25, 57.4, 4.25, 10.2),
+      removeRect: rect(x + 11.4, 22.4, 3.5, 6.2)
+    })),
+    order: {
+      previewRect: rect(4.8, 23.4, 20.2, 29.8),
+      labelRect: rect(4.2, 54.1, 8.0, 11.5),
+      countRect: rect(12.8, 54.1, 5.4, 11.5),
+      totalRect: rect(18.7, 54.1, 6.1, 11.5),
+      buttonRect: rect(3.8, 22.8, 21.5, 44.0)
+    }
   }
 }
 
+const rectVars = (prefix, value) => ({
+  [`--${prefix}-x`]: `${value.x}%`,
+  [`--${prefix}-y`]: `${value.y}%`,
+  [`--${prefix}-w`]: `${value.width}%`,
+  [`--${prefix}-h`]: `${value.height}%`
+})
+const localRect = (child, parent) => rect(
+  (child.x - parent.x) / parent.width * 100,
+  (child.y - parent.y) / parent.height * 100,
+  child.width / parent.width * 100,
+  child.height / parent.height * 100
+)
+
 const midnightCartStyle = computed(() => {
-  const anchor = MIDNIGHT_CART_ANCHORS[props.side]
+  const anchor = MIDNIGHT_CART_V3_ANCHORS[props.side]
+  const button = anchor.order.buttonRect
   return {
-    '--midnight-order-x': `${anchor.order.x}%`,
-    '--midnight-order-y': `${anchor.order.y}%`,
-    '--midnight-order-w': `${anchor.order.width}%`,
-    '--midnight-order-h': `${anchor.order.height}%`
+    ...rectVars('order-preview', localRect(anchor.order.previewRect, button)),
+    ...rectVars('order-label', localRect(anchor.order.labelRect, button)),
+    ...rectVars('order-count', localRect(anchor.order.countRect, button)),
+    ...rectVars('order-total', localRect(anchor.order.totalRect, button)),
+    ...rectVars('order-button', anchor.order.buttonRect)
   }
 })
 
 const midnightSlotStyle = (index) => {
-  const anchor = MIDNIGHT_CART_ANCHORS[props.side].slots[index]
+  const anchor = MIDNIGHT_CART_V3_ANCHORS[props.side].slots[index]
   return {
-    '--midnight-slot-x': `${anchor.x}%`,
-    '--midnight-slot-y': `${anchor.y}%`,
-    '--midnight-slot-w': `${anchor.width}%`,
-    '--midnight-slot-h': `${anchor.height}%`
+    ...rectVars('slot-image', anchor.imageRect),
+    ...rectVars('slot-name', anchor.nameRect),
+    ...rectVars('slot-minus', anchor.minusRect),
+    ...rectVars('slot-quantity', anchor.quantityRect),
+    ...rectVars('slot-plus', anchor.plusRect),
+    ...rectVars('slot-remove', localRect(anchor.removeRect, anchor.imageRect))
   }
 }
 
@@ -467,6 +504,8 @@ const handleTipsClick = () => {
 /* Midnight Station: the carts are staffed luggage / meal-ticket counters.
    Every selector is rooted at the document theme so legacy skins stay intact. */
 [data-theme="midnight-station"] .is-midnight-cart {
+  width: 1050px;
+  height: 300px;
   padding: 0;
   overflow: visible;
   background: transparent;
@@ -488,136 +527,90 @@ const handleTipsClick = () => {
     z-index: 1;
     width: 100%;
     height: 100%;
-    display: grid;
-    align-items: start;
-    gap: 0;
+    display: block;
     box-sizing: border-box;
-    padding-block: clamp(60px, 3.55vw, 72px) 9px;
+    padding: 0;
   }
 
-  .order-btn-left ~ .cart-item,
-  .order-btn-right ~ .cart-item { min-width: 0; }
-
-  &:has(.order-btn-left) .item-group {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(118px, 1.18fr);
-    padding-inline: 7.5% 1.8%;
-  }
-
-  &:has(.order-btn-right) .item-group {
-    grid-template-columns: minmax(118px, 1.28fr) repeat(4, minmax(0, 1fr));
-    padding-inline: 2.5% 7.2%;
-  }
-
-  .cart-item {
-    width: 100%;
-    height: 142px;
-    gap: 0;
-  }
-
+  .cart-item { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .item-circle {
-    width: 78%;
-    height: 58px;
+    position: absolute;
+    left: var(--slot-image-x); top: var(--slot-image-y);
+    width: var(--slot-image-w); height: var(--slot-image-h);
     box-sizing: border-box;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-
-    &:hover { transform: translateY(-2px); filter: drop-shadow(0 0 7px rgba(242, 201, 120, .72)); box-shadow: none; }
+    border: 0; border-radius: 2px; background: transparent; box-shadow: none;
+    pointer-events: auto;
+    &:hover { filter: drop-shadow(0 0 8px rgba(242, 201, 120, .78)); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
-    &.empty-item::after { color: rgba(242, 201, 120, .52); font-size: 25px; }
+    &.empty-item::after { color: rgba(242, 201, 120, .58); font-size: clamp(26px, 1.35vw, 34px); }
   }
 
-  .item-image img { width: 94%; height: 94%; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .48)); }
+  .item-image,
+  .item-image img { width: 100%; height: 100%; }
+  .item-image img { object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .58)); }
   .circle-close-btn {
-    top: -7px; right: -13px; width: 28px; height: 28px;
+    top: var(--slot-remove-y); left: var(--slot-remove-x);
+    width: var(--slot-remove-w); height: var(--slot-remove-h);
+    min-width: 32px; min-height: 32px;
     border: 0; border-radius: 50%;
-    background: transparent; color: #fff6df; box-shadow: none;
-    &:hover:not(:disabled) { background: transparent; filter: drop-shadow(0 0 6px #f4a77c); transform: scale(1.06); }
+    background: rgba(93, 21, 17, .82); color: #fff6df; box-shadow: 0 0 0 2px #c98f52;
+    pointer-events: auto;
+    &:hover:not(:disabled) { filter: drop-shadow(0 0 7px #f4a77c); transform: scale(1.06); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 2px; }
   }
 
-  .item-info {
-    width: 100%;
-    margin-top: -1px;
-    display: flex;
-    flex-direction: column-reverse;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
+  .item-info,
+  .item-controls { display: contents; }
+  .item-name-area {
+    position: absolute;
+    left: var(--slot-name-x); top: var(--slot-name-y);
+    width: var(--slot-name-w); height: var(--slot-name-h);
+    padding: 0 5%; display: grid; place-items: center;
+    overflow: hidden; color: #fff1c8;
+    font-size: clamp(16px, .95vw, 23px); font-weight: 800; line-height: 1.1;
+    text-align: center; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 2px 4px #06100e;
   }
-  .item-name-area { height: 29px; padding: 1px 5px; line-height: 27px; color: #fff1c8; font-size: clamp(14px, .82vw, 20px); font-weight: 800; text-shadow: 0 2px 4px #06100e; }
-  .item-controls { height: 28px; padding: 0 13%; color: #fff1c8; }
-  .quantity-display { min-width: 2ch; font-size: clamp(17px, 1vw, 24px); font-weight: 900; }
+  .quantity-display {
+    position: absolute;
+    left: var(--slot-quantity-x); top: var(--slot-quantity-y);
+    width: var(--slot-quantity-w); height: var(--slot-quantity-h);
+    display: grid; place-items: center; color: #fff1c8;
+    font-size: clamp(21px, 1.15vw, 29px); font-weight: 900; font-variant-numeric: tabular-nums;
+  }
   .item-controls .minus-btn,
   .item-controls .plus-btn {
-    width: 30px; height: 28px; border: 0; border-radius: 50%;
-    background: transparent; color: #21180d; font-size: 20px;
-    box-shadow: none; text-shadow: 0 1px rgba(255, 236, 177, .72);
-    &:hover:not(.empty-btn) { background: transparent; filter: drop-shadow(0 0 6px #ffe4a0); transform: translateY(-1px); }
+    position: absolute; min-width: 44px; min-height: 44px;
+    width: var(--slot-minus-w); height: var(--slot-minus-h);
+    border: 0; border-radius: 50%; background: transparent;
+    color: #25170b; font-size: clamp(27px, 1.45vw, 36px); font-weight: 950;
+    box-shadow: none; text-shadow: 0 1px rgba(255, 236, 177, .78); pointer-events: auto;
+    &:hover:not(.empty-btn) { filter: drop-shadow(0 0 8px #ffe4a0); transform: scale(1.05); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 1px; }
   }
+  .item-controls .minus-btn { left: var(--slot-minus-x); top: var(--slot-minus-y); }
+  .item-controls .plus-btn { left: var(--slot-plus-x); top: var(--slot-plus-y); width: var(--slot-plus-w); height: var(--slot-plus-h); }
 
   .order-btn {
-    width: 100%; height: 132px; box-sizing: border-box; padding: 3px 8px 10px;
-    display: grid; place-content: center; gap: 5px;
-    border: 0; border-radius: 0;
-    color: #fff1c8; background: transparent;
-    box-shadow: none; text-shadow: 0 2px 4px #020706;
-    font-family: inherit; cursor: pointer;
-    &:hover:not(:disabled) { transform: translateY(-2px); filter: drop-shadow(0 0 7px rgba(242, 201, 120, .72)); }
-    &:active:not(:disabled) { transform: translateY(1px); }
+    position: absolute;
+    left: var(--order-button-x); top: var(--order-button-y);
+    width: var(--order-button-w); height: var(--order-button-h);
+    padding: 0; display: block; border: 0; border-radius: 3px;
+    color: #fff1c8; background: transparent; box-shadow: none;
+    text-shadow: 0 2px 4px #020706; font-family: inherit; cursor: pointer;
+    &:hover:not(:disabled) { filter: drop-shadow(0 0 9px rgba(242, 201, 120, .78)); }
+    &:active:not(:disabled) { filter: brightness(.88); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
     &:disabled { cursor: wait; opacity: .68; }
   }
-  .order-label { font-size: clamp(18px, 1.1vw, 26px); font-weight: 900; letter-spacing: .06em; }
-  .order-progress { position: static; padding: 0; font-size: clamp(19px, 1.15vw, 28px); font-weight: 800; line-height: 1; }
-  .order-total { color: #e5d7bc; font-size: clamp(14px, .8vw, 19px); font-weight: 700; }
-
-  /* Asset-anchor layout: the tray, control strip and ticket window remain
-     visible because every interactive rectangle is mapped to its painted bay. */
-  .item-group { display: block; padding: 0; }
-  .cart-item {
-    position: absolute;
-    left: var(--midnight-slot-x);
-    top: var(--midnight-slot-y);
-    width: var(--midnight-slot-w);
-    height: var(--midnight-slot-h);
-    display: block;
-  }
-  .item-circle { width: 100%; height: 57%; }
-  .item-info { position: absolute; inset: 56% 0 0; display: block; }
-  .item-name-area {
-    height: 44%; padding: 0 5%; line-height: 1.15;
-    display: grid; place-items: center; font-size: clamp(14px, .9vw, 22px);
-  }
-  .item-controls {
-    position: absolute; inset: 47% 3% 0;
-    height: auto; padding: 0; display: grid;
-    grid-template-columns: 1fr minmax(30px, .8fr) 1fr; gap: 4%;
-  }
-  .quantity-display { align-self: center; justify-self: center; font-size: clamp(18px, 1.05vw, 26px); }
-  .item-controls .minus-btn,
-  .item-controls .plus-btn {
-    width: 100%; min-width: 30px; height: 100%; min-height: 30px;
-    font-size: clamp(20px, 1.18vw, 28px);
-  }
-  .circle-close-btn { top: -6px; right: -5px; width: 30px; height: 30px; }
-  .order-btn {
-    position: absolute;
-    left: var(--midnight-order-x); top: var(--midnight-order-y);
-    width: var(--midnight-order-w); height: var(--midnight-order-h);
-    padding: 4% 5% 3%; display: grid;
-    grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr auto auto auto;
-    gap: 2px; align-items: center; justify-items: center;
-  }
-  .order-preview { min-width: 0; min-height: 0; height: 100%; display: grid; place-items: center; }
-  .order-preview img { width: min(72px, 78%); height: 100%; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(0,0,0,.6)); }
-  .order-label { font-size: clamp(17px, 1.05vw, 25px); }
-  .order-progress { font-size: clamp(19px, 1.18vw, 28px); }
-  .order-total { font-size: clamp(15px, .9vw, 21px); }
+  .order-preview,
+  .order-label,
+  .order-progress,
+  .order-total { position: absolute; display: grid; place-items: center; margin: 0; }
+  .order-preview { left: var(--order-preview-x); top: var(--order-preview-y); width: var(--order-preview-w); height: var(--order-preview-h); }
+  .order-preview img { width: min(110px, 88%); height: min(110px, 92%); object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,.62)); }
+  .order-label { left: var(--order-label-x); top: var(--order-label-y); width: var(--order-label-w); height: var(--order-label-h); font-size: clamp(19px, 1.08vw, 27px); font-weight: 900; }
+  .order-progress { left: var(--order-count-x); top: var(--order-count-y); width: var(--order-count-w); height: var(--order-count-h); font-size: clamp(20px, 1.16vw, 29px); font-weight: 900; font-variant-numeric: tabular-nums; }
+  .order-total { left: var(--order-total-x); top: var(--order-total-y); width: var(--order-total-w); height: var(--order-total-h); color: #fff1c8; font-size: clamp(16px, .9vw, 22px); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
 }
 
 @media (min-width: 769px) and (max-width: 1920px) {
@@ -642,28 +635,16 @@ const handleTipsClick = () => {
   }
 
   [data-theme="midnight-station"] .is-midnight-cart {
-    .item-group { height: 100%; padding-block: 46px 5px; }
-    &:has(.order-btn-left) .item-group { padding-inline: 7.5% 1.8%; }
-    &:has(.order-btn-right) .item-group { padding-inline: 2.5% 7.2%; }
-    .cart-item { width: 100%; height: 116px; }
-    .item-circle { width: 78%; height: 43px; }
-    .item-name-area { height: 24px; line-height: 22px; font-size: 13px; }
-    .item-controls { height: 24px; padding-inline: 8%; }
+    width: 100%;
+    height: 220px;
+    .item-name-area { font-size: clamp(16px, 1.02vw, 20px); }
     .item-controls .minus-btn,
-    .item-controls .plus-btn { width: 24px; height: 24px; font-size: 17px; }
-    .quantity-display { font-size: 17px; }
-    .order-btn { width: 100%; height: 105px; padding: 0 4px 5px; }
-    .order-label { font-size: 17px; }
-    .order-progress { font-size: 20px; }
-    .order-total { font-size: 13px; }
-    .item-group { display: block; padding: 0; }
-    .cart-item { position: absolute; left: var(--midnight-slot-x); top: var(--midnight-slot-y); width: var(--midnight-slot-w); height: var(--midnight-slot-h); }
-    .item-circle { width: 100%; height: 57%; }
-    .item-info { position: absolute; inset: 56% 0 0; display: block; }
-    .item-name-area { height: 44%; display: grid; place-items: center; line-height: 1.1; font-size: clamp(12px, .75vw, 15px); }
-    .item-controls { position: absolute; inset: 47% 2% 0; height: auto; padding: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; }
-    .item-controls .minus-btn, .item-controls .plus-btn { width: 100%; height: 100%; min-width: 24px; min-height: 24px; }
-    .order-btn { position: absolute; left: var(--midnight-order-x); top: var(--midnight-order-y); width: var(--midnight-order-w); height: var(--midnight-order-h); padding: 3% 4%; grid-template-rows: 1fr auto auto auto; }
+    .item-controls .plus-btn { min-width: 34px; min-height: 34px; font-size: clamp(23px, 1.4vw, 30px); }
+    .quantity-display { font-size: clamp(19px, 1.2vw, 25px); }
+    .order-preview img { width: min(70px, 88%); height: min(70px, 92%); }
+    .order-label { font-size: clamp(17px, 1.15vw, 22px); }
+    .order-progress { font-size: clamp(18px, 1.2vw, 24px); }
+    .order-total { font-size: clamp(14px, .92vw, 18px); }
   }
 
   .item-circle {

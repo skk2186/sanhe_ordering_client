@@ -1,6 +1,6 @@
 <template>
   <div class="bottom-center" :style="midnightConsoleStyle">
-    <img class="midnight-service-facility" src="/images/ui/midnight-station/service-console-v2.png" alt="" aria-hidden="true">
+    <img class="midnight-service-facility" src="/images/ui/midnight-station/service-console-v3.png" alt="" aria-hidden="true">
     <div class="center-layout">
       <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" :title="$t('common.menu')" @click="$emit('open-detail-menu', 'left')">
         <span>{{ $t('common.menu') }}</span>
@@ -31,17 +31,17 @@
 <script setup>
 // The physical console is one image; all button rectangles use its normalized
 // service positions so labels cannot drift independently from the equipment.
-const MIDNIGHT_CONSOLE_ANCHORS = {
-  leftMenu: { x: 10.5, y: 30, width: 16, height: 29 },
-  navigation: { x: 27.4, y: 33, width: 16.2, height: 25 },
-  history: { x: 44.4, y: 31.5, width: 24.2, height: 17 },
-  settings: { x: 44.9, y: 48.5, width: 12.8, height: 20 },
-  waiter: { x: 58.3, y: 47.5, width: 12.2, height: 21 },
-  rightMenu: { x: 75.2, y: 30, width: 16, height: 29 }
+const MIDNIGHT_CONSOLE_V3_ANCHORS = {
+  leftMenuRect: { x: 8.9, y: 21.5, width: 19.5, height: 44.5 },
+  navigationRect: { x: 30.7, y: 25.0, width: 17.3, height: 19.0 },
+  historyRect: { x: 49.3, y: 25.0, width: 18.0, height: 19.0 },
+  settingsRect: { x: 30.7, y: 47.0, width: 17.3, height: 20.0 },
+  waiterRect: { x: 49.3, y: 47.0, width: 18.0, height: 20.0 },
+  rightMenuRect: { x: 71.6, y: 21.5, width: 19.5, height: 44.5 }
 }
 
 const midnightConsoleStyle = Object.fromEntries(
-  Object.entries(MIDNIGHT_CONSOLE_ANCHORS).flatMap(([name, rect]) => [
+  Object.entries(MIDNIGHT_CONSOLE_V3_ANCHORS).flatMap(([name, rect]) => [
     [`--console-${name}-x`, `${rect.x}%`],
     [`--console-${name}-y`, `${rect.y}%`],
     [`--console-${name}-w`, `${rect.width}%`],
@@ -73,6 +73,8 @@ defineEmits([
   background: url('/images/ui/c/cart_bg2.png') ;
 }
 [data-theme="midnight-station"] .bottom-center {
+  width: 900px;
+  height: 300px;
   box-sizing: border-box;
   position: relative;
   padding: 0;
@@ -104,27 +106,28 @@ defineEmits([
     box-shadow: none;
     text-shadow: 0 2px 4px #07110f;
     font-family: inherit;
-    font-size: clamp(17px, .95vw, 24px);
+    font-size: clamp(20px, 1.08vw, 28px);
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: .04em;
     text-align: center;
   }
   .menu-btn {
-    width: var(--console-leftMenu-w); height: var(--console-leftMenu-h); padding: 4px;
+    width: var(--console-leftMenuRect-w); height: var(--console-leftMenuRect-h); padding: 8px;
     color: #292316;
     text-shadow: 0 1px rgba(255, 255, 255, .35);
+    font-size: clamp(22px, 1.18vw, 30px);
   }
-  .left-menu { left: var(--console-leftMenu-x); top: var(--console-leftMenu-y); }
-  .right-menu { left: var(--console-rightMenu-x); top: var(--console-rightMenu-y); width: var(--console-rightMenu-w); height: var(--console-rightMenu-h); }
-  .navigation-btn { left: var(--console-navigation-x); top: var(--console-navigation-y); width: var(--console-navigation-w); height: var(--console-navigation-h); }
-  .checkout-btn { left: var(--console-history-x); top: var(--console-history-y); width: var(--console-history-w); height: var(--console-history-h); font-size: clamp(15px, .82vw, 21px); }
-  .settings-btn { left: var(--console-settings-x); top: var(--console-settings-y); width: var(--console-settings-w); height: var(--console-settings-h); font-size: clamp(14px, .76vw, 19px); }
+  .left-menu { left: var(--console-leftMenuRect-x); top: var(--console-leftMenuRect-y); }
+  .right-menu { left: var(--console-rightMenuRect-x); top: var(--console-rightMenuRect-y); width: var(--console-rightMenuRect-w); height: var(--console-rightMenuRect-h); }
+  .navigation-btn { left: var(--console-navigationRect-x); top: var(--console-navigationRect-y); width: var(--console-navigationRect-w); height: var(--console-navigationRect-h); }
+  .checkout-btn { left: var(--console-historyRect-x); top: var(--console-historyRect-y); width: var(--console-historyRect-w); height: var(--console-historyRect-h); font-size: clamp(19px, 1.02vw, 26px); }
+  .settings-btn { left: var(--console-settingsRect-x); top: var(--console-settingsRect-y); width: var(--console-settingsRect-w); height: var(--console-settingsRect-h); font-size: clamp(18px, .96vw, 24px); }
   .waiter-btn {
-    left: var(--console-waiter-x); top: var(--console-waiter-y); width: var(--console-waiter-w); height: var(--console-waiter-h);
+    left: var(--console-waiterRect-x); top: var(--console-waiterRect-y); width: var(--console-waiterRect-w); height: var(--console-waiterRect-h);
     color: #fff1c8;
     padding: 0;
-    font-size: clamp(14px, .76vw, 19px);
+    font-size: clamp(18px, .96vw, 24px);
   }
   .menu-btn:hover,
   .function-btn:hover { transform: translateY(-2px); filter: drop-shadow(0 0 7px rgba(242, 201, 120, .8)); box-shadow: none; }
@@ -147,12 +150,15 @@ defineEmits([
 
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .bottom-center {
+    width: 100%;
+    height: 220px;
     padding: 0;
     .center-layout { height: 100%; }
-    .menu-btn,
-    .function-btn { font-size: clamp(13px, 1vw, 17px); }
-    .checkout-btn { font-size: clamp(12px, .9vw, 15px); }
-    .settings-btn { font-size: clamp(11px, .82vw, 14px); }
+    .menu-btn { font-size: clamp(17px, 1.1vw, 22px); }
+    .function-btn { font-size: clamp(16px, 1.02vw, 20px); }
+    .checkout-btn,
+    .settings-btn,
+    .waiter-btn { font-size: clamp(15px, .98vw, 19px); }
   }
 
   .bottom-center {

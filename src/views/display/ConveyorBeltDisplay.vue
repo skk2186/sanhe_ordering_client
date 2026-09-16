@@ -299,9 +299,9 @@ const SCENES = {
       '/images/ui/midnight-station/special-express-lower-mask.webp',
       '/images/ui/midnight-station/special-wheel.webp',
       '/images/ui/midnight-station/special-driving-rod.webp',
-      '/images/ui/midnight-station/cart-counter-left-v2.png',
-      '/images/ui/midnight-station/cart-counter-right-v2.png',
-      '/images/ui/midnight-station/service-console-v2.png',
+      '/images/ui/midnight-station/cart-counter-left-v3.png',
+      '/images/ui/midnight-station/cart-counter-right-v3.png',
+      '/images/ui/midnight-station/service-console-v3.png',
       '/images/ui/midnight-station/progress-console-v2.png',
       '/images/ui/midnight-station/progress-hanger-v1.png',
       '/images/ui/midnight-station/brand-sign-v2.png'
@@ -1717,17 +1717,17 @@ onUnmounted(() => {
    allowance keeps their physical trays and the 44px control hot zones readable
    without changing the delivery corridor structure. */
 @media (min-width: 1921px) {
-  [data-theme="midnight-station"] .bottom-section { height: 260px; }
+  [data-theme="midnight-station"] .bottom-section { height: 320px; gap: 40px; }
   [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
   [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
-  [data-theme="midnight-station"] :deep(.bottom-center) { height: 250px; }
+  [data-theme="midnight-station"] :deep(.bottom-center) { height: 300px; }
 }
 
 @media (min-width: 769px) and (max-width: 1920px) {
-  [data-theme="midnight-station"] .bottom-section { height: 200px; }
+  [data-theme="midnight-station"] .bottom-section { height: 230px; }
   [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
   [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
-  [data-theme="midnight-station"] :deep(.bottom-center) { height: 190px; }
+  [data-theme="midnight-station"] :deep(.bottom-center) { height: 220px; }
 }
 
 @media (min-width: 1921px) {
