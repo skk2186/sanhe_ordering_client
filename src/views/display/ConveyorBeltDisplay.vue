@@ -299,9 +299,6 @@ const SCENES = {
       '/images/ui/midnight-station/special-express-lower-mask.webp',
       '/images/ui/midnight-station/special-wheel.webp',
       '/images/ui/midnight-station/special-driving-rod.webp',
-      '/images/ui/midnight-station/cart-counter-left-v3.png',
-      '/images/ui/midnight-station/cart-counter-right-v3.png',
-      '/images/ui/midnight-station/service-console-v3.png',
       '/images/ui/midnight-station/progress-console-v2.png',
       '/images/ui/midnight-station/progress-hanger-v1.png',
       '/images/ui/midnight-station/brand-sign-v2.png'
@@ -1698,7 +1695,7 @@ onUnmounted(() => {
   .brand-lockup strong { position: relative; top: 11%; color: #fff1c8; font-size: clamp(30px, 1.2vw, 38px); letter-spacing: .12em; line-height: 1; }
   .brand-table { color: #e5d7bc; font-size: clamp(17px, .88vw, 22px); letter-spacing: .08em; }
 
-  .top-progress { position: relative; grid-column: 2; top: auto; left: auto; width: 100%; transform: none; align-self: center; display: flex; justify-content: center; }
+  .top-progress { position: absolute; top: 38px; left: 50%; width: min(1040px, calc(100vw - 1120px)); transform: translateX(-50%); }
   .top-progress :deep(.is-midnight-progress) {
     width: 100% !important;
     max-width: 1040px;
@@ -1717,23 +1714,6 @@ onUnmounted(() => {
     border-radius: 3px;
     backdrop-filter: none;
   }
-}
-
-/* The counters are the primary ordering surface.  A modest extra vertical
-   allowance keeps their physical trays and the 44px control hot zones readable
-   without changing the delivery corridor structure. */
-@media (min-width: 1921px) {
-  [data-theme="midnight-station"] .bottom-section { height: 320px; gap: 40px; }
-  [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
-  [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
-  [data-theme="midnight-station"] :deep(.bottom-center) { height: 300px; }
-}
-
-@media (min-width: 769px) and (max-width: 1920px) {
-  [data-theme="midnight-station"] .bottom-section { height: 230px; }
-  [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
-  [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
-  [data-theme="midnight-station"] :deep(.bottom-center) { height: 220px; }
 }
 
 @media (min-width: 1921px) {

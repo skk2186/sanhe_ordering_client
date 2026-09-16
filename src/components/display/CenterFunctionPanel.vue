@@ -1,6 +1,5 @@
 <template>
   <div class="bottom-center">
-    <img class="midnight-service-facility" src="/images/ui/midnight-station/service-console-v3.png" alt="" aria-hidden="true">
     <div class="center-layout">
       <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" :title="$t('common.menu')" @click="$emit('open-detail-menu', 'left')">
         <span>{{ $t('common.menu') }}</span>
@@ -41,7 +40,6 @@ defineEmits([
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
 
-.midnight-service-facility { display: none; }
 
 [data-theme="ailaotou"] .bottom-center {
   background: url('/images/ui/a/cart_bg2.png');
@@ -56,14 +54,9 @@ defineEmits([
 .menu-btn, .function-btn { border: 0; background-color: transparent; padding: 0; }
 .menu-btn span, .function-btn span { visibility: hidden; }
 [data-theme="midnight-station"] .bottom-center {
-  width: 900px; height: 300px; padding: 20px 28px 68px;
-  box-sizing: border-box; position: relative; background: transparent;
-  .midnight-service-facility { display: block; position: absolute; inset: 0; width: 100%; height: 100%; clip-path: inset(72% 0 0); pointer-events: none; }
-  .center-layout { position: relative; z-index: 1; width: 100%; height: 100%; padding: 0; gap: 16px; align-items: stretch; }
-  .center-functions { flex: 1; min-width: 0; height: 100%; gap: 12px; }
-  .function-row { flex: 1; min-height: 0; gap: 12px; }
-  .menu-btn { flex: 0 0 18%; width: auto; height: 100%; writing-mode: vertical-rl; background: #d6c5a0; color: #25251e; font-size: 30px; }
-  .first-row .function-btn, .second-row .function-btn { flex: 1; min-width: 0; width: auto; height: 100%; background: #17342d; color: #fff1c8; font-size: 26px; }
+  background: transparent;
+  .menu-btn { background: #d6c5a0; color: #25251e; font-size: 30px; }
+  .first-row .function-btn, .second-row .function-btn { background: #17342d; color: #fff1c8; font-size: 26px; }
   .menu-btn, .function-btn { padding: 12px; border: 1px solid #b79152; border-radius: 3px; font-family: inherit; font-weight: 800; line-height: 1.3; background-size: 100% 100%; }
   .menu-btn span, .function-btn span { visibility: visible; }
   .waiter-btn { background: #64492a !important; }
@@ -134,11 +127,7 @@ defineEmits([
 
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .bottom-center {
-    width: 100%; height: 220px; padding: 8px 12px 38px;
-    .center-layout { height: 100%; gap: 8px; }
-    .center-functions { height: 100%; gap: 8px; }
-    .function-row { height: auto; gap: 8px; }
-    .menu-btn { height: 100%; font-size: 23px; }
+    .menu-btn { font-size: 23px; }
     .first-row .function-btn, .second-row .function-btn { font-size: 20px; }
     .menu-btn, .function-btn { padding: 5px; }
   }

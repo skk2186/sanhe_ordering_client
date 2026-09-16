@@ -1,11 +1,5 @@
 <template>
   <div class="cart-section is-midnight-cart">
-    <img
-      class="midnight-cart-facility"
-      :src="`/images/ui/midnight-station/cart-counter-${side}-v3.png`"
-      alt=""
-      aria-hidden="true"
-    >
 
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
@@ -103,7 +97,6 @@ const handleTipsClick = () => {
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
 
-.midnight-cart-facility { display: none; }
 
 .tips-overlay {
   position: absolute;
@@ -424,28 +417,25 @@ const handleTipsClick = () => {
 
 .w3-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
 
-/* Shared flow owns all content; Midnight only supplies surface skin and sizing. */
+/* Shared geometry owns the panel; Midnight only supplies its readable skin. */
 .order-preview, .order-label, .order-total, .item-price { display: none; }
 [data-theme="midnight-station"] .is-midnight-cart {
-  width: 1050px; height: 300px; padding: 16px 26px 48px;
-  box-sizing: border-box; position: relative; background: transparent; border: 0;
-  .midnight-cart-facility { display: block; position: absolute; inset: 0; width: 100%; height: 100%; clip-path: inset(72% 0 0); pointer-events: none; z-index: 0; }
-  .item-group { position: relative; z-index: 1; display: flex; width: 100%; height: 100%; gap: 16px; align-items: stretch; }
-  .cart-item { flex: 1 1 0; min-width: 0; width: auto; height: 100%; gap: 8px; background: #122b28; border: 1px solid #9a7642; padding: 8px; box-sizing: border-box; }
-  .item-circle { width: 100%; height: 110px; flex: 0 0 110px; border-radius: 3px; box-shadow: none; background: transparent; }
+  background: transparent; border: 0;
+  .cart-item { background: #122b28; border: 1px solid #9a7642; }
+  .item-circle { border-radius: 3px; box-shadow: none; background: transparent; }
   .item-image img { width: 100%; height: 100%; }
-  .item-info { width: 100%; margin: 0; border: 0; border-radius: 0; background: transparent; overflow: visible; }
-  .item-name-area { padding: 0; height: 48px; line-height: 24px; font-size: 22px; color: #fff1c8; white-space: nowrap; }
-  .item-price { display: block; color: #e6bf79; font-size: 20px; line-height: 24px; }
-  .item-controls { height: 44px; padding: 0; gap: 4px; color: #fff1c8; }
-  .item-controls .minus-btn, .item-controls .plus-btn { width: 44px; height: 44px; flex: 0 0 44px; font-size: 30px; background: #c39b54; color: #211a10; border: 1px solid #efce90; border-radius: 3px; }
+  .item-info { width: 100%; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+  .item-name-area { padding: 0; height: 44px; line-height: 22px; font-size: 22px; color: #fff1c8; white-space: nowrap; }
+  .item-price { display: block; color: #e6bf79; font-size: 20px; line-height: 22px; }
+  .item-controls { height: 34px; padding: 0; gap: 4px; color: #fff1c8; }
+  .item-controls .minus-btn, .item-controls .plus-btn { width: 34px; height: 34px; flex: 0 0 34px; font-size: 28px; background: #c39b54; color: #211a10; border: 1px solid #efce90; border-radius: 3px; }
   .quantity-display { color: #fff1c8; flex: 1; text-align: center; font-size: 26px; font-variant-numeric: tabular-nums; }
-  .order-btn { flex: 1.35 1 0; min-width: 0; width: auto; height: 100%; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 7px; background: #142e2b; color: #fff1c8; border: 1px solid #b28a4b; border-radius: 3px; }
-  .order-preview { display: grid; place-items: center; width: 100%; height: 100px; }
-  .order-preview img { width: 100px; height: 100px; object-fit: contain; }
-  .order-label { display: block; font-size: 28px; font-weight: 800; }
+  .order-btn { padding: 6px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; background: #142e2b; color: #fff1c8; border: 1px solid #b28a4b; border-radius: 3px; }
+  .order-preview { display: grid; place-items: center; width: 100%; height: 80px; }
+  .order-preview img { width: 80px; height: 80px; object-fit: contain; }
+  .order-label { display: block; font-size: 26px; line-height: 1; font-weight: 800; }
   .order-progress { color: #fff1c8; position: static; display: block; font-size: 26px; line-height: 1; }
-  .order-total { display: block; font-size: 24px; white-space: nowrap; }
+  .order-total { display: block; font-size: 24px; line-height: 1; white-space: nowrap; }
   button:focus-visible, .item-circle:focus-visible { outline: 3px solid #ffe0a0; outline-offset: 3px; }
   button:disabled { opacity: .5; }
   .circle-close-btn { background: #512a22; }
@@ -517,16 +507,13 @@ const handleTipsClick = () => {
 }
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .is-midnight-cart {
-    width: 100%; height: 220px; padding: 8px 10px 38px;
-    .item-group { gap: 8px; }
-    .cart-item { padding: 5px; gap: 4px; }
-    .item-circle { height: 76px; flex-basis: 76px; }
     .item-name-area { height: 40px; line-height: 20px; font-size: 17px; }
     .item-price { font-size: 16px; line-height: 20px; }
+    .item-info { height: auto; }
     .item-controls { height: 34px; }
     .item-controls .minus-btn, .item-controls .plus-btn { width: 34px; height: 34px; flex-basis: 34px; font-size: 25px; }
     .quantity-display { font-size: 21px; }
-    .order-btn { padding: 5px; gap: 4px; }
+    .order-btn { padding: 5px; gap: 3px; }
     .order-preview { height: 65px; }
     .order-preview img { width: 65px; height: 65px; }
     .order-label { font-size: 22px; }
