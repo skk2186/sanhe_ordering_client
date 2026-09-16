@@ -10,6 +10,7 @@
     :style="{ '--progress': `${numericProgress}%` }"
   >
     <template v-if="themeKey === 'midnight-station'">
+      <img class="midnight-progress-facility" src="/images/ui/midnight-station/progress-console-v2.png" alt="" aria-hidden="true">
       <span class="progress-fill-art midnight-signal-fill" aria-hidden="true"></span>
       <span class="progress-label">{{ numericProgress >= 100 ? '通行信号' : '站务线路' }}</span>
       <span class="progress-count">{{ formatted }}</span>
@@ -113,51 +114,47 @@ const assetUrls = computed(() => {
 .is-midnight-progress {
   width: min(100%, 1040px);
   min-height: 92px;
-  aspect-ratio: 2172 / 724;
-  overflow: visible;
+  aspect-ratio: 1040 / 124;
+  overflow: hidden;
   isolation: auto;
   padding: 0 !important;
-  border: 3px solid #9d7841 !important;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #203833, #0d201d 52%, #152b26) !important;
-  box-shadow: inset 0 2px 0 rgba(255, 228, 154, .18), inset 0 -3px 0 rgba(0, 0, 0, .52), 0 6px 15px rgba(0, 0, 0, .42);
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
 
-  &::before,
-  &::after {
-    content: '';
+  .midnight-progress-facility {
     position: absolute;
     z-index: 0;
-    top: 50%;
-    width: 18px;
-    height: 18px;
-    border: 3px solid #b98b46;
-    border-radius: 50%;
-    background: #172a25;
-    box-shadow: inset 0 0 0 4px #091513, 0 0 9px rgba(0, 0, 0, .6);
-    transform: translateY(-50%);
+    top: -52%;
+    left: 0;
+    width: 100%;
+    height: 204%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
   }
-  &::before { left: 17px; }
-  &::after { right: 17px; }
 
-  /* 保留旧站务板的图片结构，亮态只由真实进度裁切，避免将数值画死在素材中。 */
+  /* 设施结构全部来自图片；这里只裁切真实进度的信号灯亮态。 */
   .midnight-signal-fill {
     z-index: 1;
-    top: 46.5%;
-    left: 13.5%;
-    width: 73%;
-    height: 19.5%;
-    clip-path: inset(0 calc(100% - var(--progress)) 0 0 round 12px);
+    top: 58%;
+    left: 16.8%;
+    width: 66.3%;
+    height: 21%;
+    clip-path: inset(0 calc(100% - var(--progress)) 0 0);
     background:
-      repeating-linear-gradient(90deg, transparent 0 37px, rgba(9, 20, 20, .78) 38px 46px),
+      repeating-linear-gradient(90deg, transparent 0 30px, rgba(9, 20, 20, .88) 31px 37px),
       linear-gradient(90deg, #b96e25, #f4c969 52%, #d99b4a);
-    box-shadow: 0 0 12px rgba(232, 171, 72, .58), inset 0 1px 0 rgba(255, 245, 195, .7);
+    box-shadow: 0 0 10px rgba(232, 171, 72, .72);
+    opacity: .86;
   }
 
   .progress-label {
     position: absolute;
     z-index: 3;
-    left: 16%;
-    top: 42%;
+    left: 22%;
+    top: 31%;
     display: block;
     color: #ead6a6;
     font-size: clamp(14px, 1.02vw, 24px);
@@ -168,9 +165,9 @@ const assetUrls = computed(() => {
   }
 
   .progress-count {
-    top: 48%;
+    top: 37%;
     left: auto;
-    right: 14.5%;
+    right: 22%;
     color: #fff1c8;
     font-size: clamp(20px, 1.28vw, 30px);
     text-shadow: 0 2px 4px rgba(0, 0, 0, .92);

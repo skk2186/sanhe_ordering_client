@@ -1,5 +1,11 @@
 <template>
   <div class="cart-section is-midnight-cart">
+    <img
+      class="midnight-cart-facility"
+      :src="`/images/ui/midnight-station/cart-counter-${side}-v2.png`"
+      alt=""
+      aria-hidden="true"
+    >
 
     <div v-if="tipsType === 'order_meal' || tipsType === 'out_meal'"
         class="tips-overlay"
@@ -91,6 +97,8 @@ const handleTipsClick = () => {
 
 <style lang="scss" scoped>
 @use '@/styles/conveyor-belt.scss';
+
+.midnight-cart-facility { display: none; }
 
 .tips-overlay {
   position: absolute;
@@ -411,75 +419,107 @@ const handleTipsClick = () => {
 /* Midnight Station: the carts are staffed luggage / meal-ticket counters.
    Every selector is rooted at the document theme so legacy skins stay intact. */
 [data-theme="midnight-station"] .is-midnight-cart {
-  padding: clamp(17px, 1.15vw, 24px) clamp(20px, 1.4vw, 30px) 14px;
+  padding: 0;
   overflow: visible;
-  background: url('/images/ui/midnight-station/platform-service-counter-v1.png') center / 100% 128% no-repeat;
+  background: transparent;
 
-  .item-group {
+  .midnight-cart-facility {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
     width: 100%;
     height: 100%;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(10px, .95vw, 26px);
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .item-group {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    align-items: start;
+    gap: 0;
+    box-sizing: border-box;
+    padding-block: clamp(60px, 3.55vw, 72px) 9px;
+  }
+
+  .order-btn-left ~ .cart-item,
+  .order-btn-right ~ .cart-item { min-width: 0; }
+
+  &:has(.order-btn-left) .item-group {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(118px, 1.18fr);
+    padding-inline: 7.5% 1.8%;
+  }
+
+  &:has(.order-btn-right) .item-group {
+    grid-template-columns: minmax(118px, 1.28fr) repeat(4, minmax(0, 1fr));
+    padding-inline: 2.5% 7.2%;
   }
 
   .cart-item {
-    width: clamp(112px, 7.3vw, 146px);
-    height: 175px;
+    width: 100%;
+    height: 142px;
     gap: 0;
   }
 
   .item-circle {
-    width: clamp(88px, 5.8vw, 116px);
-    height: clamp(72px, 4.6vw, 92px);
+    width: 78%;
+    height: 58px;
     box-sizing: border-box;
-    border: 2px solid rgba(209, 168, 91, .64);
-    border-radius: 8px 8px 5px 5px;
-    background: linear-gradient(180deg, rgba(9, 26, 27, .92), rgba(31, 54, 48, .88));
-    box-shadow: inset 0 2px 0 rgba(255, 229, 164, .12), 0 7px 10px rgba(0, 0, 0, .3);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 
-    &:hover { transform: translateY(-2px); box-shadow: inset 0 2px 0 rgba(255, 229, 164, .18), 0 10px 16px rgba(0, 0, 0, .42); }
+    &:hover { transform: translateY(-2px); filter: drop-shadow(0 0 7px rgba(242, 201, 120, .72)); box-shadow: none; }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
-    &.empty-item::after { color: rgba(242, 201, 120, .62); font-size: 28px; }
+    &.empty-item::after { color: rgba(242, 201, 120, .52); font-size: 25px; }
   }
 
-  .item-image img { width: 88%; height: 88%; object-fit: contain; }
+  .item-image img { width: 94%; height: 94%; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .48)); }
   .circle-close-btn {
-    top: -12px; right: -12px; width: 32px; height: 32px;
-    border: 2px solid #e5d7bc; border-radius: 50%;
-    background: #6f302b; color: #fff6df; box-shadow: 0 3px 7px rgba(0, 0, 0, .45);
-    &:hover:not(:disabled) { background: #8c3d34; transform: scale(1.06); }
+    top: -7px; right: -13px; width: 28px; height: 28px;
+    border: 0; border-radius: 50%;
+    background: transparent; color: #fff6df; box-shadow: none;
+    &:hover:not(:disabled) { background: transparent; filter: drop-shadow(0 0 6px #f4a77c); transform: scale(1.06); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 2px; }
   }
 
   .item-info {
-    width: calc(100% - 2px);
-    margin-top: -3px;
-    border: 1px solid rgba(79, 57, 35, .7);
-    border-radius: 0 0 5px 5px;
-    background: #e5d7bc;
-    box-shadow: 0 4px 7px rgba(0, 0, 0, .25);
+    width: 100%;
+    margin-top: -1px;
+    display: flex;
+    flex-direction: column-reverse;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
   }
-  .item-name-area { height: 32px; padding: 1px 6px; line-height: 30px; color: #2b2921; font-size: clamp(15px, .9vw, 22px); font-weight: 800; }
-  .item-controls { height: 34px; padding: 0 7px; color: #172924; }
+  .item-name-area { height: 29px; padding: 1px 5px; line-height: 27px; color: #fff1c8; font-size: clamp(14px, .82vw, 20px); font-weight: 800; text-shadow: 0 2px 4px #06100e; }
+  .item-controls { height: 28px; padding: 0 13%; color: #fff1c8; }
   .quantity-display { min-width: 2ch; font-size: clamp(17px, 1vw, 24px); font-weight: 900; }
   .item-controls .minus-btn,
   .item-controls .plus-btn {
-    width: 30px; height: 28px; border: 1px solid #5b452d; border-radius: 3px;
-    background: linear-gradient(#d9b56b, #a97936); color: #1a241f; font-size: 19px;
-    box-shadow: inset 0 1px 0 rgba(255, 239, 185, .65);
-    &:hover:not(.empty-btn) { background: linear-gradient(#f2c978, #bd8436); transform: translateY(-1px); }
-    &:focus-visible { outline: 3px solid #203833; outline-offset: 2px; }
+    width: 30px; height: 28px; border: 0; border-radius: 50%;
+    background: transparent; color: #21180d; font-size: 20px;
+    box-shadow: none; text-shadow: 0 1px rgba(255, 236, 177, .72);
+    &:hover:not(.empty-btn) { background: transparent; filter: drop-shadow(0 0 6px #ffe4a0); transform: translateY(-1px); }
+    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 1px; }
   }
 
   .order-btn {
-    width: clamp(112px, 7vw, 138px); height: 158px; box-sizing: border-box; padding: 12px 8px 10px;
+    width: 100%; height: 132px; box-sizing: border-box; padding: 3px 8px 10px;
     display: grid; place-content: center; gap: 5px;
-    border: 2px solid #c89b50; border-radius: 5px;
-    color: #fff1c8; background: linear-gradient(145deg, #28443b, #102620 58%, #1e332c);
-    box-shadow: inset 0 2px 0 rgba(255, 225, 153, .18), 0 7px 12px rgba(0, 0, 0, .35);
+    border: 0; border-radius: 0;
+    color: #fff1c8; background: transparent;
+    box-shadow: none; text-shadow: 0 2px 4px #020706;
     font-family: inherit; cursor: pointer;
-    &:hover:not(:disabled) { transform: translateY(-2px); border-color: #f2c978; }
+    &:hover:not(:disabled) { transform: translateY(-2px); filter: drop-shadow(0 0 7px rgba(242, 201, 120, .72)); }
     &:active:not(:disabled) { transform: translateY(1px); }
     &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
     &:disabled { cursor: wait; opacity: .68; }
@@ -508,6 +548,23 @@ const handleTipsClick = () => {
     align-items: center;
     justify-content: space-between;
     gap: clamp(6px, 0.7vw, 14px);
+  }
+
+  [data-theme="midnight-station"] .is-midnight-cart {
+    .item-group { height: 100%; padding-block: 46px 5px; }
+    &:has(.order-btn-left) .item-group { padding-inline: 7.5% 1.8%; }
+    &:has(.order-btn-right) .item-group { padding-inline: 2.5% 7.2%; }
+    .cart-item { width: 100%; height: 116px; }
+    .item-circle { width: 78%; height: 43px; }
+    .item-name-area { height: 24px; line-height: 22px; font-size: 13px; }
+    .item-controls { height: 24px; padding-inline: 8%; }
+    .item-controls .minus-btn,
+    .item-controls .plus-btn { width: 24px; height: 24px; font-size: 17px; }
+    .quantity-display { font-size: 17px; }
+    .order-btn { width: 100%; height: 105px; padding: 0 4px 5px; }
+    .order-label { font-size: 17px; }
+    .order-progress { font-size: 20px; }
+    .order-total { font-size: 13px; }
   }
 
   .item-circle {

@@ -10,6 +10,7 @@
     <div class="top-section">
       <div class="top-scene-banner">
         <div class="brand-lockup">
+          <img class="midnight-brand-facility" src="/images/ui/midnight-station/brand-sign-v2.png" alt="" aria-hidden="true">
           <span class="brand-kicker">AI DINING TABLE</span>
           <strong>{{ $t('menu.brand') }}</strong>
           <span class="brand-table">TABLE {{ deskNumber }} · {{ deskPeople }} SEATS</span>
@@ -298,7 +299,12 @@ const SCENES = {
       '/images/ui/midnight-station/special-express-lower-mask.webp',
       '/images/ui/midnight-station/special-wheel.webp',
       '/images/ui/midnight-station/special-driving-rod.webp',
-      '/images/ui/midnight-station/platform-service-counter-v1.png'
+      '/images/ui/midnight-station/cart-counter-left-v2.png',
+      '/images/ui/midnight-station/cart-counter-right-v2.png',
+      '/images/ui/midnight-station/service-console-v2.png',
+      '/images/ui/midnight-station/progress-console-v2.png',
+      '/images/ui/midnight-station/ai-station-desk-v2.png',
+      '/images/ui/midnight-station/brand-sign-v2.png'
     ]
   }
 }
@@ -1589,7 +1595,7 @@ onUnmounted(() => {
 }
 
 .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
-  grid-template-columns: minmax(0, 1fr) 270px;
+  grid-template-columns: minmax(0, 1fr) clamp(420px, 24vw, 620px);
 }
 
 .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) {
@@ -1611,7 +1617,7 @@ onUnmounted(() => {
 }
 .assistant-slot :deep(.recommendation-card img) { width: 46px; height: 46px; }
 .assistant-slot :deep(.recommendation-number) { left: 5px; width: 20px; height: 20px; font-size: 10px; }
-.assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 102px; }
+.assistant-slot :deep(.virtual-assistant) { grid-column: 2; grid-template-columns: minmax(0, 1fr) 102px; }
 .assistant-slot :deep(.assistant-character) { width: 102px; height: 126px; }
 .assistant-slot :deep(.assistant-bubble) { width: fit-content; max-width: min(100%, 420px); min-height: 0; height: auto; justify-self: end; padding: 8px 12px; }
 .assistant-slot :deep(.assistant-bubble strong) { font-size: 15px; }
@@ -1634,6 +1640,8 @@ onUnmounted(() => {
   background: url('/images/ui/midnight-station/background-v3-foreground.png') center/cover no-repeat;
   pointer-events: none;
 }
+
+.midnight-brand-facility { display: none; }
 
 .middle-section > :deep(.featured-dish-screen) {
   z-index: 8;
@@ -1664,12 +1672,23 @@ onUnmounted(() => {
     max-width: 500px;
     min-height: 112px;
     box-sizing: border-box;
-    padding: 16px 28px 16px 34px;
-    border: 1px solid rgba(204, 159, 81, .78);
-    border-left: 9px solid #29483d;
-    border-radius: 3px;
-    background: linear-gradient(105deg, rgba(18, 37, 33, .94), rgba(12, 25, 24, .88));
-    box-shadow: inset 0 2px 0 rgba(255, 226, 150, .14), 0 7px 16px rgba(0, 0, 0, .35);
+    padding: 32px 44px 18px 48px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    isolation: isolate;
+  }
+  .midnight-brand-facility {
+    display: block;
+    position: absolute;
+    inset: -9% -4%;
+    z-index: -1;
+    width: 108%;
+    height: 118%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
   }
   .brand-kicker { color: #d99b4a; font-size: clamp(13px, .7vw, 17px); letter-spacing: .18em; }
   .brand-lockup strong { color: #fff1c8; font-size: clamp(30px, 1.65vw, 40px); letter-spacing: .03em; }
@@ -1697,7 +1716,7 @@ onUnmounted(() => {
 @media (min-width: 1921px) {
   [data-theme="midnight-station"] .conveyor-display {
     .top-scene-banner { grid-template-columns: minmax(470px, .7fr) minmax(760px, 1.05fr) minmax(960px, 1.25fr); }
-    .brand-lockup { max-width: 570px; min-height: 136px; padding: 19px 32px 18px 38px; }
+    .brand-lockup { max-width: 570px; min-height: 136px; padding: 39px 54px 20px 58px; }
     .assistant-slot :deep(.assistant-recommendation-rail) { margin-right: 10px; }
     .top-progress :deep(.is-midnight-progress) { height: 124px; aspect-ratio: 1040 / 124 !important; }
   }
@@ -1724,7 +1743,7 @@ onUnmounted(() => {
   .brand-lockup strong { font-size: 36px; }
   .brand-table { font-size: 15px; }
   .top-scene-banner { grid-template-columns: minmax(420px, 0.7fr) minmax(560px, 1.05fr) minmax(1080px, 1.25fr); }
-  .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 320px; }
+    .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 620px; }
   .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) { grid-template-columns: minmax(0, 1fr) 300px; }
   .assistant-slot :deep(.recommendation-list) { grid-auto-columns: 160px; gap: 10px; }
   .assistant-slot :deep(.recommendation-card) {

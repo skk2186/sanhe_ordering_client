@@ -40,6 +40,7 @@
     </div>
 
     <aside class="virtual-assistant">
+      <img class="midnight-ai-facility" src="/images/ui/midnight-station/ai-station-desk-v2.png" alt="" aria-hidden="true">
       <div class="assistant-bubble" role="status">
         <strong>{{ $t('assistant.name') }}</strong>
         <span>{{ statusText }}</span>
@@ -770,6 +771,8 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.midnight-ai-facility { display: none; }
+
 .assistant-recommendation-rail {
   --assistant-panel-width: 245px;
   --recommendation-card-width: 224px;
@@ -1116,27 +1119,22 @@ onUnmounted(() => {
   --rail-shell-width: 0px;
   min-height: 158px;
   margin: 0 14px 4px;
-  padding: 12px 14px 16px;
+  padding: 4px 6px 2px;
   color: #2c2a21;
-  background: linear-gradient(90deg, rgba(25, 44, 38, .9), rgba(16, 31, 27, .94));
-  border: 1px solid rgba(207, 163, 83, .72);
-  border-radius: 5px 5px 8px 8px;
-  box-shadow: inset 0 2px 0 rgba(255, 224, 153, .16), 0 7px 16px rgba(0, 0, 0, .38);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 
   &::after {
-    content: '';
-    position: absolute;
-    left: 7%; right: 7%; bottom: 5px; height: 8px;
-    border-top: 2px solid rgba(226, 184, 103, .68);
-    border-bottom: 2px solid rgba(4, 12, 12, .7);
-    pointer-events: none;
+    display: none;
   }
 }
 
 [data-theme="midnight-station"] .assistant-recommendation-rail.has-recommendations {
-  background: linear-gradient(90deg, rgba(25, 44, 38, .96), rgba(16, 31, 27, .97));
-  border-color: rgba(226, 184, 103, .78);
-  box-shadow: inset 0 2px 0 rgba(255, 224, 153, .18), 0 7px 17px rgba(0, 0, 0, .42);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 [data-theme="midnight-station"] {
@@ -1160,22 +1158,50 @@ onUnmounted(() => {
   .recommendation-copy strong { font-size: clamp(14px, .78vw, 18px); }
   .recommendation-copy span { color: #8c3d34; font-size: clamp(13px, .72vw, 16px); }
   .assistant-bubble {
-    max-width: min(100%, 510px);
-    padding: 10px 13px;
+    position: absolute !important;
+    left: 15%;
+    top: 29%;
+    z-index: 2;
+    width: 40% !important;
+    max-width: none !important;
+    min-height: 34% !important;
+    box-sizing: border-box;
+    justify-self: auto !important;
+    padding: 6px 12px !important;
     color: #29271e;
-    background: #e5d7bc !important;
-    border: 1px solid #967440 !important;
-    border-radius: 3px;
-    box-shadow: 3px 4px 0 rgba(3, 12, 10, .32);
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
     strong { color: #29483d !important; font-size: clamp(15px, .82vw, 19px); }
     span { font-size: clamp(15px, .84vw, 19px); line-height: 1.4; }
   }
+  .virtual-assistant {
+    position: relative;
+    display: block !important;
+    min-height: 150px;
+    isolation: isolate;
+  }
+  .midnight-ai-facility {
+    display: block;
+    position: absolute;
+    inset: -5% -4% -4% -6%;
+    z-index: -1;
+    width: 110%;
+    height: 109%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+  }
   .assistant-character {
-    width: 132px; height: 150px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    width: 19% !important;
+    height: 95% !important;
     &::before {
-      content: ''; position: absolute; z-index: 0; left: 4px; right: 4px; bottom: 0; height: 42px;
-      border: 2px solid #bd8e48; border-radius: 5px 5px 2px 2px;
-      background: linear-gradient(#29483d, #132b25); box-shadow: inset 0 2px 0 rgba(255, 227, 152, .15);
+      display: none;
     }
     &:focus-visible { outline-color: #f2c978; border-radius: 4px; }
   }
