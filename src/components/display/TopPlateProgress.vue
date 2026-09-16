@@ -12,7 +12,7 @@
     <template v-if="themeKey === 'midnight-station'">
       <img class="midnight-progress-hanger" src="/images/ui/midnight-station/progress-hanger-v1.png" alt="" aria-hidden="true">
       <img class="midnight-progress-facility" src="/images/ui/midnight-station/progress-console-v2.png" alt="" aria-hidden="true">
-      <span class="progress-fill-art midnight-signal-fill" aria-hidden="true"></span>
+      <img class="progress-fill-art midnight-signal-fill" src="/images/ui/midnight-station/progress-console-v2.png" alt="" aria-hidden="true">
       <span class="progress-label">{{ numericProgress >= 100 ? '通行信号' : '站务线路' }}</span>
       <span class="progress-count">{{ formatted }}</span>
     </template>
@@ -44,11 +44,12 @@ const numericProgress = computed(() => {
 // generated hanger, console, label and percentage always share one scale.
 const MIDNIGHT_PROGRESS_ANCHORS = {
   hanger: { x: 0, y: -58, width: 100, height: 76 },
-  label: { x: 22, y: 31, width: 30, height: 18 },
-  percent: { x: 72, y: 31, width: 12, height: 18 }
+  label: { x: 19, y: 20, width: 24, height: 18 },
+  percent: { x: 57, y: 20, width: 24, height: 18 }
 }
 const progressStyle = computed(() => ({
   '--progress': `${numericProgress.value}%`,
+  '--signal-right': `${85 - .70 * numericProgress.value}%`,
   '--hanger-x': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.x}%`,
   '--hanger-y': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.y}px`,
   '--hanger-w': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.width}%`,
@@ -169,17 +170,10 @@ const assetUrls = computed(() => {
 
   /* 设施结构全部来自图片；这里只裁切真实进度的信号灯亮态。 */
   .midnight-signal-fill {
-    z-index: 2;
-    top: 58%;
-    left: 16.8%;
-    width: 66.3%;
-    height: 21%;
-    clip-path: inset(0 calc(100% - var(--progress)) 0 0);
-    background:
-      repeating-linear-gradient(90deg, transparent 0 30px, rgba(9, 20, 20, .88) 31px 37px),
-      linear-gradient(90deg, #b96e25, #f4c969 52%, #d99b4a);
-    box-shadow: 0 0 10px rgba(232, 171, 72, .72);
-    opacity: .86;
+    z-index: 2; top: -52%; left: 0; width: 100%; height: 204%;
+    object-fit: fill;
+    clip-path: inset(49.5% var(--signal-right) 39% 15%);
+    filter: brightness(1.8) saturate(1.3);
   }
 
   .progress-label {
@@ -187,7 +181,9 @@ const assetUrls = computed(() => {
     z-index: 3;
     left: var(--label-x);
     top: var(--label-y);
-    display: block;
+    display: grid;
+    place-items: center;
+    width: 24%; height: 18%;
     color: #ead6a6;
     font-size: clamp(14px, 1.02vw, 24px);
     font-weight: 800;
@@ -201,18 +197,15 @@ const assetUrls = computed(() => {
     left: auto;
     left: var(--percent-x);
     right: auto;
+    width: 24%; height: 18%; min-width: 0;
+    transform: none; display: grid; place-items: center;
     color: #fff1c8;
     font-size: clamp(20px, 1.28vw, 30px);
     text-shadow: 0 2px 4px rgba(0, 0, 0, .92);
   }
 
   &.is-complete {
-    .midnight-signal-fill {
-      background:
-        repeating-linear-gradient(90deg, transparent 0 37px, rgba(8, 28, 18, .78) 38px 46px),
-        linear-gradient(90deg, #50755b, #b3c992 52%, #718e70);
-      box-shadow: 0 0 13px rgba(143, 189, 127, .58), inset 0 1px 0 rgba(238, 255, 205, .72);
-    }
+    .midnight-signal-fill { filter: brightness(1.8) saturate(1.3) hue-rotate(65deg); }
 
     .progress-label::before { content: '● '; color: #b3c992; }
   }

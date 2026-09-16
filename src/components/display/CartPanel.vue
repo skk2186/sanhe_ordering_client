@@ -1,5 +1,5 @@
 <template>
-  <div class="cart-section is-midnight-cart" :style="midnightCartStyle">
+  <div class="cart-section is-midnight-cart">
     <img
       class="midnight-cart-facility"
       :src="`/images/ui/midnight-station/cart-counter-${side}-v3.png`"
@@ -32,7 +32,7 @@
       </button>
 
       <!-- 购物车圆形显示 -->
-      <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" :class="'cart-item cart-item-'+side" :style="midnightSlotStyle(index)">
+      <div v-for="(item, index) in items" :key="`${side}-circle-${index}`" :class="'cart-item cart-item-'+side">
         <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" role="button" tabindex="0"
           @click="$emit('select', side, index)" @keydown.enter="$emit('select', side, index)" @keydown.space.prevent="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
@@ -45,7 +45,7 @@
         <!-- 下方信息区域 - 始终显示 -->
         <div class="item-info" :class="{ 'empty-info': !item }">
           <div class="item-name-area" :class="{ 'empty-name': !item }">
-            <div v-if="item" >{{ item.storeName }}</div>
+            <div v-if="item" >{{ item.storeName }}<span class="item-price">¥ {{ Number(item.price ?? 0).toFixed(2) }}</span></div>
           </div>
           <div class="item-controls" :class="{ 'empty-controls': !item }">
             <button class="minus-btn" type="button" :disabled="!item || submitting" :aria-disabled="!item || submitting"
@@ -88,86 +88,6 @@ const totalPrice = computed(() => props.items.reduce((total, item) => {
   return total + unit * Number(item.quantity ?? 0)
 }, 0).toFixed(2))
 
-// Midnight assets contain fixed physical bays.  These normalized rectangles are
-// the single source of truth for all DOM content instead of visual nudging.
-const rect = (x, y, width, height) => ({ x, y, width, height })
-
-// V3 uses final, fine-grained asset coordinates. Every visible datum and
-// control has its own physical rectangle; no child inset is used to guess it.
-const MIDNIGHT_CART_V3_ANCHORS = {
-  left: {
-    slots: [8.7, 25.1, 41.5, 57.9].map((x) => ({
-      imageRect: rect(x, 24.5, 14.7, 24.2),
-      nameRect: rect(x + .2, 49.5, 14.3, 7.3),
-      minusRect: rect(x + .2, 57.4, 4.25, 10.2),
-      quantityRect: rect(x + 5.05, 57.4, 4.6, 10.2),
-      plusRect: rect(x + 10.25, 57.4, 4.25, 10.2),
-      removeRect: rect(x + 11.4, 22.4, 3.5, 6.2)
-    })),
-    order: {
-      previewRect: rect(74.8, 23.4, 20.2, 29.8),
-      labelRect: rect(75.2, 54.1, 8.0, 11.5),
-      countRect: rect(83.8, 54.1, 5.4, 11.5),
-      totalRect: rect(89.7, 54.1, 6.1, 11.5),
-      buttonRect: rect(74.6, 22.8, 21.5, 44.0)
-    }
-  },
-  right: {
-    slots: [27.0, 43.4, 59.8, 76.2].map((x) => ({
-      imageRect: rect(x, 24.5, 14.7, 24.2),
-      nameRect: rect(x + .2, 49.5, 14.3, 7.3),
-      minusRect: rect(x + .2, 57.4, 4.25, 10.2),
-      quantityRect: rect(x + 5.05, 57.4, 4.6, 10.2),
-      plusRect: rect(x + 10.25, 57.4, 4.25, 10.2),
-      removeRect: rect(x + 11.4, 22.4, 3.5, 6.2)
-    })),
-    order: {
-      previewRect: rect(4.8, 23.4, 20.2, 29.8),
-      labelRect: rect(4.2, 54.1, 8.0, 11.5),
-      countRect: rect(12.8, 54.1, 5.4, 11.5),
-      totalRect: rect(18.7, 54.1, 6.1, 11.5),
-      buttonRect: rect(3.8, 22.8, 21.5, 44.0)
-    }
-  }
-}
-
-const rectVars = (prefix, value) => ({
-  [`--${prefix}-x`]: `${value.x}%`,
-  [`--${prefix}-y`]: `${value.y}%`,
-  [`--${prefix}-w`]: `${value.width}%`,
-  [`--${prefix}-h`]: `${value.height}%`
-})
-const localRect = (child, parent) => rect(
-  (child.x - parent.x) / parent.width * 100,
-  (child.y - parent.y) / parent.height * 100,
-  child.width / parent.width * 100,
-  child.height / parent.height * 100
-)
-
-const midnightCartStyle = computed(() => {
-  const anchor = MIDNIGHT_CART_V3_ANCHORS[props.side]
-  const button = anchor.order.buttonRect
-  return {
-    ...rectVars('order-preview', localRect(anchor.order.previewRect, button)),
-    ...rectVars('order-label', localRect(anchor.order.labelRect, button)),
-    ...rectVars('order-count', localRect(anchor.order.countRect, button)),
-    ...rectVars('order-total', localRect(anchor.order.totalRect, button)),
-    ...rectVars('order-button', anchor.order.buttonRect)
-  }
-})
-
-const midnightSlotStyle = (index) => {
-  const anchor = MIDNIGHT_CART_V3_ANCHORS[props.side].slots[index]
-  return {
-    ...rectVars('slot-image', anchor.imageRect),
-    ...rectVars('slot-name', anchor.nameRect),
-    ...rectVars('slot-minus', anchor.minusRect),
-    ...rectVars('slot-quantity', anchor.quantityRect),
-    ...rectVars('slot-plus', anchor.plusRect),
-    ...rectVars('slot-remove', localRect(anchor.removeRect, anchor.imageRect))
-  }
-}
-
 const orderPreviewItem = computed(() => props.items.find(Boolean) || null)
 
 // 处理提示点击事件
@@ -199,6 +119,9 @@ const handleTipsClick = () => {
   align-items: center;
   justify-content: center;
 }
+
+.order-btn { border: 0; background-color: transparent; padding: 0; }
+.order-btn .order-progress { inset-inline-start: 0; box-sizing: border-box; }
 
 .order-btn.is-submitting {
   cursor: wait;
@@ -501,118 +424,32 @@ const handleTipsClick = () => {
 
 .w3-animate-top{position:relative;animation:animatetop 0.4s}@keyframes animatetop{from{top:-300px;opacity:0} to{top:0;opacity:1}}
 
-/* Midnight Station: the carts are staffed luggage / meal-ticket counters.
-   Every selector is rooted at the document theme so legacy skins stay intact. */
+/* Shared flow owns all content; Midnight only supplies surface skin and sizing. */
+.order-preview, .order-label, .order-total, .item-price { display: none; }
 [data-theme="midnight-station"] .is-midnight-cart {
-  width: 1050px;
-  height: 300px;
-  padding: 0;
-  overflow: visible;
-  background: transparent;
-
-  .midnight-cart-facility {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .item-group {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    display: block;
-    box-sizing: border-box;
-    padding: 0;
-  }
-
-  .cart-item { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .item-circle {
-    position: absolute;
-    left: var(--slot-image-x); top: var(--slot-image-y);
-    width: var(--slot-image-w); height: var(--slot-image-h);
-    box-sizing: border-box;
-    border: 0; border-radius: 2px; background: transparent; box-shadow: none;
-    pointer-events: auto;
-    &:hover { filter: drop-shadow(0 0 8px rgba(242, 201, 120, .78)); }
-    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
-    &.empty-item::after { color: rgba(242, 201, 120, .58); font-size: clamp(26px, 1.35vw, 34px); }
-  }
-
-  .item-image,
+  width: 1050px; height: 300px; padding: 16px 26px 48px;
+  box-sizing: border-box; position: relative; background: transparent; border: 0;
+  .midnight-cart-facility { display: block; position: absolute; inset: 0; width: 100%; height: 100%; clip-path: inset(72% 0 0); pointer-events: none; z-index: 0; }
+  .item-group { position: relative; z-index: 1; display: flex; width: 100%; height: 100%; gap: 16px; align-items: stretch; }
+  .cart-item { flex: 1 1 0; min-width: 0; width: auto; height: 100%; gap: 8px; background: #122b28; border: 1px solid #9a7642; padding: 8px; box-sizing: border-box; }
+  .item-circle { width: 100%; height: 110px; flex: 0 0 110px; border-radius: 3px; box-shadow: none; background: transparent; }
   .item-image img { width: 100%; height: 100%; }
-  .item-image img { object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0, 0, 0, .58)); }
-  .circle-close-btn {
-    top: var(--slot-remove-y); left: var(--slot-remove-x);
-    width: var(--slot-remove-w); height: var(--slot-remove-h);
-    min-width: 32px; min-height: 32px;
-    border: 0; border-radius: 50%;
-    background: rgba(93, 21, 17, .82); color: #fff6df; box-shadow: 0 0 0 2px #c98f52;
-    pointer-events: auto;
-    &:hover:not(:disabled) { filter: drop-shadow(0 0 7px #f4a77c); transform: scale(1.06); }
-    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 2px; }
-  }
-
-  .item-info,
-  .item-controls { display: contents; }
-  .item-name-area {
-    position: absolute;
-    left: var(--slot-name-x); top: var(--slot-name-y);
-    width: var(--slot-name-w); height: var(--slot-name-h);
-    padding: 0 5%; display: grid; place-items: center;
-    overflow: hidden; color: #fff1c8;
-    font-size: clamp(16px, .95vw, 23px); font-weight: 800; line-height: 1.1;
-    text-align: center; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 2px 4px #06100e;
-  }
-  .quantity-display {
-    position: absolute;
-    left: var(--slot-quantity-x); top: var(--slot-quantity-y);
-    width: var(--slot-quantity-w); height: var(--slot-quantity-h);
-    display: grid; place-items: center; color: #fff1c8;
-    font-size: clamp(21px, 1.15vw, 29px); font-weight: 900; font-variant-numeric: tabular-nums;
-  }
-  .item-controls .minus-btn,
-  .item-controls .plus-btn {
-    position: absolute; min-width: 44px; min-height: 44px;
-    width: var(--slot-minus-w); height: var(--slot-minus-h);
-    border: 0; border-radius: 50%; background: transparent;
-    color: #25170b; font-size: clamp(27px, 1.45vw, 36px); font-weight: 950;
-    box-shadow: none; text-shadow: 0 1px rgba(255, 236, 177, .78); pointer-events: auto;
-    &:hover:not(.empty-btn) { filter: drop-shadow(0 0 8px #ffe4a0); transform: scale(1.05); }
-    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 1px; }
-  }
-  .item-controls .minus-btn { left: var(--slot-minus-x); top: var(--slot-minus-y); }
-  .item-controls .plus-btn { left: var(--slot-plus-x); top: var(--slot-plus-y); width: var(--slot-plus-w); height: var(--slot-plus-h); }
-
-  .order-btn {
-    position: absolute;
-    left: var(--order-button-x); top: var(--order-button-y);
-    width: var(--order-button-w); height: var(--order-button-h);
-    padding: 0; display: block; border: 0; border-radius: 3px;
-    color: #fff1c8; background: transparent; box-shadow: none;
-    text-shadow: 0 2px 4px #020706; font-family: inherit; cursor: pointer;
-    &:hover:not(:disabled) { filter: drop-shadow(0 0 9px rgba(242, 201, 120, .78)); }
-    &:active:not(:disabled) { filter: brightness(.88); }
-    &:focus-visible { outline: 3px solid #f2c978; outline-offset: 3px; }
-    &:disabled { cursor: wait; opacity: .68; }
-  }
-  .order-preview,
-  .order-label,
-  .order-progress,
-  .order-total { position: absolute; display: grid; place-items: center; margin: 0; }
-  .order-preview { left: var(--order-preview-x); top: var(--order-preview-y); width: var(--order-preview-w); height: var(--order-preview-h); }
-  .order-preview img { width: min(110px, 88%); height: min(110px, 92%); object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,.62)); }
-  .order-label { left: var(--order-label-x); top: var(--order-label-y); width: var(--order-label-w); height: var(--order-label-h); font-size: clamp(19px, 1.08vw, 27px); font-weight: 900; }
-  .order-progress { left: var(--order-count-x); top: var(--order-count-y); width: var(--order-count-w); height: var(--order-count-h); font-size: clamp(20px, 1.16vw, 29px); font-weight: 900; font-variant-numeric: tabular-nums; }
-  .order-total { left: var(--order-total-x); top: var(--order-total-y); width: var(--order-total-w); height: var(--order-total-h); color: #fff1c8; font-size: clamp(16px, .9vw, 22px); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .item-info { width: 100%; margin: 0; border: 0; border-radius: 0; background: transparent; overflow: visible; }
+  .item-name-area { padding: 0; height: 48px; line-height: 24px; font-size: 22px; color: #fff1c8; white-space: nowrap; }
+  .item-price { display: block; color: #e6bf79; font-size: 20px; line-height: 24px; }
+  .item-controls { height: 44px; padding: 0; gap: 4px; color: #fff1c8; }
+  .item-controls .minus-btn, .item-controls .plus-btn { width: 44px; height: 44px; flex: 0 0 44px; font-size: 30px; background: #c39b54; color: #211a10; border: 1px solid #efce90; border-radius: 3px; }
+  .quantity-display { color: #fff1c8; flex: 1; text-align: center; font-size: 26px; font-variant-numeric: tabular-nums; }
+  .order-btn { flex: 1.35 1 0; min-width: 0; width: auto; height: 100%; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 7px; background: #142e2b; color: #fff1c8; border: 1px solid #b28a4b; border-radius: 3px; }
+  .order-preview { display: grid; place-items: center; width: 100%; height: 100px; }
+  .order-preview img { width: 100px; height: 100px; object-fit: contain; }
+  .order-label { display: block; font-size: 28px; font-weight: 800; }
+  .order-progress { color: #fff1c8; position: static; display: block; font-size: 26px; line-height: 1; }
+  .order-total { display: block; font-size: 24px; white-space: nowrap; }
+  button:focus-visible, .item-circle:focus-visible { outline: 3px solid #ffe0a0; outline-offset: 3px; }
+  button:disabled { opacity: .5; }
+  .circle-close-btn { background: #512a22; }
 }
-
 @media (min-width: 769px) and (max-width: 1920px) {
   .cart-section {
     width: 100%;
@@ -634,18 +471,6 @@ const handleTipsClick = () => {
     gap: clamp(6px, 0.7vw, 14px);
   }
 
-  [data-theme="midnight-station"] .is-midnight-cart {
-    width: 100%;
-    height: 220px;
-    .item-name-area { font-size: clamp(16px, 1.02vw, 20px); }
-    .item-controls .minus-btn,
-    .item-controls .plus-btn { min-width: 34px; min-height: 34px; font-size: clamp(23px, 1.4vw, 30px); }
-    .quantity-display { font-size: clamp(19px, 1.2vw, 25px); }
-    .order-preview img { width: min(70px, 88%); height: min(70px, 92%); }
-    .order-label { font-size: clamp(17px, 1.15vw, 22px); }
-    .order-progress { font-size: clamp(18px, 1.2vw, 24px); }
-    .order-total { font-size: clamp(14px, .92vw, 18px); }
-  }
 
   .item-circle {
     width: clamp(72px, 5vw, 96px);
@@ -688,6 +513,24 @@ const handleTipsClick = () => {
       bottom: 18px;
       font-size: 22px;
     }
+  }
+}
+@media (min-width: 769px) and (max-width: 1920px) {
+  [data-theme="midnight-station"] .is-midnight-cart {
+    width: 100%; height: 220px; padding: 8px 10px 38px;
+    .item-group { gap: 8px; }
+    .cart-item { padding: 5px; gap: 4px; }
+    .item-circle { height: 76px; flex-basis: 76px; }
+    .item-name-area { height: 40px; line-height: 20px; font-size: 17px; }
+    .item-price { font-size: 16px; line-height: 20px; }
+    .item-controls { height: 34px; }
+    .item-controls .minus-btn, .item-controls .plus-btn { width: 34px; height: 34px; flex-basis: 34px; font-size: 25px; }
+    .quantity-display { font-size: 21px; }
+    .order-btn { padding: 5px; gap: 4px; }
+    .order-preview { height: 65px; }
+    .order-preview img { width: 65px; height: 65px; }
+    .order-label { font-size: 22px; }
+    .order-progress, .order-total { font-size: 20px; }
   }
 }
 </style>

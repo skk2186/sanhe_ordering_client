@@ -11,9 +11,9 @@
       <div class="top-scene-banner">
         <div class="brand-lockup">
           <img class="midnight-brand-facility" src="/images/ui/midnight-station/brand-sign-v2.png" alt="" aria-hidden="true">
-          <span class="brand-kicker">AI DINING TABLE</span>
+          <span v-if="activeSceneKey !== 'midnight-station'" class="brand-kicker">AI DINING TABLE</span>
           <strong>{{ $t('menu.brand') }}</strong>
-          <span class="brand-table">TABLE {{ deskNumber }} · {{ deskPeople }} SEATS</span>
+          <span v-if="activeSceneKey !== 'midnight-station'" class="brand-table">TABLE {{ deskNumber }} · {{ deskPeople }} SEATS</span>
         </div>
 
         <div class="top-progress">
@@ -1672,7 +1672,11 @@ onUnmounted(() => {
     max-width: 500px;
     min-height: 112px;
     box-sizing: border-box;
-    padding: 32px 44px 18px 48px;
+    padding: 0;
+    width: 440px;
+    height: 160px;
+    display: grid;
+    place-items: center;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -1682,21 +1686,23 @@ onUnmounted(() => {
   .midnight-brand-facility {
     display: block;
     position: absolute;
-    inset: -9% -4%;
+    inset: 0;
     z-index: -1;
-    width: 108%;
-    height: 118%;
+    width: 100%;
+    height: 100%;
     object-fit: fill;
     pointer-events: none;
     user-select: none;
   }
   .brand-kicker { color: #d99b4a; font-size: clamp(13px, .7vw, 17px); letter-spacing: .18em; }
-  .brand-lockup strong { color: #fff1c8; font-size: clamp(30px, 1.65vw, 40px); letter-spacing: .03em; }
+  .brand-lockup strong { position: relative; top: 11%; color: #fff1c8; font-size: clamp(30px, 1.2vw, 38px); letter-spacing: .12em; line-height: 1; }
   .brand-table { color: #e5d7bc; font-size: clamp(17px, .88vw, 22px); letter-spacing: .08em; }
 
-  .top-progress { align-self: center; display: grid; place-items: center; }
+  .top-progress { position: relative; grid-column: 2; top: auto; left: auto; width: 100%; transform: none; align-self: center; display: flex; justify-content: center; }
   .top-progress :deep(.is-midnight-progress) {
-    width: min(1040px, 100%) !important;
+    width: 100% !important;
+    max-width: 1040px;
+    min-width: 0;
     height: 112px;
     min-height: 0;
     flex: 0 0 auto;
@@ -1733,8 +1739,7 @@ onUnmounted(() => {
 @media (min-width: 1921px) {
   [data-theme="midnight-station"] .conveyor-display {
     .top-scene-banner { grid-template-columns: minmax(470px, .7fr) minmax(760px, 1.05fr) minmax(960px, 1.25fr); }
-    .brand-lockup { max-width: 570px; min-height: 136px; padding: 39px 54px 20px 58px; }
-    .assistant-slot :deep(.assistant-recommendation-rail) { margin-right: 10px; }
+    .brand-lockup { max-width: 570px; min-height: 136px; padding: 0; }
     .top-progress :deep(.is-midnight-progress) { height: 124px; aspect-ratio: 1040 / 124 !important; }
   }
 }
