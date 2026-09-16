@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-center">
+  <div class="bottom-center" :style="midnightConsoleStyle">
     <img class="midnight-service-facility" src="/images/ui/midnight-station/service-console-v2.png" alt="" aria-hidden="true">
     <div class="center-layout">
       <button class="menu-btn left-menu" type="button" :aria-label="$t('common.menu')" :title="$t('common.menu')" @click="$emit('open-detail-menu', 'left')">
@@ -29,7 +29,26 @@
 </template>
 
 <script setup>
-// 无需 props，事件由父级承接
+// The physical console is one image; all button rectangles use its normalized
+// service positions so labels cannot drift independently from the equipment.
+const MIDNIGHT_CONSOLE_ANCHORS = {
+  leftMenu: { x: 10.5, y: 30, width: 16, height: 29 },
+  navigation: { x: 27.4, y: 33, width: 16.2, height: 25 },
+  history: { x: 44.4, y: 31.5, width: 24.2, height: 17 },
+  settings: { x: 44.9, y: 48.5, width: 12.8, height: 20 },
+  waiter: { x: 58.3, y: 47.5, width: 12.2, height: 21 },
+  rightMenu: { x: 75.2, y: 30, width: 16, height: 29 }
+}
+
+const midnightConsoleStyle = Object.fromEntries(
+  Object.entries(MIDNIGHT_CONSOLE_ANCHORS).flatMap(([name, rect]) => [
+    [`--console-${name}-x`, `${rect.x}%`],
+    [`--console-${name}-y`, `${rect.y}%`],
+    [`--console-${name}-w`, `${rect.width}%`],
+    [`--console-${name}-h`, `${rect.height}%`]
+  ])
+)
+
 defineEmits([
   'open-detail-menu',
   'open-navigation',
@@ -92,17 +111,17 @@ defineEmits([
     text-align: center;
   }
   .menu-btn {
-    top: 28%; width: 17%; height: 34%; padding: 8px;
+    width: var(--console-leftMenu-w); height: var(--console-leftMenu-h); padding: 4px;
     color: #292316;
     text-shadow: 0 1px rgba(255, 255, 255, .35);
   }
-  .left-menu { left: 10.2%; }
-  .right-menu { left: 75.1%; }
-  .navigation-btn { left: 28.5%; top: 31%; width: 16.5%; height: 31%; }
-  .checkout-btn { left: 45.2%; top: 24%; width: 26.7%; height: 22%; font-size: clamp(15px, .82vw, 21px); }
-  .settings-btn { left: 45.3%; top: 47%; width: 14.3%; height: 18%; font-size: clamp(14px, .76vw, 19px); }
+  .left-menu { left: var(--console-leftMenu-x); top: var(--console-leftMenu-y); }
+  .right-menu { left: var(--console-rightMenu-x); top: var(--console-rightMenu-y); width: var(--console-rightMenu-w); height: var(--console-rightMenu-h); }
+  .navigation-btn { left: var(--console-navigation-x); top: var(--console-navigation-y); width: var(--console-navigation-w); height: var(--console-navigation-h); }
+  .checkout-btn { left: var(--console-history-x); top: var(--console-history-y); width: var(--console-history-w); height: var(--console-history-h); font-size: clamp(15px, .82vw, 21px); }
+  .settings-btn { left: var(--console-settings-x); top: var(--console-settings-y); width: var(--console-settings-w); height: var(--console-settings-h); font-size: clamp(14px, .76vw, 19px); }
   .waiter-btn {
-    left: 58.8%; top: 58%; width: 18%; height: 13%;
+    left: var(--console-waiter-x); top: var(--console-waiter-y); width: var(--console-waiter-w); height: var(--console-waiter-h);
     color: #fff1c8;
     padding: 0;
     font-size: clamp(14px, .76vw, 19px);

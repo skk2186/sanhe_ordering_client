@@ -7,9 +7,10 @@
     aria-valuemin="0"
     aria-valuemax="100"
     :aria-valuenow="numericProgress"
-    :style="{ '--progress': `${numericProgress}%` }"
+    :style="progressStyle"
   >
     <template v-if="themeKey === 'midnight-station'">
+      <img class="midnight-progress-hanger" src="/images/ui/midnight-station/progress-hanger-v1.png" alt="" aria-hidden="true">
       <img class="midnight-progress-facility" src="/images/ui/midnight-station/progress-console-v2.png" alt="" aria-hidden="true">
       <span class="progress-fill-art midnight-signal-fill" aria-hidden="true"></span>
       <span class="progress-label">{{ numericProgress >= 100 ? '通行信号' : '站务线路' }}</span>
@@ -38,6 +39,25 @@ const numericProgress = computed(() => {
   const val = Number(unref(props.progress) ?? 0)
   return Math.min(100, Math.max(0, isNaN(val) ? 0 : val))
 })
+
+// Normalized anchors are intentionally kept next to the progress logic: the
+// generated hanger, console, label and percentage always share one scale.
+const MIDNIGHT_PROGRESS_ANCHORS = {
+  hanger: { x: 0, y: -58, width: 100, height: 76 },
+  label: { x: 22, y: 31, width: 30, height: 18 },
+  percent: { x: 72, y: 31, width: 12, height: 18 }
+}
+const progressStyle = computed(() => ({
+  '--progress': `${numericProgress.value}%`,
+  '--hanger-x': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.x}%`,
+  '--hanger-y': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.y}px`,
+  '--hanger-w': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.width}%`,
+  '--hanger-h': `${MIDNIGHT_PROGRESS_ANCHORS.hanger.height}px`,
+  '--label-x': `${MIDNIGHT_PROGRESS_ANCHORS.label.x}%`,
+  '--label-y': `${MIDNIGHT_PROGRESS_ANCHORS.label.y}%`,
+  '--percent-x': `${MIDNIGHT_PROGRESS_ANCHORS.percent.x}%`,
+  '--percent-y': `${MIDNIGHT_PROGRESS_ANCHORS.percent.y}%`
+}))
 
 const assetUrls = computed(() => {
   const themeFolder = props.themeKey === 'xiaoxin' ? 'c' : 'b'
@@ -115,7 +135,7 @@ const assetUrls = computed(() => {
   width: min(100%, 1040px);
   min-height: 92px;
   aspect-ratio: 1040 / 124;
-  overflow: hidden;
+  overflow: visible;
   isolation: auto;
   padding: 0 !important;
   border: 0 !important;
@@ -125,7 +145,7 @@ const assetUrls = computed(() => {
 
   .midnight-progress-facility {
     position: absolute;
-    z-index: 0;
+    z-index: 1;
     top: -52%;
     left: 0;
     width: 100%;
@@ -135,9 +155,21 @@ const assetUrls = computed(() => {
     user-select: none;
   }
 
+  .midnight-progress-hanger {
+    position: absolute;
+    z-index: 0;
+    left: var(--hanger-x);
+    top: var(--hanger-y);
+    width: var(--hanger-w);
+    height: var(--hanger-h);
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+  }
+
   /* 设施结构全部来自图片；这里只裁切真实进度的信号灯亮态。 */
   .midnight-signal-fill {
-    z-index: 1;
+    z-index: 2;
     top: 58%;
     left: 16.8%;
     width: 66.3%;
@@ -153,8 +185,8 @@ const assetUrls = computed(() => {
   .progress-label {
     position: absolute;
     z-index: 3;
-    left: 22%;
-    top: 31%;
+    left: var(--label-x);
+    top: var(--label-y);
     display: block;
     color: #ead6a6;
     font-size: clamp(14px, 1.02vw, 24px);
@@ -165,9 +197,10 @@ const assetUrls = computed(() => {
   }
 
   .progress-count {
-    top: 37%;
+    top: var(--percent-y);
     left: auto;
-    right: 22%;
+    left: var(--percent-x);
+    right: auto;
     color: #fff1c8;
     font-size: clamp(20px, 1.28vw, 30px);
     text-shadow: 0 2px 4px rgba(0, 0, 0, .92);

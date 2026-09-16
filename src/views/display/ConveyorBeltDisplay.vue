@@ -303,7 +303,7 @@ const SCENES = {
       '/images/ui/midnight-station/cart-counter-right-v2.png',
       '/images/ui/midnight-station/service-console-v2.png',
       '/images/ui/midnight-station/progress-console-v2.png',
-      '/images/ui/midnight-station/ai-station-desk-v2.png',
+      '/images/ui/midnight-station/progress-hanger-v1.png',
       '/images/ui/midnight-station/brand-sign-v2.png'
     ]
   }
@@ -1595,7 +1595,7 @@ onUnmounted(() => {
 }
 
 .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) {
-  grid-template-columns: minmax(0, 1fr) clamp(420px, 24vw, 620px);
+  grid-template-columns: minmax(0, 1fr) 270px;
 }
 
 .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) {
@@ -1617,7 +1617,7 @@ onUnmounted(() => {
 }
 .assistant-slot :deep(.recommendation-card img) { width: 46px; height: 46px; }
 .assistant-slot :deep(.recommendation-number) { left: 5px; width: 20px; height: 20px; font-size: 10px; }
-.assistant-slot :deep(.virtual-assistant) { grid-column: 2; grid-template-columns: minmax(0, 1fr) 102px; }
+.assistant-slot :deep(.virtual-assistant) { grid-template-columns: minmax(0, 1fr) 102px; }
 .assistant-slot :deep(.assistant-character) { width: 102px; height: 126px; }
 .assistant-slot :deep(.assistant-bubble) { width: fit-content; max-width: min(100%, 420px); min-height: 0; height: auto; justify-self: end; padding: 8px 12px; }
 .assistant-slot :deep(.assistant-bubble strong) { font-size: 15px; }
@@ -1713,6 +1713,23 @@ onUnmounted(() => {
   }
 }
 
+/* The counters are the primary ordering surface.  A modest extra vertical
+   allowance keeps their physical trays and the 44px control hot zones readable
+   without changing the delivery corridor structure. */
+@media (min-width: 1921px) {
+  [data-theme="midnight-station"] .bottom-section { height: 260px; }
+  [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
+  [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
+  [data-theme="midnight-station"] :deep(.bottom-center) { height: 250px; }
+}
+
+@media (min-width: 769px) and (max-width: 1920px) {
+  [data-theme="midnight-station"] .bottom-section { height: 200px; }
+  [data-theme="midnight-station"] .bottom-left :deep(.cart-section),
+  [data-theme="midnight-station"] .bottom-right :deep(.cart-section),
+  [data-theme="midnight-station"] :deep(.bottom-center) { height: 190px; }
+}
+
 @media (min-width: 1921px) {
   [data-theme="midnight-station"] .conveyor-display {
     .top-scene-banner { grid-template-columns: minmax(470px, .7fr) minmax(760px, 1.05fr) minmax(960px, 1.25fr); }
@@ -1743,7 +1760,7 @@ onUnmounted(() => {
   .brand-lockup strong { font-size: 36px; }
   .brand-table { font-size: 15px; }
   .top-scene-banner { grid-template-columns: minmax(420px, 0.7fr) minmax(560px, 1.05fr) minmax(1080px, 1.25fr); }
-    .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 620px; }
+    .assistant-slot :deep(.assistant-recommendation-rail:not(.has-recommendations)) { grid-template-columns: minmax(0, 1fr) 320px; }
   .assistant-slot :deep(.assistant-recommendation-rail.has-recommendations) { grid-template-columns: minmax(0, 1fr) 300px; }
   .assistant-slot :deep(.recommendation-list) { grid-auto-columns: 160px; gap: 10px; }
   .assistant-slot :deep(.recommendation-card) {
