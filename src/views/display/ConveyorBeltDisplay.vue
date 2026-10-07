@@ -104,7 +104,7 @@
             @select="selectCartSlot"
             @close-tips="closeCartFullTips('left')"
           />
-          <MenuView  v-if="menuVisibility.left" side="left" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
+          <MenuView  v-if="menuVisibility.left" side="left" :theme-key="activeSceneKey" @close="menuVisibility.left = false" @add-to-cart="addSpecificItem" />
       </div>
 
       <!-- 中间功能按钮区 -->
@@ -133,7 +133,7 @@
           @close-tips="closeCartFullTips('right')"
         />
 
-        <MenuView v-if="menuVisibility.right" side="right" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
+        <MenuView v-if="menuVisibility.right" side="right" :theme-key="activeSceneKey" @close="menuVisibility.right = false" @add-to-cart="addSpecificItem" />
       </div>
     </div>
 
@@ -205,6 +205,7 @@
     <SceneTransitionOverlay
       :phase="sceneTransitionPhase"
       :scene-key="pendingSceneKey || activeSceneKey"
+      :station-timing="stationTransitionTiming"
     />
 
     <GameInvitationFlow
@@ -315,6 +316,7 @@ const pendingSceneKey = ref('')
 const sceneTransitionPhase = ref('idle')
 const sceneRevision = ref(0)
 const sceneTransitionBusy = computed(() => sceneTransitionPhase.value !== 'idle')
+const stationTransitionTiming = ref(false)
 let sceneTransitionRun = 0
 
 const applySceneTheme = (sceneKey) => {
@@ -366,12 +368,16 @@ const handleThemeChange = async (theme) => {
   const run = ++sceneTransitionRun
   const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false
   pendingSceneKey.value = nextSceneKey
+  stationTransitionTiming.value = nextSceneKey === 'midnight-station' || activeSceneKey.value === 'midnight-station'
+  // Station transitions warm assets during the cover; a failed dish URL must not hold the curtain.
+  const stationPreload = stationTransitionTiming.value ? preloadScene(nextSceneKey) : null
   sceneTransitionPhase.value = 'covering'
-  await waitForSceneFrame(reducedMotion ? 20 : 1700)
+  await waitForSceneFrame(reducedMotion ? 20 : stationTransitionTiming.value ? 600 : 1700)
   if (run !== sceneTransitionRun) return
 
   sceneTransitionPhase.value = 'covered'
-  await preloadScene(nextSceneKey)
+  if (stationPreload) await Promise.race([stationPreload, waitForSceneFrame(200)])
+  else await preloadScene(nextSceneKey)
   if (run !== sceneTransitionRun) return
 
   activeSceneKey.value = nextSceneKey
@@ -380,7 +386,7 @@ const handleThemeChange = async (theme) => {
   await nextTick()
 
   sceneTransitionPhase.value = 'revealing'
-  await waitForSceneFrame(reducedMotion ? 40 : 1050)
+  await waitForSceneFrame(reducedMotion ? 40 : stationTransitionTiming.value ? 450 : 1050)
   if (run !== sceneTransitionRun) return
   sceneTransitionPhase.value = 'idle'
   pendingSceneKey.value = ''

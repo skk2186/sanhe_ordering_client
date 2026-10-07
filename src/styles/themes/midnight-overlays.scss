@@ -1,0 +1,42 @@
+// Overlay-only tokens: never target the frozen scene, carts or assistant.
+@mixin scope($root) {
+  [data-theme="midnight-station"] #{$root} {
+    --station-metal: #17342d;
+    --station-night: #101b24;
+    --station-paper: #e5d7bc;
+    --station-ink: #29271f;
+    --station-brass: #b79152;
+    --station-lamp: #f2c978;
+    --station-text: #fff1d0;
+    --station-muted: #d4c6aa;
+    --station-title: clamp(28px, .95vw, 36px);
+    --station-body: clamp(18px, .62vw, 24px);
+    --station-control: clamp(20px, .68vw, 26px);
+    @content;
+  }
+}
+
+@mixin metal {
+  background: var(--station-metal);
+  color: var(--station-text);
+  border: 2px solid var(--station-brass);
+  border-radius: 4px;
+  box-shadow: 0 16px 40px #0008;
+  backdrop-filter: none;
+}
+
+@mixin paper {
+  background: var(--station-paper);
+  color: var(--station-ink);
+  border: 1px solid #b5a281;
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+@mixin controls {
+  button:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--station-lamp);
+    outline-offset: 3px;
+  }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+}

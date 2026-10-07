@@ -1,4 +1,5 @@
 <template>
+  <Teleport to="body" :disabled="themeKey !== 'midnight-station'">
   <div class="menu-view-container">
 
 
@@ -77,6 +78,7 @@
     <!-- 中部分页控制 -->
 
   </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -88,6 +90,7 @@ import { useI18n } from '@/i18n'
 const { t } = useI18n()
 
 const props = defineProps({
+  themeKey: { type: String, default: 'zhenxian' },
   side: {
     type: String,
     default: 'left'
@@ -203,6 +206,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/themes/midnight-overlays' as station;
 // 这是作为一个独立的、非弹窗组件的样式，定位由父组件通过props或CSS控制
 .menu-view-container {
   position: absolute;
@@ -428,6 +432,43 @@ onMounted(async () => {
       color: #d9534f;
       margin: 0;
     }
+  }
+}
+@include station.scope('.menu-view-container') {
+  @include station.metal;
+  @include station.controls;
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(1540px, calc(100vw - 64px));
+  height: min(680px, calc(100vh - 240px));
+  box-sizing: border-box; padding: 24px; gap: 24px; z-index: 1800;
+  .left-panel { background: var(--station-night); border-radius: 3px; color: var(--station-text); width: 240px; }
+  .header { font-size: var(--station-title); border-bottom: 1px solid var(--station-brass); }
+  .logo { display: none; }
+  .category-item { font-size: var(--station-body); border-radius: 2px; border-color: var(--station-brass); }
+  .category-item.active { background: var(--station-paper); color: var(--station-ink); }
+  .category-item:hover:not(.active) { background: #365347; }
+  .exit-btn { background: var(--station-brass); color: var(--station-ink); border-radius: 3px; font-size: var(--station-control); }
+  .exit-btn img { filter: sepia(1); }
+  .right-panel { min-width: 0; }
+  .pagination-panel { width: 90px; flex-shrink: 0; }
+  .page-btn { background: #755531; color: var(--station-text); border: 1px solid var(--station-brass); border-radius: 3px; font-size: var(--station-control); cursor: pointer; }
+  .page-btn[disabled=true] { opacity: .5; cursor: not-allowed; }
+  .page-info { @include station.paper; font-size: var(--station-body); }
+  .main-panel { min-width: 0; padding-inline-start: 24px; }
+  .grid-container { gap: 18px; }
+  .dish-card { @include station.paper; width: auto; min-width: 0; }
+  .dish-image { height: clamp(150px, 5.1vw, 196px); }
+  .dish-name { font-size: var(--station-body); font-weight: 700; }
+  .dish-price { font-size: clamp(24px, .78vw, 30px); color: #77431d; }
+  .dish-card:hover { border-color: var(--station-lamp); }
+  .empty-container { color: var(--station-muted); font-size: var(--station-body); }
+}
+@media (max-width: 1920px) {
+  [data-theme="midnight-station"] .menu-view-container {
+    width: min(1320px, calc(100vw - 64px)); padding: 20px; gap: 16px;
+    .left-panel { width: 210px; }
+    .main-panel { padding-inline-start: 16px; }
   }
 }
 </style>

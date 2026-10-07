@@ -212,7 +212,8 @@ const confirmDeal = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/styles/themes/midnight-overlays' as station;
 .overlay {
   position: fixed;
   top: 50%;
@@ -498,4 +499,30 @@ const confirmDeal = () => {
   min-width: 500px;
 }
 
+@include station.scope('.overlay') {
+  @include station.controls;
+  background: #07111dcc;
+  .ordering-modal-frame { width: min(1720px, calc(100vw - 64px)); gap: 24px; }
+  .ordering-modal { @include station.metal; min-width: 0; flex: 1; padding: 24px; }
+  .btn-container { gap: 16px; margin: 0; }
+  .scroll-btn { width: 64px; height: 64px; background: var(--station-brass); border-color: #e2c68e; border-radius: 3px; }
+  .scroll-btn img { max-width: 38px; max-height: 38px; }
+  .table-container { @include station.paper; width: 100%; height: min(580px, 54vh); overflow-x: auto; }
+  .order-table { font-size: var(--station-body); border-color: #b5a281; }
+  .order-table th { background: #243e34; color: var(--station-text); border-color: #b5a281; padding: 18px 12px; }
+  .order-table td { border-color: #b5a281; padding: 18px 12px; font-variant-numeric: tabular-nums; }
+  .order-table tr:nth-child(even) { background: #d9c9ab; }
+  .order-table tr:hover { background: #f0e4cb; }
+  .status { font-size: clamp(18px, .55vw, 22px); white-space: nowrap; }
+  .modal-footer { background: #10231e; border-color: var(--station-brass); }
+  .total-name, .total-amount { color: var(--station-text); font-size: var(--station-control); }
+  .total-amount { color: var(--station-lamp); }
+  .action-bar { width: 100%; background: transparent; padding: 18px 0 0; gap: 24px; box-shadow: none; flex-wrap: wrap; }
+  .action-bar button, .deal-actions button { background: #64492a; color: var(--station-text); border: 1px solid var(--station-brass); border-radius: 3px; font-size: var(--station-control); }
+  .deal-btn { background: #73382e !important; }
+  .popup-content { @include station.paper; border: 4px solid var(--station-brass); }
+  .popup-message h2 { color: var(--station-ink); font-size: var(--station-title); }
+  .popup-message p { color: var(--station-ink); font-size: var(--station-body); }
+  .deal-amount { color: #77431d; text-shadow: none; }
+}
 </style>

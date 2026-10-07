@@ -609,6 +609,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/themes/midnight-overlays' as station;
 .sushi-navigation-overlay {
   position: fixed;
   top: 0;
@@ -1217,6 +1218,53 @@ onUnmounted(() => {
 
   .menu-item {
     width: 180px;
+  }
+}
+@include station.scope('.sushi-navigation-overlay') {
+  @include station.controls;
+  background: var(--station-night); color: var(--station-text);
+  .navigation-container { background: var(--station-night); }
+  .infinite-menu-container { margin-bottom: 213px; background: #102820; border-bottom: 2px solid var(--station-brass); }
+  .menu-items-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 28px; }
+  .menu-item { width: 240px; height: 320px; }
+  .item-image { width: 220px; height: 220px; }
+  .item-info { @include station.paper; height: 82px; margin-top: 10px; padding: 10px; box-sizing: border-box; }
+  .item-name { color: var(--station-ink); font-size: var(--station-body); }
+  .item-price { color: #77431d; font-size: clamp(22px, .75vw, 28px); }
+  .filter-item .filter-image { @include station.metal; height: 220px; }
+  .menu-item.filter-item .filter-image .filter-content .filter-name { font-size: var(--station-control); }
+  .menu-item.filter-item .filter-image .filter-content .filter-keyword { font-size: var(--station-body); opacity: 1; color: var(--station-muted); }
+  .filter-item.active-filter { border: 2px solid var(--station-lamp); box-shadow: none; }
+  .arrow-circle { border: 1px solid var(--station-brass); border-radius: 3px; }
+  .new-badge { background: #714f2a; border-radius: 2px; font-size: 18px; }
+  .sold-out-overlay { background: #161a17bb; font-size: var(--station-body); }
+  .add-overlay { background: #b7915222; }
+  .bottom-left, .bottom-right { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+  .return-btn { background: var(--station-metal); background-image: none; color: var(--station-text); border-color: var(--station-brass); border-radius: 3px; font-size: var(--station-control); }
+  .return-btn:not(.return-btn--back) { background: #64492a; }
+  .loading-overlay { background: var(--station-night); backdrop-filter: none; }
+  .loading-content { @include station.metal; }
+  .sushi-plate { background: #64492a; border-color: var(--station-brass); }
+  .loading-text h3 { color: var(--station-text); font-size: var(--station-title); text-shadow: none; }
+  .loading-text p, .progress-text { color: var(--station-muted); font-size: var(--station-body); opacity: 1; }
+  .progress-bar { background: #090f0d; border-radius: 0; }
+  .progress-fill { background: var(--station-lamp); border-radius: 0; box-shadow: none; }
+  .navigation-state { background: var(--station-night); color: var(--station-text); }
+  .navigation-state p { font-size: var(--station-body); }
+  .navigation-state .el-button { background: var(--station-brass); color: var(--station-ink); border-color: var(--station-brass); font-size: var(--station-control); min-height: 44px; }
+}
+@media (min-width: 769px) and (max-width: 1920px) {
+  [data-theme="midnight-station"] .sushi-navigation-overlay {
+    .infinite-menu-container { margin-bottom: 180px; }
+    .bottom-section-navigation { height: 180px; gap: 18px; padding: 0 8px; }
+    .bottom-left, .bottom-right { flex: 1 1 0; min-width: 0; padding: 0; margin: 0; }
+    .navigation-return-actions { width: 360px; flex-shrink: 0; flex-wrap: wrap; }
+    .return-btn { min-width: 170px; min-height: 50px; padding: 10px; }
+    .menu-items-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .menu-item { width: 220px; height: 290px; }
+    .item-image { width: 200px; height: 200px; }
+    .filter-item .filter-image { height: 200px; }
+    .navigation-state { bottom: 180px; }
   }
 }
 </style>

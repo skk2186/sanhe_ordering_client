@@ -32,7 +32,8 @@
           <span class="setting-tab-label"><el-icon><Picture /></el-icon>{{ copy.themeSettings }}</span>
         </template>
         <div class="theme-item">
-          <div
+          <button
+              type="button"
               class="theme-card"
               v-for="item in themeItem"
               :key="item.key"
@@ -42,6 +43,8 @@
                 'theme-card--disabled': themeChanging
               }"
               :aria-disabled="themeChanging"
+              :disabled="themeChanging"
+              :aria-pressed="selectedThemeKey === item.key"
           >
             <!-- 选中状态标识 -->
             <div class="theme-card__check" v-if="selectedThemeKey === item.key">
@@ -50,7 +53,7 @@
             <img :src="item.img" :alt="copy.themeBackground" class="theme-card__img">
             <div class="theme-card__title">{{ item.title }}</div>
             <div class="theme-card__key">{{ item.key }}</div>
-          </div>
+          </button>
         </div>
 
         <section class="language-settings" aria-labelledby="language-settings-title">
@@ -145,9 +148,11 @@
           <div class="setting-section">
             <h3 class="section-title">{{ copy.movementDirection }}</h3>
             <div class="direction-options">
-              <div
+              <button
+                  type="button"
                   class="direction-card"
                   :class="{ 'direction-card--active': beltDirection === 'left' }"
+                  :aria-pressed="beltDirection === 'left'"
                   @click="setBeltDirection('left')"
               >
                 <div class="direction-icon">←</div>
@@ -156,11 +161,13 @@
                 <div class="direction-check" v-if="beltDirection === 'left'">
                   <el-icon><Check /></el-icon>
                 </div>
-              </div>
+              </button>
 
-              <div
+              <button
+                  type="button"
                   class="direction-card"
                   :class="{ 'direction-card--active': beltDirection === 'right' }"
+                  :aria-pressed="beltDirection === 'right'"
                   @click="setBeltDirection('right')"
               >
                 <div class="direction-icon">→</div>
@@ -169,7 +176,7 @@
                 <div class="direction-check" v-if="beltDirection === 'right'">
                   <el-icon><Check /></el-icon>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -380,6 +387,8 @@ initBeltSettings()
 </script>
 
 <style lang="scss">
+@use '@/styles/themes/midnight-overlays' as station;
+button.theme-card, button.direction-card { font: inherit; text-align: inherit; }
 // 全局CSS变量定义
 :root {
   --theme-key: "zhenxian"; // 默认主题key
@@ -988,5 +997,61 @@ initBeltSettings()
   .luxury-settings-dialog .language-settings,
   .luxury-settings-dialog .conveyor-settings,
   .luxury-settings-dialog .voice-settings { padding: 14px; }
+}
+@include station.scope('.luxury-settings-dialog') {
+  @include station.metal;
+  @include station.controls;
+  --theme-active-color: #f2c978;
+  --el-color-primary: #b79152;
+  --el-text-color-primary: #fff1d0;
+  --el-text-color-regular: #d4c6aa;
+  --el-border-color: #b79152;
+  --settings-ink: #fff1d0;
+  --settings-muted: #d4c6aa;
+  --settings-coral: #f2c978;
+  --settings-sea: #b79152;
+  max-height: calc(100vh - 64px); margin-top: 32px;
+  overflow-y: auto; padding: 0;
+  &::before { display: none; }
+  .el-dialog__header, .el-dialog__body, .el-dialog__footer { background: transparent; }
+  &.el-dialog .el-dialog__header .el-dialog__title { color: var(--station-text); font-size: var(--station-title); }
+  .el-dialog__headerbtn { width: 44px; height: 44px; }
+  .el-dialog__close { color: var(--station-text); }
+  .settings-hero { border-color: var(--station-brass); border-radius: 3px; box-shadow: none; min-height: 100px; }
+  .settings-hero__veil { background: #07111db3; }
+  .settings-hero h2 { font-size: var(--station-title); }
+  .settings-hero p { color: var(--station-text); font-size: var(--station-body); }
+  .settings-hero__eyebrow { display: none; }
+  .settings-hero__badge { background: #243e34; border-color: var(--station-brass); border-radius: 3px; backdrop-filter: none; font-size: var(--station-body); }
+  .el-tabs__nav { background: #10231e; border-color: var(--station-brass); border-radius: 3px; }
+  .el-tabs__item { color: var(--station-muted); font-size: var(--station-control); height: 50px; border-radius: 2px; }
+  .el-tabs__item.is-active { background: #365347; color: var(--station-lamp); box-shadow: none; }
+  .theme-item { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .theme-card { background: #10231e; border-color: var(--station-brass); border-radius: 3px; box-shadow: none; }
+  .theme-card__img { height: 180px; border-radius: 2px; }
+  .theme-card__title { color: var(--station-text); font-size: var(--station-control); }
+  .theme-card__check { background: var(--station-brass); color: var(--station-ink); box-shadow: none; }
+  .theme-card--active { background: #365347; border-color: var(--station-lamp); box-shadow: none; }
+  .theme-card--active .theme-card__title { color: var(--station-lamp); }
+  .language-settings, .conveyor-settings, .voice-settings { background: #10231e; border-color: var(--station-brass); border-radius: 3px; box-shadow: none; }
+  .section-title, .voice-setting-row__content h3 { color: var(--station-text); font-size: var(--station-control); }
+  .voice-setting-row__content p, .direction-desc, .speed-labels { color: var(--station-muted); font-size: var(--station-body); }
+  .direction-card { background: #17342d; border-color: var(--station-brass); border-radius: 3px; }
+  .direction-card--active { background: #365347; border-color: var(--station-lamp); }
+  .direction-icon, .direction-label { color: var(--station-text); }
+  .direction-label { font-size: var(--station-control); }
+  .direction-card--active .direction-icon, .direction-card--active .direction-label { color: var(--station-lamp); }
+  .el-button, .el-button:not(.el-button--primary):not(.settings-close) { background: #64492a; color: var(--station-text); border-color: var(--station-brass); border-radius: 3px; font-size: var(--station-control); min-height: 44px; }
+  .language-button.el-button--primary { background: var(--station-brass); color: var(--station-ink); }
+  .settings-close { background: var(--station-brass); color: var(--station-ink); box-shadow: none; }
+  .el-slider__runway { background: #485a4e; }
+  .el-slider__bar { background: var(--station-brass); }
+  .el-slider__button { border-color: var(--station-lamp); background: #17342d; }
+}
+@media (max-width: 1920px) {
+  [data-theme="midnight-station"] .luxury-settings-dialog {
+    .theme-card__img { height: 150px; }
+    .settings-hero { min-height: 84px; padding: 18px; }
+  }
 }
 </style>

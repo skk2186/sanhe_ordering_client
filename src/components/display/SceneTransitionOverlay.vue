@@ -2,7 +2,7 @@
   <div
     v-if="phase !== 'idle'"
     class="scene-transition-overlay"
-    :class="[`is-${phase}`, `is-${sceneKey}`]"
+    :class="[`is-${phase}`, `is-${sceneKey}`, { 'is-station-transition': stationTiming }]"
     role="status"
     aria-live="polite"
     aria-label="Scene changing"
@@ -42,7 +42,8 @@
 <script setup>
 defineProps({
   phase: { type: String, default: 'idle' },
-  sceneKey: { type: String, default: 'zhenxian' }
+  sceneKey: { type: String, default: 'zhenxian' },
+  stationTiming: { type: Boolean, default: false }
 })
 
 const bubbleStyle = (index) => ({
@@ -339,4 +340,11 @@ const bubbleStyle = (index) => ({
   .midnight-transition-train { animation-duration: 1ms !important; }
   .midnight-transition-mist { display: none; }
 }
+/* Only transitions involving Midnight use the short station cadence. */
+.is-station-transition.is-covering .scene-transition-curtain,
+.is-station-transition.is-covering .midnight-transition-train { animation-duration: 600ms; }
+.is-station-transition.is-revealing .scene-transition-curtain,
+.is-station-transition.is-revealing .midnight-transition-train { animation-duration: 450ms; }
+.is-station-transition .collage-item,
+.is-station-transition .ocean-animal-pile { animation-duration: 450ms; animation-delay: 0ms; }
 </style>

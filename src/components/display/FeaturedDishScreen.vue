@@ -143,6 +143,7 @@ onUnmounted(clearTimers)
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/themes/midnight-overlays' as station;
 .featured-screen {
   position: absolute;
   top: 0;
@@ -287,4 +288,15 @@ onUnmounted(clearTimers)
 
   .featured-screen__video { transition: none; }
 }
+@include station.scope('.featured-screen.is-midnight-station') {
+  @include station.controls;
+  width: min(1000px, calc(100% - 64px)); padding-top: 48px;
+  .featured-screen__rope { width: 7px; background: #b79152; border: 1px solid #4e3e27; border-radius: 0; box-shadow: none; }
+  .featured-screen__body { @include station.metal; border-width: 4px; padding: 16px; }
+  .featured-screen__media { border: 1px solid var(--station-brass); border-radius: 2px; background: var(--station-night); }
+  .featured-screen__poster, .featured-screen__video { object-fit: contain; }
+  .featured-screen__badge { background: #64492a; color: var(--station-text); border: 1px solid var(--station-brass); border-radius: 2px; font-size: var(--station-control); box-shadow: none; }
+  .featured-screen__close { width: 44px; height: 44px; border-radius: 3px; border-color: var(--station-brass); background: #73382e; box-shadow: none; }
+}
+
 </style>
