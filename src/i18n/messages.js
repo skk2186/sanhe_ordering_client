@@ -290,7 +290,9 @@ const messages = {
       cleared: '购物车已清空',
       tableRequired: '请设置桌号',
       incompleteItem: '商品 {name} 信息不完整',
-      invalidItemQuantity: '商品 {name} 数量无效'
+      invalidItemQuantity: '商品 {name} 数量无效',
+      fullStatus: '本侧已满，点击返回',
+      orderPlacedStatus: '下单成功，餐台已清空'
     },
     menu: {
       searchDish: '搜索菜品名称...',
@@ -439,6 +441,8 @@ const replaceMessages = (target, values) => {
 }
 
 replaceMessages(en, {
+  'cart.fullStatus': 'This side is full. Tap to return',
+  'cart.orderPlacedStatus': 'Order placed. This side is clear',
   'assistant.name': 'Xiaohe', 'assistant.greeting': 'Hi, I am Xiaohe', 'assistant.connecting': 'Connecting to voice service', 'assistant.listening': 'Say the dish you want to find', 'assistant.hearing': 'Listening', 'assistant.processing': 'Finding dishes', 'assistant.matchesFound': 'Found {count} matching dishes', 'assistant.noMatches': 'No dishes found for “{query}”', 'assistant.startListening': 'Start voice search', 'assistant.stopListening': 'Stop voice search', 'assistant.recommendations': 'Xiaohe recommendations', 'assistant.youSaid': 'You said: “{transcript}”', 'assistant.recommendationIdle': 'Xiaohe is ready above the conveyor', 'assistant.recommendationListening': 'Listening for what you would like', 'assistant.recommendationEmpty': 'No suitable dishes in this round', 'assistant.addedToCart': 'Added “{name}” to the {side} order area', 'assistant.cartFull': 'Both order areas are full. Place the order or adjust the dishes first', 'assistant.addFailed': 'This dish cannot be added right now', 'assistant.leftSide': 'left', 'assistant.rightSide': 'right', 'assistant.errors.unsupported': 'Voice search is not supported in this browser', 'assistant.errors.permission_denied': 'Allow microphone access and try again', 'assistant.errors.microphone_missing': 'No microphone was detected', 'assistant.errors.microphone_busy': 'The microphone is being used by another app', 'assistant.errors.connection_timeout': 'Voice service connection timed out', 'assistant.errors.service_unavailable': 'Voice service is unavailable', 'assistant.errors.service_busy': 'Voice requests are busy right now. Please try again shortly', 'assistant.errors.invalid_server_event': 'The voice service returned an invalid result', 'assistant.errors.recognition_failed': 'I could not recognize that. Please try again',
   'display.orderSubmitted': 'Order submitted: {orderId}',
   'display.orderFailed': 'Order failed. Your cart was kept; please try again',
@@ -480,6 +484,8 @@ replaceMessages(en, {
 })
 
 replaceMessages(ja, {
+  'cart.fullStatus': 'この側は満杯です。タップして戻る',
+  'cart.orderPlacedStatus': '注文しました。注文台を空にしました',
   'assistant.name': '小禾', 'assistant.greeting': 'こんにちは、小禾です', 'assistant.connecting': '音声サービスに接続中', 'assistant.listening': '探したい料理を話してください', 'assistant.hearing': '聞き取っています', 'assistant.processing': '料理を検索中', 'assistant.matchesFound': '{count}件の料理が見つかりました', 'assistant.noMatches': '「{query}」に一致する料理がありません', 'assistant.startListening': '音声検索を開始', 'assistant.stopListening': '音声検索を停止', 'assistant.recommendations': '小禾のおすすめ', 'assistant.youSaid': 'あなた：「{transcript}」', 'assistant.recommendationIdle': '小禾はレーンの上で待機中です', 'assistant.recommendationListening': 'ご希望を聞いています', 'assistant.recommendationEmpty': '今回はおすすめできる料理がありません', 'assistant.addedToCart': '「{name}」を{side}の注文エリアに追加しました', 'assistant.cartFull': '左右の注文エリアがいっぱいです。先に注文または調整してください', 'assistant.addFailed': 'この料理は現在追加できません', 'assistant.leftSide': '左側', 'assistant.rightSide': '右側', 'assistant.errors.unsupported': 'このブラウザは音声検索に対応していません', 'assistant.errors.permission_denied': 'マイクを許可して再試行してください', 'assistant.errors.microphone_missing': 'マイクが見つかりません', 'assistant.errors.microphone_busy': 'マイクが他のアプリで使用されています', 'assistant.errors.connection_timeout': '音声サービスがタイムアウトしました', 'assistant.errors.service_unavailable': '音声サービスを利用できません', 'assistant.errors.service_busy': '音声リクエストが混み合っています。少し待ってからもう一度お話しください', 'assistant.errors.invalid_server_event': '音声サービスが無効な結果を返しました', 'assistant.errors.recognition_failed': '聞き取れませんでした。もう一度お話しください',
   'display.orderSubmitted': '注文しました：{orderId}',
   'display.orderFailed': '注文に失敗しました。カートは保持されています。再試行してください',

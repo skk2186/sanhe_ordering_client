@@ -54,14 +54,30 @@ defineEmits([
 .menu-btn, .function-btn { border: 0; background-color: transparent; padding: 0; }
 .menu-btn span, .function-btn span { visibility: hidden; }
 [data-theme="midnight-station"] .bottom-center {
-  background: transparent;
-  .menu-btn { background: #d6c5a0; color: #25251e; font-size: 30px; }
-  .first-row .function-btn, .second-row .function-btn { background: #17342d; color: #fff1c8; font-size: 26px; }
-  .menu-btn, .function-btn { padding: 12px; border: 1px solid #b79152; border-radius: 3px; font-family: inherit; font-weight: 800; line-height: 1.3; background-size: 100% 100%; }
+  box-sizing: border-box;
+  padding: 10px;
+  background: linear-gradient(180deg, #1b4038 0%, #102721 100%);
+  border: 2px solid #a98247;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 #f0cc8366, 0 10px 24px #03080780;
+  .center-layout { width: 100%; height: 100%; box-sizing: border-box; align-items: stretch; gap: 10px; padding: 0; }
+  .center-functions { height: 100%; flex: 1 1 auto; gap: 8px; }
+  .function-row { flex: 1 1 0; gap: 8px; }
+  .menu-btn { width: 118px; height: auto; background: linear-gradient(180deg, #e2d3ae, #bea06d); color: #2b251b; font-size: 28px; writing-mode: horizontal-tb; text-orientation: mixed; }
+  .first-row .function-btn, .second-row .function-btn { width: auto; height: auto; flex: 1 1 0; background: #17342d; color: #fff1c8; font-size: 24px; }
+  .menu-btn, .function-btn { padding: 10px; border: 1px solid #b79152; border-radius: 12px; font-family: inherit; font-weight: 800; line-height: 1.2; background-size: 100% 100%; box-shadow: inset 0 1px 0 #ffe0a02e; }
   .menu-btn span, .function-btn span { visibility: visible; }
-  .waiter-btn { background: #64492a !important; }
+  .menu-btn, .function-btn { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .menu-btn::before, .function-btn::before { content: ''; width: 42px; height: 42px; flex: 0 0 42px; background: center / contain no-repeat; }
+  .menu-btn::before { background-image: url('/images/ui/midnight-station/icons/menu.svg'); }
+  .navigation-btn::before { background-image: url('/images/ui/midnight-station/icons/search.svg'); }
+  .checkout-btn::before { background-image: url('/images/ui/midnight-station/icons/history.svg'); }
+  .settings-btn::before { background-image: url('/images/ui/midnight-station/icons/settings.svg'); }
+  .waiter-btn::before { background-image: url('/images/ui/midnight-station/icons/bell.svg'); }
+  .second-row .function-btn::before { width: 34px; height: 34px; flex-basis: 34px; }
+  .waiter-btn { background: linear-gradient(180deg, #785632, #52371f) !important; }
   button:focus-visible { outline: 3px solid #ffe0a0; outline-offset: 3px; }
-  button:hover { filter: brightness(1.15); }
+  button:hover { filter: brightness(1.12); }
 }
 
 .bottom-center {
@@ -127,9 +143,14 @@ defineEmits([
 
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .bottom-center {
-    .menu-btn { font-size: 23px; }
-    .first-row .function-btn, .second-row .function-btn { font-size: 20px; }
-    .menu-btn, .function-btn { padding: 5px; }
+    padding: 8px;
+    .center-layout { gap: 6px; }
+    .center-functions, .function-row { gap: 6px; }
+    .menu-btn { width: clamp(64px, 4.25vw, 82px); font-size: 20px; flex-direction: column; gap: 5px; }
+    .first-row .function-btn, .second-row .function-btn { font-size: 18px; flex-direction: column; gap: 3px; }
+    .menu-btn, .function-btn { padding: 5px; border-radius: 10px; }
+    .menu-btn::before, .function-btn::before { width: 28px; height: 28px; flex-basis: 28px; }
+    .second-row .function-btn::before { width: 24px; height: 24px; flex-basis: 24px; }
   }
 }
 </style>

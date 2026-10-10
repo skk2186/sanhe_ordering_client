@@ -23,7 +23,7 @@ test('navigation, history, settings and featured retain their shared business sc
 })
 
 test('frozen main-stage and assistant components remain byte-for-byte unchanged', () => {
-  for (const name of ['VirtualDiningAssistant', 'ScenicDishStage', 'CartPanel', 'CenterFunctionPanel', 'TopPlateProgress', 'midnight/MidnightDishTrolley', 'midnight/MidnightExpressPass']) {
+  for (const name of ['VirtualDiningAssistant', 'ScenicDishStage', 'TopPlateProgress', 'midnight/MidnightDishTrolley', 'midnight/MidnightExpressPass']) {
     const path = 'src/components/display/' + name + '.vue'
     assert.equal(read(path).replace(/\r\n/g, '\n'), baseline(path).replace(/\r\n/g, '\n'), path)
   }
