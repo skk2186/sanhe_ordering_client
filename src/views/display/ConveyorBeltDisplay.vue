@@ -1,6 +1,7 @@
 <template>
   <div
     class="conveyor-display"
+    data-midnight-background="v3"
     :class="{
       'is-scene-changing': sceneTransitionBusy,
       'is-scene-revealing': sceneTransitionPhase === 'revealing'
@@ -1640,7 +1641,7 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   z-index: 6;
-  background: url('/images/ui/midnight-station/background-v3-foreground.png') center/cover no-repeat;
+  background: center/cover no-repeat;
   pointer-events: none;
 }
 
