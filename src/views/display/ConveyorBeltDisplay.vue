@@ -1,7 +1,7 @@
 <template>
   <div
     class="conveyor-display"
-    data-midnight-background="v3"
+    data-midnight-background="v4-warm"
     :class="{
       'is-scene-changing': sceneTransitionBusy,
       'is-scene-revealing': sceneTransitionPhase === 'revealing'
@@ -292,10 +292,10 @@ const SCENES = {
     ]
   },
   'midnight-station': {
-    background: '/images/ui/midnight-station/background-v3-rear.png',
+    background: '/images/ui/midnight-station/background-v4-warm-rear.png',
     assets: [
-      '/images/ui/midnight-station/background-v3-rear.png',
-      '/images/ui/midnight-station/background-v3-foreground.png',
+      '/images/ui/midnight-station/background-v4-warm-rear.png',
+      '/images/ui/midnight-station/background-v4-warm-foreground.png',
       '/images/ui/midnight-station/delivery-trolley-body-v2.webp',
       '/images/ui/midnight-station/special-express-body-v2.webp',
       '/images/ui/midnight-station/special-express-lower-mask.webp',

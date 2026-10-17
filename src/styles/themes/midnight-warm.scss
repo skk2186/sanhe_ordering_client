@@ -1,4 +1,4 @@
-[data-theme="midnight-station"] .conveyor-display {
+:root[data-theme="midnight-station"] .conveyor-display {
   --midnight-surface: #173b33;
   --midnight-surface-light: #274e41;
   --midnight-brass: #c09754;
@@ -9,33 +9,33 @@
   --midnight-muted: #796850;
 }
 
-[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v3"] {
+:root[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v3"] {
   background: url('/images/ui/midnight-station/background-v3-rear.png') center/cover no-repeat;
 }
 
-[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v4-warm"] {
+:root[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v4-warm"] {
   background: url('/images/ui/midnight-station/background-v4-warm-rear.png') center/cover no-repeat;
 }
 
-[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v3"] .midnight-foreground-occlusion {
+:root[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v3"] .midnight-foreground-occlusion {
   background-image: url('/images/ui/midnight-station/background-v3-foreground.png');
 }
 
-[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v4-warm"] .midnight-foreground-occlusion {
+:root[data-theme="midnight-station"] .conveyor-display[data-midnight-background="v4-warm"] .midnight-foreground-occlusion {
   background-image: url('/images/ui/midnight-station/background-v4-warm-foreground.png');
 }
 
-[data-theme="midnight-station"] .conveyor-display .brand-lockup .midnight-brand-facility {
+:root[data-theme="midnight-station"] .conveyor-display .brand-lockup .midnight-brand-facility {
   filter: brightness(1.08) saturate(1.06);
 }
 
-[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__dish {
+:root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__dish {
   border-color: #fff7e5;
   background: #f7eddb;
   box-shadow: 0 8px 16px #01070c52, 0 0 0 4px #e4a5529e, 0 0 24px #ffb05b6b;
 }
 
-[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__copy {
+:root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__copy {
   border-color: #ffe8be;
   background: #fff7e6f7;
   box-shadow: 0 5px 12px #19120a47;
@@ -44,22 +44,22 @@
   strong { color: #b34f35; }
 }
 
-[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__ai {
+:root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__ai {
   color: #fff9ee;
   background: #db7457;
 }
 
-[data-theme="midnight-station"] .conveyor-display .is-midnight-progress .midnight-progress-facility {
+:root[data-theme="midnight-station"] .conveyor-display .is-midnight-progress .midnight-progress-facility {
   filter: brightness(1.12) saturate(1.08);
 }
 
-[data-theme="midnight-station"] .conveyor-display .bottom-center,
-[data-theme="midnight-station"] .conveyor-display .is-midnight-cart {
+:root[data-theme="midnight-station"] .conveyor-display .bottom-center,
+:root[data-theme="midnight-station"] .conveyor-display .is-midnight-cart {
   background: linear-gradient(180deg, #23483e 0%, #18352e 100%);
   border-color: var(--midnight-brass);
 }
 
-[data-theme="midnight-station"] .conveyor-display .is-midnight-cart {
+:root[data-theme="midnight-station"] .conveyor-display .is-midnight-cart {
   .cart-item {
     background: #eadfc7;
     border-color: #b18d58;
@@ -112,12 +112,12 @@
   }
 }
 
-[data-theme="midnight-station"] .conveyor-display .center-layout {
+:root[data-theme="midnight-station"] .conveyor-display .center-layout {
   border-top-color: #d4a865;
   background: linear-gradient(90deg, #173b33e8, #315548eb, #173b33e8);
 }
 
-[data-theme="midnight-station"] .conveyor-display .bottom-center {
+:root[data-theme="midnight-station"] .conveyor-display .bottom-center {
   box-shadow: inset 0 1px 0 #fff0c36b, 0 10px 24px #03080780;
 
   .menu-btn,
@@ -140,7 +140,7 @@
   }
 }
 
-[data-theme="midnight-station"] .conveyor-display .scenic-dish-stage.is-midnight-theme {
+:root[data-theme="midnight-station"] .conveyor-display .scenic-dish-stage.is-midnight-theme {
   .tide-toolbar {
     border-top-color: #d7b270;
     border-bottom-color: #102821;
