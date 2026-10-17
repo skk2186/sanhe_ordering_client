@@ -11,8 +11,8 @@ v5 后景由两处生成内容局部合成而成：右侧岗亭原有空白窗�
 - [v5 后景 3840×1080](../../public/images/ui/midnight-station/background-v5-food-station-rear.png)
 - [v5 前景 3840×1080](../../public/images/ui/midnight-station/background-v5-food-station-foreground.png)
 - [透明可编辑区域蒙版](../../public/images/ui/midnight-station/background-v5-food-station-edit-mask.png)
-- [v4/v5 背景并排对比](screenshots/phase04r3r-background-v4-v5-side-by-side.png)
-- [v4/v5 背景半透明重合对齐检查](screenshots/phase04r3r-background-v4-v5-overlay-check.png)
+- v4/v5 背景并排对比（文件：phase04r3r-background-v4-v5-side-by-side.png，本地归档）
+- v4/v5 背景半透明重合对齐检查（文件：phase04r3r-background-v4-v5-overlay-check.png，本地归档）
 
 ## 编辑区域与生成方法
 
@@ -49,11 +49,11 @@ v5 后景由两处生成内容局部合成而成：右侧岗亭原有空白窗�
 
 页面 A/B 使用同一张 Phase04-R2 v4 完整页面截图作底图，保留原商品、商品位置、空购物车、操作区及布局；只在可见背景蒙版范围内替换为 v5 后景像素。岗亭区域在商品带下方被遮挡的部分保留原页面像素，避免把背景覆到商品上。该图是基于真实页面截图的隔离重合成图，**不是本轮重新打开浏览器拍摄的实时截图**。
 
-- [v4 页面 3840×1080（原始真实页面截图）](screenshots/phase04r2-B-v4-warm-3840x1080.png)
-- [v5 页面 3840×1080（同布局隔离重合成）](screenshots/phase04r3r-v5-page-3840x1080.png)
-- [v4/v5 页面并排 A/B](screenshots/phase04r3r-page-v4-v5-side-by-side.png)
-- [v5 页面 1920×1080](screenshots/phase04r3r-v5-page-1920x1080.png)
-- [1920 页面 A/B 并排](screenshots/phase04r3r-page-1920-v4-v5-side-by-side.png)
+- v4 页面 3840×1080（原始真实页面截图）（文件：phase04r2-B-v4-warm-3840x1080.png，本地归档）
+- v5 页面 3840×1080（同布局隔离重合成）（文件：phase04r3r-v5-page-3840x1080.png，本地归档）
+- v4/v5 页面并排 A/B（文件：phase04r3r-page-v4-v5-side-by-side.png，本地归档）
+- v5 页面 1920×1080（文件：phase04r3r-v5-page-1920x1080.png，本地归档）
+- 1920 页面 A/B 并排（文件：phase04r3r-page-1920-v4-v5-side-by-side.png，本地归档）
 
 1920 页面使用 v4 的 `center/cover` 视口时显示源图中部，当前两处编辑均落在中心裁切区域以外，因此 v5 与 v4 的 1920 页面像素完全相同；这不是漏贴图。3840 页面能看到岗亭餐饮窗和左侧地面反光。未在本轮正式主题中挂载 v5，也未做新的实时浏览器 CSS 切换；实际商品/UI 几何取自同一张已验收页面截图，前后景同尺寸且前景 alpha 不变。
 

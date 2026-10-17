@@ -53,8 +53,8 @@
 
 以下是 Phase04-R2 留存的真实 v4 页面截图，页面为完整主页面和原布局：
 
-- 3840×1080：[`phase04r2-B-v4-warm-3840x1080.png`](screenshots/phase04r2-B-v4-warm-3840x1080.png)
-- 1920×1080：[`phase04r2-B-v4-warm-1920x1080.png`](screenshots/phase04r2-B-v4-warm-1920x1080.png)
+- 3840×1080：`phase04r2-B-v4-warm-3840x1080.png`（文件：phase04r2-B-v4-warm-3840x1080.png，本地归档）
+- 1920×1080：`phase04r2-B-v4-warm-1920x1080.png`（文件：phase04r2-B-v4-warm-1920x1080.png，本地归档）
 
 本阶段未生成 v5 3840×1080 页面截图、v5 1920×1080 页面截图或新旧背景并排图：无符合画幅及几何约束的 v5 候选可用于隔离预览。不得把上述 v4 截图误认为本阶段新拍的截图。
 

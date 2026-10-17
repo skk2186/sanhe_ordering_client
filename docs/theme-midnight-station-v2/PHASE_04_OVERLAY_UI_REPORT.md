@@ -19,7 +19,7 @@
 - `src/views/display/ConveyorBeltDisplay.vue`：仅菜单主题参数、Midnight 菜单覆盖层挂载和转场时序接线，没有修改主页面几何。
 - 新增 `src/styles/themes/midnight-overlays.scss`：覆盖层专用材质/字号/焦点样式 mixin。
 - 新增 `tests/midnight-overlays.test.mjs`：隔离、共享业务脚本、冻结组件和转场时序回归保护。
-- 本报告及 `screenshots/phase04-*.png`。
+- 本报告及 `phase04-*.png`（本地截图归档）。
 
 ## 3. 新增资产与实现边界
 
@@ -144,7 +144,7 @@ Midnight 调度柜限定于 `[data-theme="midnight-station"] .luxury-settings-di
 
 ## 17. 截图清单
 
-均保存在本目录 `screenshots/`：
+截图原件已保存在仓库外的本地截图归档目录：
 
 - `phase04-midnight-menu.png`
 - `phase04-midnight-navigation.png`

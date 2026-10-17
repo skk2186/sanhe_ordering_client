@@ -105,7 +105,7 @@ VirtualDiningAssistant 继续严格 FROZEN：本轮没有修改文件，没有�
 
 ## 截图
 
-全部位于本目录 screenshots/，真实 Chrome 页面截图，非设计稿：
+全部位于本目录 本地截图归档目录/，真实 Chrome 页面截图，非设计稿：
 
 - phase03r5-midnight-3840-full.png
 - phase03r5-progress-center.png

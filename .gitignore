@@ -57,3 +57,10 @@ docs/refactor/ConveyorBeltDisplay_Part2.md
 docs/refactor/ConveyorBeltDisplay_Part3.md
 .gitignore
 /%SystemDrive%/
+
+# Generated visual review artifacts
+/docs/theme-midnight-station-v2/screenshots/
+/output/imagegen/
+
+# Local temporary visual experiments
+/.visual-review/

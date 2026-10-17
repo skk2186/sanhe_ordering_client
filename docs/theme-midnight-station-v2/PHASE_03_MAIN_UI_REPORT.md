@@ -21,7 +21,7 @@
 ### 资产与验证截图
 
 - `public/images/ui/midnight-station/platform-service-counter-v1.png`
-- `docs/theme-midnight-station-v2/screenshots/phase03-*.png`
+- `phase03-*.png`（本地截图归档）
 
 `platform-service-counter-v1.png` 是无文字、无 Logo 的深绿搪瓷 / 暗木 / 黄铜月台服务柜素材。它仅承担购物车与中部服务台的实体材质；菜名、数量、价格、按钮文案和状态仍由 DOM 输出。
 

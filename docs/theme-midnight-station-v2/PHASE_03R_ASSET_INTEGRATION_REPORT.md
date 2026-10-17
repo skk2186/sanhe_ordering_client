@@ -22,7 +22,7 @@ Phase03 已接入 `platform-service-counter-v1.png`，但 Midnight 专属 CSS �
 - `src/components/display/TopPlateProgress.vue`
 - `src/components/display/VirtualDiningAssistant.vue`
 - `docs/theme-midnight-station-v2/PHASE_03R_ASSET_INTEGRATION_REPORT.md`
-- `docs/theme-midnight-station-v2/screenshots/phase03r-*.png`
+- `phase03r-*.png`（本地截图归档）
 - `public/images/ui/midnight-station/*-v2.png`（见下一节）
 
 未修改 `ScenicDishStage.vue` 的 Phase03 resize 实现，也未修改 Phase02-R2 主舞台、轨道、普通配送车、特殊列车或 background-v3 构图。

@@ -57,18 +57,18 @@ progress-hanger-v1 位于控制板后方并向上延伸至顶栏，包含真实�
 
 PASS。实际页面为 Midnight 主题，两个购物柜、中央服务台、66 个普通托盘车、3 个特快节点均存在；吊架显示为 block。全景及局部截图：
 
-- `screenshots/phase03r2-midnight-3840-full.png`
-- `screenshots/phase03r2-progress.png`
-- `screenshots/phase03r2-left-cart.png`
-- `screenshots/phase03r2-center-console.png`
-- `screenshots/phase03r2-right-cart.png`
-- `screenshots/phase03r2-cart-filled.png`
+- `phase03r2-midnight-3840-full.png`（本地截图归档）
+- `phase03r2-progress.png`（本地截图归档）
+- `phase03r2-left-cart.png`（本地截图归档）
+- `phase03r2-center-console.png`（本地截图归档）
+- `phase03r2-right-cart.png`（本地截图归档）
+- `phase03r2-cart-filled.png`（本地截图归档）
 
 ### 1920×1080
 
 PASS。按同一相对锚点降级，无整组 `scale(.5)`；商品流、特快节点和三套设施仍显示。
 
-- `screenshots/phase03r2-1920-full.png`
+- `phase03r2-1920-full.png`（本地截图归档）
 
 ### Resize
 
@@ -82,8 +82,8 @@ PASS。真实页面触发左右商品加购，两个订单窗均显示 `1/4` 与
 
 PASS。切换 zhenxian / xiaoxin 后，Midnight 设施不显示；旧主题进度与点餐区不使用上述锚点或吊架。
 
-- `screenshots/phase03r2-zhenxian-regression.png`
-- `screenshots/phase03r2-xiaoxin-regression.png`
+- `phase03r2-zhenxian-regression.png`（本地截图归档）
+- `phase03r2-xiaoxin-regression.png`（本地截图归档）
 
 ### Build 与 AI 测试
 

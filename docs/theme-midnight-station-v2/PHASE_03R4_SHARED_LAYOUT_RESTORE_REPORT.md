@@ -17,7 +17,7 @@
 
 仅 Midnight 隐去 DOM 的 `AI DINING TABLE` 与 `TABLE ... SEATS`；旧主题内容不变。原牌匾资产保留，容器 440×160px，中文位于主体信息面中央（视觉中心约 61% 高度），取消旧的多行 padding。中文使用 30～38px、自然字间距，没有 skew 或变形。
 
-证据：`screenshots/phase03r4-brand-plaque.png`。
+证据：`phase03r4-brand-plaque.png`（本地截图归档）。
 
 ## 4. 进度文字与充能归位
 
@@ -28,7 +28,7 @@
 - 顶部进度从绝对居中覆盖恢复为中间栏正常排布，并用 flex 消除 grid 的内在宽度溢出；1920 下不再遮挡牌匾或助手。
 - progress 计算、formatted、完成态、ARIA 和动态更新均未改，progress-hanger-v1 与设备资产未换。
 
-真实本机下单后进度为 10%，裁切为 `inset(49.5% 78% 39% 15%)`。证据：`screenshots/phase03r4-progress.png`。
+真实本机下单后进度为 10%，裁切为 `inset(49.5% 78% 39% 15%)`。证据：`phase03r4-progress.png`（本地截图归档）。
 
 ## 5. 底部回归共享逻辑
 
@@ -67,7 +67,7 @@ Midnight 的 CSS 仅覆盖容器尺寸、间距、颜色、边框、字体、背
 
 **FROZEN**：后续无用户明确授权不得修改 VirtualDiningAssistant 外观。
 
-证据：`screenshots/phase03r4-assistant.png`。
+证据：`phase03r4-assistant.png`（本地截图归档）。
 
 ## 10. 3840 验证
 
@@ -91,7 +91,7 @@ Midnight 的 CSS 仅覆盖容器尺寸、间距、颜色、边框、字体、背
 - `phase03r4-right-cart.png`
 - `phase03r4-assistant.png`
 
-均位于 `screenshots/`。
+截图原件位于仓库外的本地截图归档目录。
 
 ## 11. 1920 与 resize 验证
 
@@ -99,7 +99,7 @@ Midnight 的 CSS 仅覆盖容器尺寸、间距、颜色、边框、字体、背
 
 真实执行 3840 → 1920 → 3840，不刷新；普通配送节点仍为 66、特殊列车节点仍为 3，购物车未重置。ScenicDishStage 和 ResizeObserver 修复代码零修改。
 
-证据：`screenshots/phase03r4-1920-full.png`。
+证据：`phase03r4-1920-full.png`（本地截图归档）。
 
 ## 12. Midnight 业务回归
 
@@ -119,13 +119,13 @@ Midnight 的 CSS 仅覆盖容器尺寸、间距、颜色、边框、字体、背
 
 截图加载完成后检查：四槽、商品信息、数量、订单 count 与六个中央入口排布正常；重复 DOM 文案消失，订单 count 位于原信息窗内。Midnight facility=`none`、额外 order preview=`none`、中心额外 span=`hidden`，助手背景=`none`。
 
-证据：`screenshots/phase03r4-zhenxian-regression.png`。
+证据：`phase03r4-zhenxian-regression.png`（本地截图归档）。
 
 ## 14. xiaoxin 回归
 
 同样检查四槽、购物车、名称、数量、订单窗及中央按钮；未使用 Midnight 布局或资产，无重复标签。上述 display/visibility/assistant background 实测结果与 zhenxian 相同。
 
-证据：`screenshots/phase03r4-xiaoxin-regression.png`。
+证据：`phase03r4-xiaoxin-regression.png`（本地截图归档）。
 
 ## 15. Build 与测试
 

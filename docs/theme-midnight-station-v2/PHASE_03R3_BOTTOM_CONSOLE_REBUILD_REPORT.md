@@ -25,7 +25,7 @@ R2 的失败并非单纯坐标偏差，而是物理结构不足：购物台约 1
 文件与截图：
 
 - `preview/phase03r3-bottom-wireframe.html`
-- `screenshots/phase03r3-wireframe-3840.png`
+- `phase03r3-wireframe-3840.png`（本地截图归档）
 
 ## 4. 新 v3 资产
 
@@ -103,12 +103,12 @@ R3 中央实际字号：菜单 30px、导航 28px、点餐记录 26px、设置 2
 
 局部证据：
 
-- `screenshots/phase03r3-left-cart-empty.png`
-- `screenshots/phase03r3-left-cart-filled.png`
-- `screenshots/phase03r3-right-cart-filled.png`
-- `screenshots/phase03r3-order-zone.png`
-- `screenshots/phase03r3-quantity-controls.png`
-- `screenshots/phase03r3-center-console.png`
+- `phase03r3-left-cart-empty.png`（本地截图归档）
+- `phase03r3-left-cart-filled.png`（本地截图归档）
+- `phase03r3-right-cart-filled.png`（本地截图归档）
+- `phase03r3-order-zone.png`（本地截图归档）
+- `phase03r3-quantity-controls.png`（本地截图归档）
+- `phase03r3-center-console.png`（本地截图归档）
 
 ## 9. 3840×1080 实测
 
@@ -120,7 +120,7 @@ PASS。
 - 3840 → 1920 → 3840 后测量恢复为 1050×300 / 900×300，商品流与特殊列车数量仍为 66 / 3，无空屏。
 - 顶部 progress-hanger-v1 与原进度逻辑未修改；VirtualDiningAssistant 未修改。
 
-截图：`screenshots/phase03r3-midnight-3840-full.png`。
+截图：`phase03r3-midnight-3840-full.png`（本地截图归档）。
 
 ## 10. 1920×1080 实测
 
@@ -133,7 +133,7 @@ PASS。没有整组 `scale(.5)`；组件按容器宽度与局部 clamp 降级。
 - 中央菜单 93.6×97.9px / 21.12px；导航 83×41.8px / 19.584px；其余核心入口 18.816px。
 - 商品流与特殊列车仍为 66 / 3，设施热区与图像保持对齐。
 
-截图：`screenshots/phase03r3-1920-full.png`。
+截图：`phase03r3-1920-full.png`（本地截图归档）。
 
 ## 11. 业务回归
 
@@ -155,8 +155,8 @@ PASS。
 
 截图：
 
-- `screenshots/phase03r3-zhenxian-regression.png`
-- `screenshots/phase03r3-xiaoxin-regression.png`
+- `phase03r3-zhenxian-regression.png`（本地截图归档）
+- `phase03r3-xiaoxin-regression.png`（本地截图归档）
 
 ## 13. Build
 

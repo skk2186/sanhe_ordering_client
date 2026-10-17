@@ -89,26 +89,26 @@ Midnight 左右两侧均实际加入 4 件商品：
 
 截图：
 
-- `screenshots/phase04r-midnight-bottom-full.png`
-- `screenshots/phase04r-midnight-left-cart-empty.png`
-- `screenshots/phase04r-midnight-left-cart-full-4.png`
-- `screenshots/phase04r-midnight-left-cart-after-order.png`
-- `screenshots/phase04r-midnight-right-cart-full-4.png`
-- `screenshots/phase04r-midnight-center-console.png`
+- `phase04r-midnight-bottom-full.png`（本地截图归档）
+- `phase04r-midnight-left-cart-empty.png`（本地截图归档）
+- `phase04r-midnight-left-cart-full-4.png`（本地截图归档）
+- `phase04r-midnight-left-cart-after-order.png`（本地截图归档）
+- `phase04r-midnight-right-cart-full-4.png`（本地截图归档）
+- `phase04r-midnight-center-console.png`（本地截图归档）
 
 ## 13. zhenxian 回归
 
 - 实际切换到 zhenxian，左侧加入 4 件商品，四槽在满载提示出现时仍保持可见。
 - 下单后四个空槽立即恢复并保持；共享数量、加减和中央入口结构正常。
 - 原主题橙色资产、尺寸和中央图文没有被 Midnight 外框、图标或颜色污染。
-- 截图：`screenshots/phase04r-zhenxian-bottom.png`。
+- 截图：`phase04r-zhenxian-bottom.png`（本地截图归档）。
 
 ## 14. xiaoxin 回归
 
 - 实际切换到 xiaoxin，右侧加入 4 件商品，满载与下单后均未发生整区消失。
 - 原主题黄色资产、尺寸、数量控件和中央按钮保持原表现。
 - Midnight 的深绿框架与中央 SVG 图标仅在 `[data-theme="midnight-station"]` 下生效。
-- 截图：`screenshots/phase04r-xiaoxin-bottom.png`。
+- 截图：`phase04r-xiaoxin-bottom.png`（本地截图归档）。
 
 ## 15. build 与测试
 
