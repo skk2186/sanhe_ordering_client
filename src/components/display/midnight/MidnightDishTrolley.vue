@@ -45,9 +45,10 @@
           draggable="false"
         />
       </span>
-      <span class="midnight-dish-trolley__copy">
-        <span class="midnight-dish-trolley__name">{{ name }}</span>
-        <strong>¥{{ price }}</strong>
+      <span class="midnight-dish-trolley__plaque-mounts" aria-hidden="true"></span>
+      <span class="midnight-dish-trolley__side-plaque" aria-hidden="true">
+        <span class="midnight-dish-trolley__plaque-name" :title="name">{{ name }}</span>
+        <strong class="midnight-dish-trolley__plaque-price">¥{{ price }}</strong>
       </span>
     </span>
 
@@ -197,47 +198,92 @@ const handleImageError = event => {
   -webkit-user-drag: none;
 }
 
-.midnight-dish-trolley__copy {
+.midnight-dish-trolley__plaque-mounts {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.midnight-dish-trolley__plaque-mounts::before,
+.midnight-dish-trolley__plaque-mounts::after {
+  content: '';
+  position: absolute;
+  top: 61%;
+  width: 22%;
+  height: 7%;
+  box-sizing: border-box;
+  border: 1px solid #684a27;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #e0c47b 0%, #a27a43 48%, #4b3920 100%);
+  box-shadow: 0 2px 3px rgba(4, 8, 7, .48);
+}
+
+.midnight-dish-trolley__plaque-mounts::before {
+  left: 6%;
+  background-image:
+    radial-gradient(circle at 96% 50%, #f4d995 0 2px, transparent 2.6px),
+    linear-gradient(180deg, #e0c47b 0%, #a27a43 48%, #4b3920 100%);
+}
+
+.midnight-dish-trolley__plaque-mounts::after {
+  right: 6%;
+  background-image:
+    radial-gradient(circle at 4% 50%, #f4d995 0 2px, transparent 2.6px),
+    linear-gradient(180deg, #e0c47b 0%, #a27a43 48%, #4b3920 100%);
+}
+
+.midnight-dish-trolley__side-plaque {
   position: absolute;
   left: 50%;
-  top: 49%;
-  z-index: 5;
-  width: 76%;
-  min-height: 25%;
+  top: 30%;
+  z-index: 6;
+  width: 44%;
+  height: 65%;
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: center;
+  justify-items: center;
+  gap: 1px;
   overflow: hidden;
-  padding: 0 10px;
-  color: #392817;
-  border: 1px solid #f5dda4;
-  border-radius: 5px;
-  background: linear-gradient(180deg, rgba(226, 191, 126, .98), rgba(177, 132, 73, .98));
-  box-shadow: inset 0 1px 0 rgba(255, 249, 222, .72), 0 2px 4px rgba(5, 9, 8, .36);
+  padding: 3px 5px 4px;
+  color: #f2e7d0;
+  border: 2px solid #d4ad68;
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, transparent 0 76%, rgba(154, 111, 54, .45) 76% 81%, transparent 81%),
+    linear-gradient(145deg, #285044 0%, #17372f 70%, #122a25 100%);
+  box-shadow: inset 0 0 0 2px rgba(255, 235, 189, .12), 0 4px 7px rgba(3, 8, 7, .56);
   text-align: center;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
-.midnight-dish-trolley__name {
+.midnight-dish-trolley__plaque-name {
+  align-self: end;
+  width: 100%;
   min-width: 0;
   overflow: hidden;
-  color: #392817;
-  font-size: var(--station-product-title, clamp(19px, .6vw, 23px));
-  font-weight: 800;
-  line-height: 1;
+  color: #fff0d3;
+  font-size: var(--station-product-title, clamp(25px, .81vw, 31px));
+  font-weight: 850;
+  line-height: .88;
+  letter-spacing: -.025em;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .58);
 }
 
-.midnight-dish-trolley__copy strong {
-  flex: 0 0 auto;
-  color: #6c301f;
-  font-size: var(--station-product-price, clamp(19px, .62vw, 24px));
+.midnight-dish-trolley__plaque-price {
+  display: block;
+  align-self: start;
+  color: #f3c774;
+  font-size: var(--station-product-price, clamp(26px, .885vw, 34px));
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
+  line-height: .88;
   white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .64);
 }
 
 .midnight-dish-trolley__lamp {
@@ -339,14 +385,8 @@ const handleImageError = event => {
     --midnight-body-width: min(88vw, 250px);
     --midnight-food-width: clamp(150px, 66vw, 180px);
     --midnight-food-height: clamp(108px, 47vw, 128px);
-    --station-product-title: 16px;
-    --station-product-price: 17px;
-  }
-
-  .midnight-dish-trolley__copy {
-    width: 78%;
-    gap: 5px;
-    padding: 0 7px;
+    --station-product-title: 19px;
+    --station-product-price: 20px;
   }
 
   .midnight-dish-trolley__soldout {
