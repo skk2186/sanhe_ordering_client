@@ -41,14 +41,21 @@ test('assistant, progress and special express stay frozen while trolley business
   assert.match(trolleyScript, /target\.src = DEFAULT_DISH_IMAGE/)
 })
 
-test('Midnight trolley uses a transparent wagon, a platter, a visible fallback and contain-fit food', () => {
+test('Midnight trolley uses one open wagon, directly displayed contain-fit food and a visible fallback', () => {
   const component = read('src/components/display/midnight/MidnightDishTrolley.vue')
   const theme = read('src/styles/themes/midnight-warm.scss')
   assert.match(component, /delivery-trolley-body-v3\.webp/)
-  assert.match(component, /delivery-trolley-platter\.svg/)
+  assert.doesNotMatch(component, /platter|platter-width/)
+  assert.match(component, /vehicle-art--front/)
+  assert.match(component, /bottom:\s*58%/)
+  assert.match(component, /\.midnight-dish-trolley__dish img\s*\{\s*position:\s*absolute;\s*inset:\s*0;/)
   assert.match(component, /default-food\.svg/)
   assert.match(component, /object-fit:\s*contain/)
+  assert.match(component, /max-height:\s*100%/)
   assert.doesNotMatch(component, /scale\(1\.16\)/)
+  assert.match(component, /width:\s*76%/)
+  assert.match(component, /clamp\(19px, \.6vw, 23px\)/)
+  assert.match(component, /clamp\(19px, \.62vw, 24px\)/)
   assert.match(component, /@keydown\.space\.prevent="handleActivate"/)
   assert.match(component, /'is-reversed': direction === 'right'/)
   assert.match(component, /'is-selected': selected/)
@@ -56,11 +63,13 @@ test('Midnight trolley uses a transparent wagon, a platter, a visible fallback a
   assert.match(component, /'is-sold-out': soldOut/)
   assert.match(component, /'is-paused': paused/)
   assert.match(theme, /--midnight-body-width:\s*clamp\(286px, 8\.35vw, 320px\)/)
+  assert.match(theme, /--midnight-food-width:\s*clamp\(170px, 5\.2vw, 200px\)/)
+  assert.match(theme, /--midnight-food-height:\s*clamp\(115px, 3\.5vw, 134px\)/)
   for (const asset of [
     'public/images/ui/midnight-station/delivery-trolley-body-v3.webp',
-    'public/images/ui/midnight-station/delivery-trolley-platter.svg',
     'public/images/ui/midnight-station/default-food.svg',
   ]) assert.equal(existsSync(new URL('../' + asset, import.meta.url)), true, asset)
+  assert.equal(existsSync(new URL('../public/images/ui/midnight-station/delivery-trolley-platter.svg', import.meta.url)), false)
 })
 
 test('menu uses one shared template and only Midnight escapes the bottom stacking context', () => {

@@ -26,6 +26,15 @@
         alt=""
         draggable="false"
       />
+      <span class="midnight-dish-trolley__dish">
+        <img :key="image" :src="image" :alt="name" @error="handleImageError" />
+      </span>
+      <img
+        class="midnight-dish-trolley__vehicle-art midnight-dish-trolley__vehicle-art--front"
+        src="/images/ui/midnight-station/delivery-trolley-body-v3.webp"
+        alt=""
+        draggable="false"
+      />
       <span class="midnight-dish-trolley__running-gear">
         <img
           v-for="wheel in trolleyWheels"
@@ -35,15 +44,6 @@
           alt=""
           draggable="false"
         />
-      </span>
-      <img
-        class="midnight-dish-trolley__platter"
-        src="/images/ui/midnight-station/delivery-trolley-platter.svg"
-        alt=""
-        draggable="false"
-      />
-      <span class="midnight-dish-trolley__dish">
-        <img :key="image" :src="image" :alt="name" @error="handleImageError" />
       </span>
       <span class="midnight-dish-trolley__copy">
         <span class="midnight-dish-trolley__name">{{ name }}</span>
@@ -131,11 +131,18 @@ const handleImageError = event => {
 .midnight-dish-trolley__vehicle-art {
   position: absolute;
   inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 5px 4px rgba(1, 7, 12, .44));
   user-select: none;
+}
+
+.midnight-dish-trolley__vehicle-art--front {
+  z-index: 3;
+  clip-path: inset(35% 0 0);
+  pointer-events: none;
 }
 
 .is-reversed .midnight-dish-trolley__vehicle-art {
@@ -145,6 +152,7 @@ const handleImageError = event => {
 .midnight-dish-trolley__running-gear {
   position: absolute;
   inset: 0;
+  z-index: 4;
 }
 
 .midnight-dish-trolley__running-gear img {
@@ -162,40 +170,29 @@ const handleImageError = event => {
   transform: translate(-50%, -50%) rotate(var(--midnight-trolley-wheel-angle-reversed, 0deg));
 }
 
-.midnight-dish-trolley__platter {
-  position: absolute;
-  left: 50%;
-  top: 16%;
-  z-index: 1;
-  width: var(--midnight-platter-width, clamp(150px, 4.85vw, 186px));
-  height: auto;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 4px 4px rgba(10, 14, 13, .5));
-  user-select: none;
-}
-
 .midnight-dish-trolley__dish {
   position: absolute;
   left: 50%;
-  top: -42%;
+  bottom: 58%;
   z-index: 2;
-  width: var(--midnight-food-width, clamp(145px, 4.3vw, 165px));
-  height: var(--midnight-food-height, clamp(80px, 2.55vw, 98px));
-  display: grid;
-  place-items: center;
+  width: var(--midnight-food-width, clamp(170px, 5.2vw, 200px));
+  height: var(--midnight-food-height, clamp(115px, 3.5vw, 134px));
   overflow: hidden;
-  border-radius: 48% 48% 42% 42%;
-  background: radial-gradient(ellipse, rgba(250, 243, 225, .92), rgba(226, 207, 169, .78) 74%, transparent 100%);
   transform: translateX(-50%);
   pointer-events: none;
 }
 
 .midnight-dish-trolley__dish img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 3px 3px rgba(20, 20, 17, .25));
+  object-position: center bottom;
+  filter: drop-shadow(0 2px 2px rgba(20, 20, 17, .28));
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -203,20 +200,20 @@ const handleImageError = event => {
 .midnight-dish-trolley__copy {
   position: absolute;
   left: 50%;
-  top: 53%;
-  z-index: 3;
-  width: 42%;
-  min-height: 27%;
+  top: 49%;
+  z-index: 5;
+  width: 76%;
+  min-height: 25%;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 8px;
   overflow: hidden;
-  padding: 0 4px;
+  padding: 0 10px;
   color: #392817;
   border: 1px solid #f5dda4;
-  border-radius: 4px;
+  border-radius: 5px;
   background: linear-gradient(180deg, rgba(226, 191, 126, .98), rgba(177, 132, 73, .98));
   box-shadow: inset 0 1px 0 rgba(255, 249, 222, .72), 0 2px 4px rgba(5, 9, 8, .36);
   text-align: center;
@@ -227,7 +224,7 @@ const handleImageError = event => {
   min-width: 0;
   overflow: hidden;
   color: #392817;
-  font-size: var(--station-product-title, clamp(14px, .42vw, 16px));
+  font-size: var(--station-product-title, clamp(19px, .6vw, 23px));
   font-weight: 800;
   line-height: 1;
   text-overflow: ellipsis;
@@ -237,7 +234,7 @@ const handleImageError = event => {
 .midnight-dish-trolley__copy strong {
   flex: 0 0 auto;
   color: #6c301f;
-  font-size: var(--station-product-price, clamp(14px, .42vw, 16px));
+  font-size: var(--station-product-price, clamp(19px, .62vw, 24px));
   font-variant-numeric: tabular-nums;
   line-height: 1;
   white-space: nowrap;
@@ -340,16 +337,16 @@ const handleImageError = event => {
   .midnight-dish-trolley {
     height: 214px;
     --midnight-body-width: min(88vw, 250px);
-    --midnight-platter-width: 144px;
-    --midnight-food-width: 112px;
-    --midnight-food-height: 76px;
-    --station-product-title: 12px;
-    --station-product-price: 13px;
+    --midnight-food-width: clamp(150px, 66vw, 180px);
+    --midnight-food-height: clamp(108px, 47vw, 128px);
+    --station-product-title: 16px;
+    --station-product-price: 17px;
   }
 
   .midnight-dish-trolley__copy {
-    width: 40%;
-    gap: 2px;
+    width: 78%;
+    gap: 5px;
+    padding: 0 7px;
   }
 
   .midnight-dish-trolley__soldout {

@@ -30,13 +30,12 @@
 }
 
 :root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme {
-  /* One physical ratio drives the wagon, platter, and food in the trolley. */
+  /* One physical ratio aligns food with the open wagon and its front plate. */
   --midnight-body-width: clamp(286px, 8.35vw, 320px);
-  --midnight-platter-width: clamp(150px, 4.85vw, 186px);
-  --midnight-food-width: clamp(145px, 4.3vw, 165px);
-  --midnight-food-height: clamp(80px, 2.55vw, 98px);
-  --station-product-title: clamp(15px, .46vw, 18px);
-  --station-product-price: clamp(14px, .42vw, 16px);
+  --midnight-food-width: clamp(170px, 5.2vw, 200px);
+  --midnight-food-height: clamp(115px, 3.5vw, 134px);
+  --station-product-title: clamp(19px, .6vw, 23px);
+  --station-product-price: clamp(19px, .62vw, 24px);
   --station-category-label: clamp(18px, .54vw, 22px);
 }
 
