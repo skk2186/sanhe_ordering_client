@@ -972,6 +972,10 @@ onUnmounted(() => {
   --ink: #fff5df;
   --stream-gap: clamp(72px, 3vw, 118px);
   --midnight-rail-drop: clamp(210px, 22vh, 242px);
+  --station-product-image: clamp(200px, 5.8vw, 232px);
+  --station-product-title: clamp(22px, .75vw, 30px);
+  --station-product-price: clamp(24px, .84vw, 32px);
+  --station-category-label: clamp(20px, .65vw, 26px);
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-current {
@@ -1899,15 +1903,15 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-categories button {
-  min-height: 52px;
+  min-height: 56px;
   padding: 11px 24px;
-  font-size: clamp(18px, .62vw, 24px);
+  font-size: var(--station-category-label);
 }
 
 .scenic-dish-stage.is-midnight-theme .tide-pause {
   width: 52px;
   height: 52px;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 @media (min-width: 1921px) {

@@ -29,17 +29,17 @@ const handleImageError = event => { const target=event?.target; if (!target || t
 </script>
 
 <style lang="scss" scoped>
-.midnight-dish-trolley { --station-ink:#e5d7bc; --station-amber:#f2c978; position:relative; isolation:isolate; width:100%; height:clamp(230px,12.5vw,258px); color:var(--station-ink); cursor:pointer; outline:none; transform-origin:50% 90%; animation:midnight-trolley-suspension 4.2s ease-in-out infinite; }
+.midnight-dish-trolley { --station-ink:#e5d7bc; --station-amber:#f2c978; position:relative; isolation:isolate; width:100%; height:clamp(250px,7.2vw,280px); color:var(--station-ink); cursor:pointer; outline:none; transform-origin:50% 90%; animation:midnight-trolley-suspension 4.2s ease-in-out infinite; }
 .midnight-dish-trolley__shadow { position:absolute; left:8%; right:8%; bottom:0; z-index:0; height:15px; border-radius:50%; background:radial-gradient(ellipse,rgba(0,0,0,.64),transparent 72%); filter:blur(3px); }
 .midnight-dish-trolley__running-gear { position:absolute; left:50%; bottom:0; z-index:1; width:116%; height:72px; transform:translateX(-50%); pointer-events:none; }
 .midnight-dish-trolley__running-gear img { position:absolute; bottom:0; width:18%; aspect-ratio:1; object-fit:contain; transform:translateX(-50%) rotate(var(--midnight-trolley-wheel-angle,0deg)); filter:brightness(.72) saturate(.64) drop-shadow(0 2px 2px rgba(0,0,0,.58)); will-change:transform; }
 .midnight-dish-trolley__vehicle { position:absolute; left:50%; bottom:17px; z-index:2; width:116%; height:auto; transform:translateX(-50%); filter:drop-shadow(0 7px 5px rgba(1,7,12,.5)); pointer-events:none; user-select:none; transition:filter 180ms ease; }
 .is-reversed .midnight-dish-trolley__vehicle { transform:translateX(-50%) scaleX(-1); }
-.midnight-dish-trolley__dish { position:absolute; left:50%; top:0; z-index:3; width:clamp(164px,9.6vw,194px); aspect-ratio:1; overflow:hidden; border:3px solid rgba(229,215,188,.88); border-radius:50%; background:#101b24; box-shadow:0 8px 16px rgba(1,7,12,.42),0 0 0 3px rgba(32,56,51,.78); transform:translateX(-50%); }
+.midnight-dish-trolley__dish { position:absolute; left:50%; top:0; z-index:3; width:var(--station-product-image,clamp(200px,5.8vw,232px)); aspect-ratio:1; overflow:hidden; border:3px solid rgba(229,215,188,.88); border-radius:50%; background:#101b24; box-shadow:0 8px 16px rgba(1,7,12,.42),0 0 0 3px rgba(32,56,51,.78); transform:translateX(-50%); }
 .midnight-dish-trolley__dish img { width:100%; height:100%; display:block; object-fit:cover; user-select:none; -webkit-user-drag:none; }
-.midnight-dish-trolley__copy { position:absolute; left:50%; bottom:29px; z-index:4; width:min(92%,318px); min-height:46px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:10px; padding:6px 12px; border:1px solid rgba(242,201,120,.5); border-radius:6px; background:rgba(7,17,29,.9); box-shadow:0 5px 12px rgba(1,7,12,.4); transform:translateX(-50%); }
-.midnight-dish-trolley__copy h3 { min-width:0; margin:0; overflow:hidden; color:#fff5df; font-size:clamp(18px,1.1vw,26px); font-weight:700; line-height:1.15; text-overflow:ellipsis; white-space:nowrap; }
-.midnight-dish-trolley__copy strong { flex:0 0 auto; color:var(--station-amber); font-size:clamp(21px,1.25vw,31px); font-variant-numeric:tabular-nums; line-height:1; }
+.midnight-dish-trolley__copy { position:absolute; left:50%; bottom:29px; z-index:4; width:min(96%,340px); min-height:56px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:10px; padding:7px 14px; border:1px solid rgba(242,201,120,.5); border-radius:6px; background:rgba(7,17,29,.92); box-shadow:0 5px 12px rgba(1,7,12,.4); transform:translateX(-50%); }
+.midnight-dish-trolley__copy h3 { min-width:0; margin:0; overflow:hidden; color:#fff5df; font-size:var(--station-product-title,clamp(22px,.75vw,30px)); font-weight:700; line-height:1.15; text-overflow:ellipsis; white-space:nowrap; }
+.midnight-dish-trolley__copy strong { flex:0 0 auto; color:var(--station-amber); font-size:var(--station-product-price,clamp(24px,.84vw,32px)); font-variant-numeric:tabular-nums; line-height:1; }
 .midnight-dish-trolley__lamp { position:absolute; left:7%; bottom:42px; z-index:5; width:12px; height:12px; border:2px solid #101b24; border-radius:50%; background:#d99b4a; box-shadow:0 0 8px rgba(217,155,74,.5); }
 .is-reversed .midnight-dish-trolley__lamp { left:auto; right:7%; }
 .midnight-dish-trolley__ai { position:absolute; top:4px; right:9%; z-index:6; min-width:48px; min-height:36px; display:grid; place-items:center; padding:0 8px; color:#07111d; background:#f2c978; border:2px solid #fff5df; border-radius:18px; font-size:18px; font-weight:900; box-shadow:0 5px 12px rgba(1,7,12,.35); }
@@ -51,7 +51,7 @@ const handleImageError = event => { const target=event?.target; if (!target || t
 .midnight-dish-trolley.is-sold-out > :not(.midnight-dish-trolley__soldout) { filter:grayscale(.55) brightness(.62); }
 .midnight-dish-trolley.is-paused { animation-play-state:paused; }
 @keyframes midnight-trolley-suspension { 0%,100% { transform:translateY(0); } 50% { transform:translateY(1px); } }
-@media (min-width:1921px) { .midnight-dish-trolley { height:266px; } .midnight-dish-trolley__dish { width:204px; } }
+@media (min-width:1921px) { .midnight-dish-trolley__dish { width:min(var(--station-product-image,232px),232px); } }
 @media (max-width:900px) { .midnight-dish-trolley { height:214px; } .midnight-dish-trolley__dish { width:150px; } .midnight-dish-trolley__copy { bottom:25px; min-height:40px; } .midnight-dish-trolley__copy h3 { font-size:16px; } .midnight-dish-trolley__copy strong { font-size:19px; } }
 @media (prefers-reduced-motion:reduce) { .midnight-dish-trolley { animation:none; } .midnight-dish-trolley__vehicle { transition:none; } .midnight-dish-trolley__running-gear img { will-change:auto; } }
 </style>

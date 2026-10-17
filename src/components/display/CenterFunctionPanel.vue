@@ -54,6 +54,8 @@ defineEmits([
 .menu-btn, .function-btn { border: 0; background-color: transparent; padding: 0; }
 .menu-btn span, .function-btn span { visibility: hidden; }
 [data-theme="midnight-station"] .bottom-center {
+  --station-menu-label: clamp(26px, .78vw, 30px);
+  --station-function-label: clamp(25px, .72vw, 28px);
   box-sizing: border-box;
   padding: 10px;
   background: linear-gradient(180deg, #1b4038 0%, #102721 100%);
@@ -63,8 +65,8 @@ defineEmits([
   .center-layout { width: 100%; height: 100%; box-sizing: border-box; align-items: stretch; gap: 10px; padding: 0; }
   .center-functions { height: 100%; flex: 1 1 auto; gap: 8px; }
   .function-row { flex: 1 1 0; gap: 8px; }
-  .menu-btn { width: 118px; height: auto; background: linear-gradient(180deg, #e2d3ae, #bea06d); color: #2b251b; font-size: 28px; writing-mode: horizontal-tb; text-orientation: mixed; }
-  .first-row .function-btn, .second-row .function-btn { width: auto; height: auto; flex: 1 1 0; background: #17342d; color: #fff1c8; font-size: 24px; }
+  .menu-btn { width: 118px; height: auto; background: linear-gradient(180deg, #e2d3ae, #bea06d); color: #2b251b; font-size: var(--station-menu-label); writing-mode: horizontal-tb; text-orientation: mixed; }
+  .first-row .function-btn, .second-row .function-btn { width: auto; height: auto; flex: 1 1 0; background: #17342d; color: #fff1c8; font-size: var(--station-function-label); }
   .menu-btn, .function-btn { padding: 10px; border: 1px solid #b79152; border-radius: 12px; font-family: inherit; font-weight: 800; line-height: 1.2; background-size: 100% 100%; box-shadow: inset 0 1px 0 #ffe0a02e; }
   .menu-btn span, .function-btn span { visibility: visible; }
   .menu-btn, .function-btn { display: flex; align-items: center; justify-content: center; gap: 12px; }
@@ -143,11 +145,13 @@ defineEmits([
 
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .bottom-center {
+    --station-menu-label: clamp(21px, 1.2vw, 23px);
+    --station-function-label: clamp(21px, 1.15vw, 23px);
     padding: 8px;
     .center-layout { gap: 6px; }
     .center-functions, .function-row { gap: 6px; }
-    .menu-btn { width: clamp(64px, 4.25vw, 82px); font-size: 20px; flex-direction: column; gap: 5px; }
-    .first-row .function-btn, .second-row .function-btn { font-size: 18px; flex-direction: column; gap: 3px; }
+    .menu-btn { width: clamp(64px, 4.25vw, 82px); font-size: var(--station-menu-label); flex-direction: column; gap: 5px; }
+    .first-row .function-btn, .second-row .function-btn { font-size: var(--station-function-label); flex-direction: column; gap: 3px; }
     .menu-btn, .function-btn { padding: 5px; border-radius: 10px; }
     .menu-btn::before, .function-btn::before { width: 28px; height: 28px; flex-basis: 28px; }
     .second-row .function-btn::before { width: 24px; height: 24px; flex-basis: 24px; }

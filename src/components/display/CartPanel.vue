@@ -424,23 +424,30 @@ const handleTipsClick = () => {
 /* Shared geometry owns the panel; Midnight only supplies its readable skin. */
 .order-preview, .order-label, .order-total, .item-price { display: none; }
 [data-theme="midnight-station"] .is-midnight-cart {
+  --station-cart-thumb: clamp(120px, 3.25vw, 132px);
+  --station-cart-title: clamp(19px, .62vw, 24px);
+  --station-cart-price: clamp(18px, .55vw, 22px);
+  --station-cart-count: clamp(23px, .68vw, 28px);
   box-sizing: border-box;
+  padding: 10px 18px;
   background: linear-gradient(180deg, #1b4038 0%, #102721 100%);
   border: 2px solid #a98247;
   border-radius: 16px;
   box-shadow: inset 0 1px 0 #f0cc8366, 0 10px 24px #03080780;
   .item-group { width: 100%; height: 100%; justify-content: space-between; gap: 12px; }
-  .cart-item { box-sizing: border-box; padding: 4px; background: #102b27; border: 1px solid #806638; border-radius: 12px; box-shadow: inset 0 1px 0 #f1d18a24; }
+  .cart-item { width: clamp(128px, 3.65vw, 144px); height: 184px; box-sizing: border-box; padding: 4px; background: #102b27; border: 1px solid #806638; border-radius: 12px; box-shadow: inset 0 1px 0 #f1d18a24; }
   .item-circle { border-radius: 9px; box-shadow: none; background: #0b1e1c; }
+  .item-circle { width: var(--station-cart-thumb); height: var(--station-cart-thumb); flex: 0 0 var(--station-cart-thumb); }
   .item-circle.empty-item { background: #0b1e1c url('/images/ui/midnight-station/icons/empty-tray.svg') center 42% / 62% auto no-repeat; }
   .item-circle.empty-item::after { margin-top: 54px; color: #d9bd7a; font-size: 22px; opacity: .75; }
   .item-image img { width: 100%; height: 100%; }
-  .item-info { width: 100%; border: 0; border-radius: 0 0 8px 8px; background: #0d211e; overflow: visible; }
-  .item-name-area { padding: 0; height: 44px; line-height: 22px; font-size: 22px; color: #fff1c8; white-space: nowrap; }
-  .item-price { display: block; color: #e6bf79; font-size: 20px; line-height: 22px; }
+  .item-info { width: 100%; margin-top: -22px; border: 0; border-radius: 0 0 8px 8px; background: #0d211e; overflow: hidden; }
+  .item-name-area { padding: 0 2px; height: 40px; line-height: 19px; font-size: var(--station-cart-title); color: #fff1c8; white-space: normal; }
+  .item-name-area > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-price { display: block; color: #e6bf79; font-size: var(--station-cart-price); line-height: 20px; }
   .item-controls { height: 34px; padding: 0; gap: 4px; color: #fff1c8; }
   .item-controls .minus-btn, .item-controls .plus-btn { width: 34px; height: 34px; flex: 0 0 34px; font-size: 28px; background: #b99150; color: #211a10; border: 1px solid #efce90; border-radius: 9px; }
-  .quantity-display { color: #fff1c8; flex: 1; text-align: center; font-size: 26px; font-variant-numeric: tabular-nums; }
+  .quantity-display { color: #fff1c8; flex: 1; text-align: center; font-size: var(--station-cart-count); font-variant-numeric: tabular-nums; }
   .order-btn { padding: 6px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; background: linear-gradient(180deg, #74532d, #4e351d); color: #fff1c8; border: 1px solid #e0b86d; border-radius: 12px; box-shadow: inset 0 1px 0 #ffe0a066; }
   .order-preview { display: grid; place-items: center; width: 100%; height: 80px; }
   .order-preview img { width: 80px; height: 80px; object-fit: contain; }
@@ -566,12 +573,18 @@ const handleTipsClick = () => {
 }
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .is-midnight-cart {
-    .item-name-area { height: 40px; line-height: 20px; font-size: 17px; }
-    .item-price { font-size: 16px; line-height: 20px; }
-    .item-info { height: auto; }
-    .item-controls { height: 34px; }
-    .item-controls .minus-btn, .item-controls .plus-btn { width: 34px; height: 34px; flex-basis: 34px; font-size: 25px; }
-    .quantity-display { font-size: 21px; }
+    --station-cart-thumb: clamp(106px, 5.83vw, 112px);
+    --station-cart-title: clamp(18px, 1.05vw, 21px);
+    --station-cart-price: clamp(18px, .95vw, 20px);
+    --station-cart-count: clamp(22px, 1.2vw, 24px);
+    padding: 4px 10px;
+    .cart-item { width: clamp(116px, 6.25vw, 122px); height: 158px; }
+    .item-circle { width: var(--station-cart-thumb); height: var(--station-cart-thumb); flex-basis: var(--station-cart-thumb); }
+    .item-name-area { height: 36px; line-height: 18px; }
+    .item-price { line-height: 18px; }
+    .item-info { height: auto; margin-top: -20px; }
+    .item-controls { height: 30px; gap: 3px; }
+    .item-controls .minus-btn, .item-controls .plus-btn { width: 30px; height: 30px; flex-basis: 30px; font-size: 24px; }
     .order-btn { padding: 5px; gap: 3px; }
     .order-preview { height: 65px; }
     .order-preview img { width: 65px; height: 65px; }
