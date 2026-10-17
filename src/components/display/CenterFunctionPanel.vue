@@ -54,8 +54,8 @@ defineEmits([
 .menu-btn, .function-btn { border: 0; background-color: transparent; padding: 0; }
 .menu-btn span, .function-btn span { visibility: hidden; }
 [data-theme="midnight-station"] .bottom-center {
-  --station-menu-label: clamp(26px, .78vw, 30px);
-  --station-function-label: clamp(25px, .72vw, 28px);
+  --station-menu-label: clamp(21px, .6vw, 24px);
+  --station-function-label: clamp(20px, .56vw, 23px);
   box-sizing: border-box;
   padding: 10px;
   background: linear-gradient(180deg, #1b4038 0%, #102721 100%);
@@ -145,8 +145,8 @@ defineEmits([
 
 @media (min-width: 769px) and (max-width: 1920px) {
   [data-theme="midnight-station"] .bottom-center {
-    --station-menu-label: clamp(21px, 1.2vw, 23px);
-    --station-function-label: clamp(21px, 1.15vw, 23px);
+    --station-menu-label: 20px;
+    --station-function-label: 19px;
     padding: 8px;
     .center-layout { gap: 6px; }
     .center-functions, .function-row { gap: 6px; }

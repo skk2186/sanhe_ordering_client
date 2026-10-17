@@ -30,23 +30,44 @@
 }
 
 :root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__dish {
-  border-color: #fff7e5;
-  background: #f7eddb;
-  box-shadow: 0 8px 16px #01070c52, 0 0 0 4px #e4a5529e, 0 0 24px #ffb05b6b;
+  border-color: #776744;
+  background: #18211d;
+  box-shadow: 0 3px 8px #01070c57;
 }
 
 :root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__copy {
-  border-color: #ffe8be;
-  background: #fff7e6f7;
-  box-shadow: 0 5px 12px #19120a47;
+  border-color: #b79152;
+  background: #112621f0;
+  box-shadow: 0 3px 7px #01070c4d;
 
-  h3 { color: #3c3024; }
-  strong { color: #b34f35; }
+  h3 { color: #fff1c8; }
+  strong { color: #f2c978; }
 }
 
 :root[data-theme="midnight-station"] .conveyor-display .midnight-dish-trolley__ai {
   color: #fff9ee;
   background: #db7457;
+}
+
+/* R5R proportions stay inside the Midnight theme, leaving the shared stage
+   and its scrolling geometry untouched. */
+:root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme {
+  --station-product-image: clamp(150px, 4.2vw, 176px);
+  --station-product-title: clamp(20px, .56vw, 22px);
+  --station-product-price: clamp(20px, .58vw, 22px);
+  --station-category-label: clamp(18px, .54vw, 22px);
+}
+
+:root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme .tide-categories button {
+  min-height: 50px;
+  padding: 9px 20px;
+  font-size: var(--station-category-label);
+}
+
+:root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme .tide-pause {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
 }
 
 :root[data-theme="midnight-station"] .conveyor-display .is-midnight-progress .midnight-progress-facility {

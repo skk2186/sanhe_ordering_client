@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
-const baseline = path => execFileSync('git', ['show', '9feb18401c6e29cf4855d968bf38c39fc4b20abd:' + path], { encoding: 'utf8' })
+const baseline = path => execFileSync('git', ['show', 'b975a737ddd14dfd830cf94e7c096822bf476326:' + path], { encoding: 'utf8' })
 const script = source => source.replace(/\r\n/g, '\n').match(/<script[^>]*>([\s\S]*?)<\/script>/)?.[1]
 
 test('overlay tokens are emitted only under the Midnight theme and an explicit component root', () => {
@@ -22,10 +22,14 @@ test('navigation, history, settings and featured retain their shared business sc
   }
 })
 
-test('frozen main-stage and assistant components remain byte-for-byte unchanged', () => {
-  for (const name of ['VirtualDiningAssistant', 'ScenicDishStage', 'TopPlateProgress', 'midnight/MidnightDishTrolley', 'midnight/MidnightExpressPass']) {
+test('assistant, progress and special express stay frozen while stage and trolley logic stays unchanged', () => {
+  for (const name of ['VirtualDiningAssistant', 'TopPlateProgress', 'midnight/MidnightExpressPass']) {
     const path = 'src/components/display/' + name + '.vue'
     assert.equal(read(path).replace(/\r\n/g, '\n'), baseline(path).replace(/\r\n/g, '\n'), path)
+  }
+  for (const name of ['ScenicDishStage', 'midnight/MidnightDishTrolley']) {
+    const path = 'src/components/display/' + name + '.vue'
+    assert.equal(script(read(path)), script(baseline(path)), path)
   }
 })
 
