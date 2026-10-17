@@ -44,7 +44,7 @@ const handlePromoClick = () => { if (props.promoItem) emit('featured-promo', pro
 </script>
 
 <style lang="scss" scoped>
-.midnight-express-pass { position:relative; width:100%; height:clamp(340px,9.375vw,360px); margin-top:calc(clamp(90px,3.125vw,120px) * -1); pointer-events:none; }
+.midnight-express-pass { position:relative; width:100%; height:clamp(368px,10vw,390px); margin-top:calc(clamp(96px,3.35vw,130px) * -1); pointer-events:none; }
 .midnight-express-pass__visual { position:absolute; inset:0; filter:drop-shadow(0 12px 9px rgba(1,7,12,.58)); }
 .midnight-express-pass__shadow { position:absolute; left:3%; right:3%; bottom:0; z-index:0; height:22px; border-radius:50%; background:radial-gradient(ellipse,rgba(0,0,0,.68),transparent 72%); filter:blur(4px); }
 .midnight-express-pass__running-gear { position:absolute; inset:0; z-index:1; transform-origin:center; pointer-events:none; }
@@ -56,7 +56,7 @@ const handlePromoClick = () => { if (props.promoItem) emit('featured-promo', pro
 .midnight-express-pass__lower-mask { z-index:4; }
 .is-reversed .midnight-express-pass__body,.is-reversed .midnight-express-pass__lower-mask,.is-reversed .midnight-express-pass__running-gear { transform:scaleX(-1); }
 .is-reversed .midnight-express-pass__wheel { transform:translateX(-50%) rotate(var(--midnight-express-wheel-angle-reversed,0deg)); }
-.midnight-express-pass__headlamp { position:absolute; left:.9%; top:56%; z-index:5; width:clamp(16px,.47vw,18px); height:clamp(16px,.47vw,18px); border-radius:50%; background:#f2c978; box-shadow:0 0 11px 4px rgba(242,201,120,.3); }
+.midnight-express-pass__headlamp { position:absolute; left:.9%; top:56%; z-index:5; width:clamp(16px,.5vw,19px); height:clamp(16px,.5vw,19px); border-radius:50%; background:#f2c978; box-shadow:0 0 11px 4px rgba(242,201,120,.3); }
 .is-reversed .midnight-express-pass__headlamp { left:auto; right:.9%; }
 .midnight-express-pass__window-glow { position:absolute; left:49%; top:39%; z-index:5; width:46%; height:20%; border-radius:42%; background:rgba(217,155,74,.065); filter:blur(11px); animation:midnight-window-breathe 5.4s ease-in-out infinite; }
 .is-reversed .midnight-express-pass__window-glow { left:5%; }

@@ -236,23 +236,23 @@ const handleImageError = event => {
 .midnight-dish-trolley__side-plaque {
   position: absolute;
   left: 50%;
-  top: 30%;
+  top: 38%;
   z-index: 6;
-  width: 44%;
-  height: 65%;
+  width: 48%;
+  height: 56%;
   box-sizing: border-box;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  align-content: center;
-  justify-items: center;
-  gap: 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   overflow: hidden;
-  padding: 3px 5px 4px;
+  padding: 5px 10px;
   color: #f2e7d0;
   border: 2px solid #d4ad68;
   border-radius: 4px;
   background:
-    linear-gradient(180deg, transparent 0 76%, rgba(154, 111, 54, .45) 76% 81%, transparent 81%),
+    linear-gradient(180deg, transparent 0 49%, rgba(154, 111, 54, .42) 49% 52%, transparent 52%),
     linear-gradient(145deg, #285044 0%, #17372f 70%, #122a25 100%);
   box-shadow: inset 0 0 0 2px rgba(255, 235, 189, .12), 0 4px 7px rgba(3, 8, 7, .56);
   text-align: center;
@@ -260,14 +260,14 @@ const handleImageError = event => {
 }
 
 .midnight-dish-trolley__plaque-name {
-  align-self: end;
+  align-self: center;
   width: 100%;
   min-width: 0;
   overflow: hidden;
   color: #fff0d3;
   font-size: var(--station-product-title, clamp(25px, .81vw, 31px));
   font-weight: 850;
-  line-height: .88;
+  line-height: 1.02;
   letter-spacing: -.025em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -276,12 +276,12 @@ const handleImageError = event => {
 
 .midnight-dish-trolley__plaque-price {
   display: block;
-  align-self: start;
+  align-self: center;
   color: #f3c774;
   font-size: var(--station-product-price, clamp(26px, .885vw, 34px));
   font-weight: 900;
   font-variant-numeric: tabular-nums;
-  line-height: .88;
+  line-height: 1.02;
   white-space: nowrap;
   text-shadow: 0 1px 2px rgba(0, 0, 0, .64);
 }
