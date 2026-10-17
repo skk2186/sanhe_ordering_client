@@ -296,7 +296,9 @@ const SCENES = {
     assets: [
       '/images/ui/midnight-station/background-v4-warm-rear.png',
       '/images/ui/midnight-station/background-v4-warm-foreground.png',
-      '/images/ui/midnight-station/delivery-trolley-body-v2.webp',
+      '/images/ui/midnight-station/delivery-trolley-body-v3.webp',
+      '/images/ui/midnight-station/delivery-trolley-platter.svg',
+      '/images/ui/midnight-station/default-food.svg',
       '/images/ui/midnight-station/special-express-body-v2.webp',
       '/images/ui/midnight-station/special-express-lower-mask.webp',
       '/images/ui/midnight-station/special-wheel.webp',

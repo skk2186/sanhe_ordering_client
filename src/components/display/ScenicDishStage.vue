@@ -972,9 +972,6 @@ onUnmounted(() => {
   --ink: #fff5df;
   --stream-gap: clamp(72px, 3vw, 118px);
   --midnight-rail-drop: clamp(210px, 22vh, 242px);
-  --station-product-image: clamp(200px, 5.8vw, 232px);
-  --station-product-title: clamp(22px, .75vw, 30px);
-  --station-product-price: clamp(24px, .84vw, 32px);
   --station-category-label: clamp(20px, .65vw, 26px);
 }
 
@@ -1912,13 +1909,6 @@ onUnmounted(() => {
   width: 52px;
   height: 52px;
   font-size: 24px;
-}
-
-@media (min-width: 1921px) {
-  .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) {
-    width: 360px;
-    flex-basis: 360px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

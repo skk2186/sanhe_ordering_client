@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 170" fill="none">
+  <defs>
+    <linearGradient id="plate" x1="120" y1="17" x2="120" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#e8d8b8"/>
+    </linearGradient>
+    <linearGradient id="rice" x1="120" y1="45" x2="120" y2="115" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffdf7"/>
+      <stop offset="1" stop-color="#e7ddc7"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="91" rx="111" ry="70" fill="#31281c" fill-opacity=".22"/>
+  <ellipse cx="120" cy="83" rx="110" ry="70" fill="url(#plate)" stroke="#b18d58" stroke-width="4"/>
+  <ellipse cx="120" cy="80" rx="96" ry="56" stroke="#fff" stroke-opacity=".85" stroke-width="3"/>
+  <g transform="rotate(-12 83 82)">
+    <rect x="47" y="59" width="72" height="45" rx="22" fill="url(#rice)" stroke="#cbbd9f" stroke-width="2"/>
+    <path d="M50 75c13-12 51-15 67-1 5 4 4 11 0 15-18 13-54 12-66 0-4-4-5-10-1-14Z" fill="#ee9c58" stroke="#b55b35" stroke-width="5"/>
+    <path d="M57 75c13-10 43-12 54-1" stroke="#ffd398" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g transform="rotate(10 156 78)">
+    <rect x="121" y="56" width="70" height="47" rx="23" fill="url(#rice)" stroke="#cbbd9f" stroke-width="2"/>
+    <path d="M124 73c14-12 49-14 64-1 5 4 5 11 0 15-16 13-51 12-64-1-4-4-4-9 0-13Z" fill="#dc8150" stroke="#8e4032" stroke-width="5"/>
+    <path d="M132 72c13-9 40-11 50-1" stroke="#f7ba75" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <circle cx="119" cy="121" r="5" fill="#7b9a62"/>
+  <circle cx="135" cy="126" r="4" fill="#a6ad67"/>
+  <circle cx="103" cy="126" r="4" fill="#a6ad67"/>
+</svg>

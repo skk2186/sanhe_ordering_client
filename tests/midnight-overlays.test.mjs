@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
@@ -22,15 +22,45 @@ test('navigation, history, settings and featured retain their shared business sc
   }
 })
 
-test('assistant, progress and special express stay frozen while stage and trolley logic stays unchanged', () => {
+test('assistant, progress and special express stay frozen while trolley business logic is preserved', () => {
   for (const name of ['VirtualDiningAssistant', 'TopPlateProgress', 'midnight/MidnightExpressPass']) {
     const path = 'src/components/display/' + name + '.vue'
     assert.equal(read(path).replace(/\r\n/g, '\n'), baseline(path).replace(/\r\n/g, '\n'), path)
   }
-  for (const name of ['ScenicDishStage', 'midnight/MidnightDishTrolley']) {
-    const path = 'src/components/display/' + name + '.vue'
-    assert.equal(script(read(path)), script(baseline(path)), path)
-  }
+  const stage = 'src/components/display/ScenicDishStage.vue'
+  assert.equal(script(read(stage)), script(baseline(stage)), stage)
+
+  const trolley = 'src/components/display/midnight/MidnightDishTrolley.vue'
+  const trolleyScript = script(read(trolley))
+  assert.match(trolleyScript, /const trolleyWheels = \[24, 76\]/)
+  assert.match(trolleyScript, /defineEmits\(\['dish-click'\]\)/)
+  assert.match(trolleyScript, /if \(!props\.soldOut\) emit\('dish-click', props\.item, event\)/)
+  assert.match(trolleyScript, /props\.item\?\.name \|\| props\.item\?\.storeName \|\| props\.item\?\.productName/)
+  assert.match(trolleyScript, /props\.item\?\.image \|\| props\.item\?\.imageUrl \|\| DEFAULT_DISH_IMAGE/)
+  assert.match(trolleyScript, /Number\.isFinite\(value\) \? value\.toFixed\(2\) : '0\.00'/)
+  assert.match(trolleyScript, /target\.src = DEFAULT_DISH_IMAGE/)
+})
+
+test('Midnight trolley uses a transparent wagon, a platter, a visible fallback and contain-fit food', () => {
+  const component = read('src/components/display/midnight/MidnightDishTrolley.vue')
+  const theme = read('src/styles/themes/midnight-warm.scss')
+  assert.match(component, /delivery-trolley-body-v3\.webp/)
+  assert.match(component, /delivery-trolley-platter\.svg/)
+  assert.match(component, /default-food\.svg/)
+  assert.match(component, /object-fit:\s*contain/)
+  assert.doesNotMatch(component, /scale\(1\.16\)/)
+  assert.match(component, /@keydown\.space\.prevent="handleActivate"/)
+  assert.match(component, /'is-reversed': direction === 'right'/)
+  assert.match(component, /'is-selected': selected/)
+  assert.match(component, /'is-recommended': recommended/)
+  assert.match(component, /'is-sold-out': soldOut/)
+  assert.match(component, /'is-paused': paused/)
+  assert.match(theme, /--midnight-body-width:\s*clamp\(286px, 8\.35vw, 320px\)/)
+  for (const asset of [
+    'public/images/ui/midnight-station/delivery-trolley-body-v3.webp',
+    'public/images/ui/midnight-station/delivery-trolley-platter.svg',
+    'public/images/ui/midnight-station/default-food.svg',
+  ]) assert.equal(existsSync(new URL('../' + asset, import.meta.url)), true, asset)
 })
 
 test('menu uses one shared template and only Midnight escapes the bottom stacking context', () => {
