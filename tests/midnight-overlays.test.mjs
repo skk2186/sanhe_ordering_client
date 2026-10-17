@@ -22,11 +22,13 @@ test('navigation, history, settings and featured retain their shared business sc
   }
 })
 
-test('assistant, progress and special express stay frozen while trolley business logic is preserved', () => {
-  for (const name of ['VirtualDiningAssistant', 'TopPlateProgress', 'midnight/MidnightExpressPass']) {
+test('assistant and progress stay frozen; express business and trolley interactions are preserved', () => {
+  for (const name of ['VirtualDiningAssistant', 'TopPlateProgress']) {
     const path = 'src/components/display/' + name + '.vue'
     assert.equal(read(path).replace(/\r\n/g, '\n'), baseline(path).replace(/\r\n/g, '\n'), path)
   }
+  const express = 'src/components/display/midnight/MidnightExpressPass.vue'
+  assert.equal(script(read(express)), script(baseline(express)), express)
   const stage = 'src/components/display/ScenicDishStage.vue'
   assert.equal(script(read(stage)), script(baseline(stage)), stage)
 
@@ -47,6 +49,7 @@ test('Midnight trolley uses one open wagon, directly displayed contain-fit food 
   assert.match(component, /delivery-trolley-body-v3\.webp/)
   assert.doesNotMatch(component, /platter|platter-width/)
   assert.match(component, /vehicle-art--front/)
+  assert.match(component, /height:\s*var\(--midnight-trolley-height, 248px\)/)
   assert.match(component, /bottom:\s*58%/)
   assert.match(component, /\.midnight-dish-trolley__dish img\s*\{\s*position:\s*absolute;\s*inset:\s*0;/)
   assert.match(component, /default-food\.svg/)
@@ -67,9 +70,17 @@ test('Midnight trolley uses one open wagon, directly displayed contain-fit food 
   assert.match(component, /'is-recommended': recommended/)
   assert.match(component, /'is-sold-out': soldOut/)
   assert.match(component, /'is-paused': paused/)
-  assert.match(theme, /--midnight-body-width:\s*clamp\(286px, 8\.35vw, 320px\)/)
-  assert.match(theme, /--midnight-food-width:\s*clamp\(170px, 5\.2vw, 200px\)/)
-  assert.match(theme, /--midnight-food-height:\s*clamp\(115px, 3\.5vw, 134px\)/)
+  assert.match(theme, /--midnight-trolley-height:\s*clamp\(320px, 9\.375vw, 360px\)/)
+  assert.match(theme, /--midnight-body-width:\s*clamp\(400px, 12\.5vw, 480px\)/)
+  assert.match(theme, /--midnight-food-width:\s*clamp\(240px, 7\.29vw, 280px\)/)
+  assert.match(theme, /--midnight-food-height:\s*clamp\(160px, 5\.31vw, 204px\)/)
+  const stageStyles = read('src/components/display/ScenicDishStage.vue')
+  assert.match(stageStyles, /@media \(min-width: 901px\)[\s\S]*?--midnight-rail-drop:\s*calc\(var\(--midnight-trolley-baseline\) - var\(--midnight-trolley-height\)\)/)
+  assert.match(stageStyles, /width:\s*clamp\(440px, 13vw, 500px\)/)
+  assert.match(stageStyles, /width:\s*clamp\(1375px, 45\.83vw, 1760px\)/)
+  const expressStyles = read('src/components/display/midnight/MidnightExpressPass.vue')
+  assert.match(expressStyles, /height:clamp\(340px,9\.375vw,360px\)/)
+  assert.match(expressStyles, /margin-top:calc\(clamp\(90px,3\.125vw,120px\) \* -1\)/)
   for (const asset of [
     'public/images/ui/midnight-station/delivery-trolley-body-v3.webp',
     'public/images/ui/midnight-station/default-food.svg',

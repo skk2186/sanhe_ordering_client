@@ -1911,6 +1911,28 @@ onUnmounted(() => {
   font-size: 24px;
 }
 
+/* Desktop R8 geometry is derived from one rail baseline. This enlarges the
+   complete wagon/train units and reduces the number of visible cars without
+   transforming the stage or changing the shared scroll mechanism. */
+@media (min-width: 901px) {
+  .scenic-dish-stage.is-midnight-theme {
+    --stream-gap: clamp(84px, 3vw, 118px);
+    --midnight-trolley-baseline: clamp(390px, 45vh, 486px);
+    --midnight-rail-drop: calc(var(--midnight-trolley-baseline) - var(--midnight-trolley-height));
+  }
+
+  .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) {
+    width: clamp(440px, 13vw, 500px);
+    flex-basis: clamp(440px, 13vw, 500px);
+  }
+
+  .scenic-dish-stage.is-midnight-theme .tide-slot.is-queue-event {
+    width: clamp(1375px, 45.83vw, 1760px);
+    flex-basis: clamp(1375px, 45.83vw, 1760px);
+    padding-top: clamp(210px, 22vh, 242px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scenic-dish-stage.is-midnight-theme .tide-slot:not(.is-queue-event) .tide-dish {
     animation: none;

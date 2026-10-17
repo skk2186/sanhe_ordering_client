@@ -30,10 +30,12 @@
 }
 
 :root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme {
-  /* One physical ratio aligns food with the open wagon and its front plate. */
-  --midnight-body-width: clamp(286px, 8.35vw, 320px);
-  --midnight-food-width: clamp(170px, 5.2vw, 200px);
-  --midnight-food-height: clamp(115px, 3.5vw, 134px);
+  /* R8 scales the complete moving unit while keeping its wheels on the same
+     photographed rail plane. The slot and rail-drop tokens live in the stage. */
+  --midnight-trolley-height: clamp(320px, 9.375vw, 360px);
+  --midnight-body-width: clamp(400px, 12.5vw, 480px);
+  --midnight-food-width: clamp(240px, 7.29vw, 280px);
+  --midnight-food-height: clamp(160px, 5.31vw, 204px);
   --station-product-title: clamp(25px, .81vw, 31px);
   --station-product-price: clamp(26px, .885vw, 34px);
   --station-category-label: clamp(18px, .54vw, 22px);

@@ -97,7 +97,7 @@ const handleImageError = event => {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: 248px;
+  height: var(--midnight-trolley-height, 248px);
   color: #e5d7bc;
   cursor: pointer;
   outline: none;
@@ -122,7 +122,7 @@ const handleImageError = event => {
   left: 50%;
   bottom: var(--trolley-bottom);
   z-index: 2;
-  width: var(--midnight-body-width, min(90%, 320px));
+  width: var(--midnight-body-width, min(90%, 480px));
   aspect-ratio: 3 / 1;
   transform: translateX(-50%);
   pointer-events: none;
