@@ -20,7 +20,7 @@
           <img
             v-if="!isVideoPlaying"
             class="featured-screen__poster"
-            :src="promo.posterImage"
+            :src="posterSource"
             :alt="getName(item)"
             @error="handlePosterError"
           />
@@ -53,6 +53,7 @@ import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { useI18n } from '@/i18n'
 import { findPromoForItem, PROMO_FALLBACK_CLOSE_DELAY } from '@/config/promoContent'
+import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 const props = defineProps({
   item: { type: Object, default: null },
@@ -74,7 +75,17 @@ let fallbackTimer = 0
 const promo = computed(() => findPromoForItem(props.item, {
   allowItemPoster: props.themeKey === 'midnight-station'
 }))
-const posterSource = computed(() => (posterBroken.value ? '' : promo.value?.posterImage || ''))
+const posterSource = computed(() => {
+  if (posterBroken.value) {
+    return props.themeKey === 'midnight-station' && promo.value?.id?.startsWith('item-')
+      ? MIDNIGHT_DEFAULT_FOOD_IMAGE
+      : ''
+  }
+  if (props.themeKey === 'midnight-station' && promo.value?.id?.startsWith('item-')) {
+    return getMidnightFoodImage(props.item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+  }
+  return promo.value?.posterImage || ''
+})
 
 const getName = (item) => item?.name || item?.storeName || item?.productName || t('common.unknown')
 const clearTimers = () => {

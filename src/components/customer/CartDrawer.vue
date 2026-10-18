@@ -29,7 +29,7 @@
           class="cart-item"
         >
           <div class="item-image">
-            <img :src="item.image" :alt="item.name" />
+            <img :src="getCartItemImage(item)" :alt="item.name" @error="handleCartImageError" />
           </div>
           
           <div class="item-info">
@@ -164,6 +164,7 @@ import {
 } from '@element-plus/icons-vue'
 import CouponSelector from './CouponSelector.vue'
 import { useI18n } from '@/i18n'
+import { getMidnightFoodImage, isMidnightStationActive, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 // Props
 const props = defineProps({
@@ -247,6 +248,18 @@ const totalAmount = computed(() => {
   const total = parseFloat(subtotal.value) + deliveryFee.value - parseFloat(discount.value)
   return Math.max(0, total).toFixed(2)
 })
+
+const getCartItemImage = (item) => isMidnightStationActive()
+  ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+  : item?.image || ''
+
+const handleCartImageError = (event) => {
+  if (!isMidnightStationActive()) return
+  const target = event?.target
+  if (!target || target.dataset.midnightFallbackApplied === '1') return
+  target.dataset.midnightFallbackApplied = '1'
+  target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+}
 
 // 方法
 const increaseQuantity = (itemId) => {

@@ -21,7 +21,7 @@
         <el-icon v-if="submitting" class="submitting-icon"><Loading /></el-icon>
         <template v-else>
           <span v-if="orderPreviewItem" class="order-preview" aria-hidden="true">
-            <img :src="orderPreviewItem.image" alt="" />
+            <img :src="getItemImage(orderPreviewItem)" alt="" @error="handleImageError" />
           </span>
           <span class="order-label">{{ $t('common.placeOrder') }}</span>
           <span class="order-progress">{{ count }}/4</span>
@@ -34,7 +34,7 @@
         <div class="item-circle" :class="{ 'has-item': item, 'empty-item': !item }" role="button" tabindex="0"
           @click="$emit('select', side, index)" @keydown.enter="$emit('select', side, index)" @keydown.space.prevent="$emit('select', side, index)">
           <div v-if="item" class="item-image w3-animate-top">
-            <img :src="item.image" :alt="item.name" />
+            <img :src="getItemImage(item)" :alt="item.name" @error="handleImageError" />
           </div>
             <button v-if="item" class="circle-close-btn" type="button" :disabled="submitting"
             :aria-label="$t('common.remove')" :title="$t('common.remove')"
@@ -65,7 +65,9 @@
 <script setup>
 import { computed } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
+import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 const props = defineProps({
+  themeKey: { type: String, default: '' },
   side: { type: String, required: true },
   items: { type: Array, required: true },
   count: { type: Number, required: true },
@@ -87,6 +89,21 @@ const totalPrice = computed(() => props.items.reduce((total, item) => {
 }, 0).toFixed(2))
 
 const orderPreviewItem = computed(() => props.items.find(Boolean) || null)
+
+const getItemImage = (item) => {
+  if (!item) return ''
+  return props.themeKey === 'midnight-station'
+    ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+    : item.image || item.imageUrl || ''
+}
+
+const handleImageError = (event) => {
+  if (props.themeKey !== 'midnight-station') return
+  const target = event?.target
+  if (!target || target.dataset.midnightFallbackApplied === '1') return
+  target.dataset.midnightFallbackApplied = '1'
+  target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+}
 
 // 处理提示点击事件
 const handleTipsClick = () => {

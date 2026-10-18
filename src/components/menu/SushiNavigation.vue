@@ -6,6 +6,7 @@
         <!-- 左侧购物车 -->
         <div class="bottom-left">
           <CartPanel
+            :theme-key="props.themeKey"
             side="left"
             :items="props.leftCart"
             :count="getCartCount('left')"
@@ -36,6 +37,7 @@
         <!-- 右侧购物车 -->
         <div class="bottom-right">
           <CartPanel
+            :theme-key="props.themeKey"
             side="right"
             :items="props.rightCart"
             :count="getCartCount('right')"
@@ -140,7 +142,7 @@
                 @click="addToCart(item, $event)"
               >
                 <div class="item-image">
-                  <img :src="item.image || DEFAULT_DISH_IMAGE" :alt="item.name" @error="handleImageError" />
+                  <img :src="getDishImage(item)" :alt="item.name" @error="handleImageError" />
                   <div v-if="!item.available" class="sold-out-overlay">
                     <span>{{ $t('common.soldOut') }}</span>
                   </div>
@@ -172,6 +174,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, nextTick, watch } from
 import { Plus, Refresh } from '@element-plus/icons-vue'
 import CartPanel from '@/components/display/CartPanel.vue'
 import { useI18n } from '@/i18n'
+import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 const { t } = useI18n()
 const DEFAULT_DISH_IMAGE = '/images/default-dish.jpg'
@@ -218,7 +221,8 @@ const props = defineProps({
   submittingSide: {
     type: String,
     default: null
-  }
+  },
+  themeKey: { type: String, default: '' }
 })
 
 // Emits
@@ -357,8 +361,20 @@ const formatPrice = (price) => {
 }
 
 const handleImageError = (event) => {
-  if (!event.target.src.endsWith(DEFAULT_DISH_IMAGE)) event.target.src = DEFAULT_DISH_IMAGE
+  const target = event?.target
+  if (!target) return
+  if (props.themeKey === 'midnight-station') {
+    if (target.dataset.midnightFallbackApplied === '1') return
+    target.dataset.midnightFallbackApplied = '1'
+    target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+    return
+  }
+  if (!target.src.endsWith(DEFAULT_DISH_IMAGE)) target.src = DEFAULT_DISH_IMAGE
 }
+
+const getDishImage = (item) => props.themeKey === 'midnight-station'
+  ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+  : item?.image || item?.imageUrl || DEFAULT_DISH_IMAGE
 
 // 开始拖拽
 const startDrag = (event) => {

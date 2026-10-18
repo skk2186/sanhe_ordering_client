@@ -61,6 +61,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from '@/i18n'
+import { getMidnightFoodImage } from '@/utils/midnightFoodImages'
 
 const trolleyWheels = [24, 76]
 const props = defineProps({
@@ -75,7 +76,7 @@ const emit = defineEmits(['dish-click'])
 const { t } = useI18n()
 const DEFAULT_DISH_IMAGE = '/images/ui/midnight-station/default-food.svg'
 const name = computed(() => props.item?.name || props.item?.storeName || props.item?.productName || t('common.unknown'))
-const image = computed(() => props.item?.image || props.item?.imageUrl || DEFAULT_DISH_IMAGE)
+const image = computed(() => getMidnightFoodImage(props.item, DEFAULT_DISH_IMAGE))
 const price = computed(() => {
   const value = Number(props.item?.price)
   return Number.isFinite(value) ? value.toFixed(2) : '0.00'

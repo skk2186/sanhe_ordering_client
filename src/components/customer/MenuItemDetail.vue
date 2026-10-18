@@ -16,7 +16,7 @@
           indicator-position="inside"
           arrow="hover"
         >
-          <el-carousel-item v-for="(image, index) in item.images" :key="index">
+          <el-carousel-item v-for="(image, index) in detailImages" :key="index">
             <img 
               :src="image" 
               :alt="item.name"
@@ -186,6 +186,7 @@
 import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useI18n } from '@/i18n'
+import { getMidnightFoodImage, isMidnightStationActive, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 import {
   Star,
   Plus,
@@ -217,6 +218,11 @@ const specialRequest = ref('')
 const visible = computed({
   get: () => props.visible,
   set: (value) => emit('update:visible', value)
+})
+
+const detailImages = computed(() => {
+  if (!isMidnightStationActive()) return props.item?.images || []
+  return [getMidnightFoodImage(props.item, MIDNIGHT_DEFAULT_FOOD_IMAGE)]
 })
 
 const imageHeight = computed(() => {
@@ -340,6 +346,13 @@ const addToCart = () => {
 }
 
 const handleImageError = (event) => {
+  if (isMidnightStationActive()) {
+    const target = event?.target
+    if (!target || target.dataset.midnightFallbackApplied === '1') return
+    target.dataset.midnightFallbackApplied = '1'
+    target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+    return
+  }
   event.target.src = '/images/placeholder-dish.jpg'
 }
 

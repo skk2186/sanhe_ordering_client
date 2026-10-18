@@ -93,6 +93,7 @@
       <!-- 左侧菜品选择区 -->
       <div class="bottom-left">
           <CartPanel
+            :theme-key="activeSceneKey"
             side="left"
             :items="leftCart"
             :count="getCartCount('left')"
@@ -121,6 +122,7 @@
       <div class="bottom-right">
 
         <CartPanel
+          :theme-key="activeSceneKey"
           side="right"
           :items="rightCart"
           :count="getCartCount('right')"
@@ -141,6 +143,7 @@
 
     <!-- 寿司导航组件 -->
     <SushiNavigation
+      :theme-key="activeSceneKey"
       :visible="showSushiNavigation"
       :items="navigationItems"
       :categories="displayCategories"
@@ -250,6 +253,7 @@ import {
 } from '@/utils/assistantRecommendations'
 import { ASSISTANT_AUDIO } from '@/utils/assistantAudio'
 import { findPromoForItem } from '@/config/promoContent'
+import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 const { t } = useI18n()
 const globalStore = useGlobalStore()
@@ -353,7 +357,9 @@ const preloadScene = async (sceneKey) => {
   if (!scene) return
   const dishAssets = displaySushiData.value
     .slice(0, 8)
-    .map(item => item?.image || item?.imageUrl)
+    .map(item => sceneKey === 'midnight-station'
+      ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+      : item?.image || item?.imageUrl)
     .filter(Boolean)
   const loading = Promise.allSettled([...new Set([...scene.assets, ...dishAssets])].map(preloadImage))
   await Promise.race([loading, waitForSceneFrame(2400)])

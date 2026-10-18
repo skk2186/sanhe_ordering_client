@@ -63,7 +63,7 @@
             @click="onAddToCart(item)"
           >
             <div class="dish-image">
-              <img :src="item.image || '/images/default-dish.jpg'" :alt="item.name" />
+              <img :src="getDishImage(item)" :alt="item.name" @error="handleDishImageError" />
             </div>
             <div class="dish-info">
               <p class="dish-name">{{ item.storeName }}</p>
@@ -86,6 +86,7 @@ import { ref, computed, onMounted } from 'vue';
 import { menuApi } from '@/api/menu.js';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { useI18n } from '@/i18n'
+import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 const { t } = useI18n()
 
@@ -102,6 +103,18 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close', 'add-to-cart']);
+
+const getDishImage = (item) => props.themeKey === 'midnight-station'
+  ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+  : item?.image || '/images/default-dish.jpg'
+
+const handleDishImageError = (event) => {
+  if (props.themeKey !== 'midnight-station') return
+  const target = event?.target
+  if (!target || target.dataset.midnightFallbackApplied === '1') return
+  target.dataset.midnightFallbackApplied = '1'
+  target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+}
 
 const currentPage = ref(1);
 const pageSize = 8; // 2行4列，一页8个

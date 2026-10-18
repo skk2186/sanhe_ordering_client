@@ -34,7 +34,7 @@
         <!-- 菜品图片 -->
         <div class="item-image">
           <img 
-            :src="item.image" 
+            :src="getDishImage(item)"
             :alt="item.name"
             @load="onImageLoad"
             @error="onImageError"
@@ -135,6 +135,7 @@ import {
   Star
 } from '@element-plus/icons-vue'
 import MenuItemDetail from '@/components/customer/MenuItemDetail.vue'
+import { getMidnightFoodImage, isMidnightStationActive, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'
 
 const cartStore = useCartStore()
 const menuStore = useMenuStore()
@@ -156,6 +157,10 @@ const filteredMenuItems = computed(() => {
     item.categoryId === activeCategory.value
   )
 })
+
+const getDishImage = (item) => isMidnightStationActive()
+  ? getMidnightFoodImage(item, MIDNIGHT_DEFAULT_FOOD_IMAGE)
+  : item?.image || ''
 
 // 方法
 const selectCategory = (categoryId) => {
@@ -240,6 +245,13 @@ const onImageLoad = (event) => {
 }
 
 const onImageError = (event) => {
+  if (isMidnightStationActive()) {
+    const target = event?.target
+    if (!target || target.dataset.midnightFallbackApplied === '1') return
+    target.dataset.midnightFallbackApplied = '1'
+    target.src = MIDNIGHT_DEFAULT_FOOD_IMAGE
+    return
+  }
   event.target.src = '/images/placeholder-dish.jpg'
 }
 

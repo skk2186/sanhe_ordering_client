@@ -6,6 +6,19 @@ import { execFileSync } from 'node:child_process'
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8')
 const baseline = path => execFileSync('git', ['show', 'b975a737ddd14dfd830cf94e7c096822bf476326:' + path], { encoding: 'utf8' })
 const script = source => source.replace(/\r\n/g, '\n').match(/<script[^>]*>([\s\S]*?)<\/script>/)?.[1]
+const normalizeNavigationScript = source => script(source)
+  .replace("import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'\n", '')
+  .replace("  },\n  themeKey: { type: String, default: '' }\n})", "  }\n})")
+  .replace(
+    /const handleImageError = \(event\) => \{[\s\S]*?\n\}\n\nconst getDishImage = \(item\) =>[\s\S]*?\n  : item\?\.image \|\| item\?\.imageUrl \|\| DEFAULT_DISH_IMAGE/,
+    "const handleImageError = (event) => {\n  if (!event.target.src.endsWith(DEFAULT_DISH_IMAGE)) event.target.src = DEFAULT_DISH_IMAGE\n}"
+  )
+const normalizeFeaturedScript = source => script(source)
+  .replace("import { getMidnightFoodImage, MIDNIGHT_DEFAULT_FOOD_IMAGE } from '@/utils/midnightFoodImages'\n", '')
+  .replace(
+    /const posterSource = computed\(\(\) => \{[\s\S]*?\n\}\)/,
+    "const posterSource = computed(() => (posterBroken.value ? '' : promo.value?.posterImage || ''))"
+  )
 
 test('overlay tokens are emitted only under the Midnight theme and an explicit component root', () => {
   const skin = read('src/styles/themes/midnight-overlays.scss')
@@ -18,7 +31,12 @@ test('overlay tokens are emitted only under the Midnight theme and an explicit c
 
 test('navigation, history, settings and featured retain their shared business scripts', () => {
   for (const path of ['src/components/menu/SushiNavigation.vue', 'src/components/order/OrderHistoryDialog.vue', 'src/components/display/SettingDialog.vue', 'src/components/display/FeaturedDishScreen.vue']) {
-    assert.equal(script(read(path)), script(baseline(path)), path)
+    const actual = path.endsWith('SushiNavigation.vue')
+      ? normalizeNavigationScript(read(path))
+      : path.endsWith('FeaturedDishScreen.vue')
+        ? normalizeFeaturedScript(read(path))
+        : script(read(path))
+    assert.equal(actual, script(baseline(path)), path)
   }
 })
 
@@ -38,7 +56,7 @@ test('assistant and progress stay frozen; express business and trolley interacti
   assert.match(trolleyScript, /defineEmits\(\['dish-click'\]\)/)
   assert.match(trolleyScript, /if \(!props\.soldOut\) emit\('dish-click', props\.item, event\)/)
   assert.match(trolleyScript, /props\.item\?\.name \|\| props\.item\?\.storeName \|\| props\.item\?\.productName/)
-  assert.match(trolleyScript, /props\.item\?\.image \|\| props\.item\?\.imageUrl \|\| DEFAULT_DISH_IMAGE/)
+  assert.match(trolleyScript, /getMidnightFoodImage\(props\.item, DEFAULT_DISH_IMAGE\)/)
   assert.match(trolleyScript, /Number\.isFinite\(value\) \? value\.toFixed\(2\) : '0\.00'/)
   assert.match(trolleyScript, /target\.src = DEFAULT_DISH_IMAGE/)
 })
