@@ -102,8 +102,8 @@ const handleImageError = event => {
 <style lang="scss" scoped>
 .midnight-dish-trolley {
   --trolley-bottom: 9px;
-  // Sink the complete food image below the manifest deck anchor so its rim sits behind the wagon's front rail.
-  --midnight-food-seat-depth: 17%;
+  // Ease the plate up by less than 1px at 3840 so the tallest drink stays inside the stage.
+  --midnight-food-seat-depth: 16.75%;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -152,7 +152,7 @@ const handleImageError = event => {
 
 .midnight-dish-trolley__vehicle-art--front {
   z-index: 3;
-  clip-path: inset(35% 0 0);
+  clip-path: inset(40% 0 0);
   pointer-events: none;
 }
 
@@ -184,7 +184,7 @@ const handleImageError = event => {
 .midnight-dish-trolley__dish {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--midnight-food-anchor-bottom, 10%) - var(--midnight-food-seat-depth, 17%));
+  bottom: calc(var(--midnight-food-anchor-bottom, 10%) - var(--midnight-food-seat-depth, 16.75%));
   z-index: 2;
   width: min(84%, 470px);
   height: auto;
@@ -405,6 +405,10 @@ const handleImageError = event => {
 
   .midnight-dish-trolley__dish {
     width: min(84%, 220px);
+  }
+
+  .midnight-dish-trolley__vehicle-art--front {
+    clip-path: inset(35% 0 0);
   }
 
   .midnight-dish-trolley__side-plaque {
