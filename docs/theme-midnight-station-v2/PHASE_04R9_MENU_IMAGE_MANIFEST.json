@@ -19,6 +19,25 @@
     "runtimeSize": "1024x1024",
     "runtimeBackground": "transparent; red plate and food preserved after in-page comparison"
   },
+  "presentationGeometry": {
+    "measurement": "Visible alpha bounds (alpha > 128) measured from the existing WebP assets; SVG contact point from its viewBox.",
+    "vehicleAspectRatio": 3,
+    "cargoDeckTopRatio": 0.38,
+    "foodFrameWidthRatio": 0.84,
+    "fallbackFrameAspectRatio": 1.411765,
+    "contentBottomRatioByAsset": {
+      "food-15.webp": 0.8408,
+      "food-16.webp": 0.7734,
+      "food-17.webp": 0.7910,
+      "food-18.webp": 0.9580,
+      "food-19.webp": 0.8096,
+      "food-20.webp": 0.7871,
+      "food-21.webp": 0.7978,
+      "food-22.webp": 0.7978,
+      "food-23.webp": 0.8027,
+      "default-food.svg": 0.9470
+    }
+  },
   "categories": [
     { "id": 1, "name": "招牌热卖" },
     { "id": 4, "name": "意向面包" },

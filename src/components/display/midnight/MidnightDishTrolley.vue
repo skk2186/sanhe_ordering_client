@@ -26,8 +26,12 @@
         alt=""
         draggable="false"
       />
-      <span class="midnight-dish-trolley__dish">
-        <img :key="image" :src="image" :alt="name" @error="handleImageError" />
+      <span
+        class="midnight-dish-trolley__dish"
+        :class="{ 'is-fallback': displayedImage === DEFAULT_DISH_IMAGE }"
+        :style="{ '--midnight-food-anchor-bottom': foodAnchorBottom }"
+      >
+        <img :key="displayedImage" :src="displayedImage" :alt="name" @error="handleImageError" />
       </span>
       <img
         class="midnight-dish-trolley__vehicle-art midnight-dish-trolley__vehicle-art--front"
@@ -59,9 +63,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from '@/i18n'
-import { getMidnightFoodImage } from '@/utils/midnightFoodImages'
+import { getMidnightFoodAnchorBottom, getMidnightFoodImage } from '@/utils/midnightFoodImages'
 
 const trolleyWheels = [24, 76]
 const props = defineProps({
@@ -77,6 +81,10 @@ const { t } = useI18n()
 const DEFAULT_DISH_IMAGE = '/images/ui/midnight-station/default-food.svg'
 const name = computed(() => props.item?.name || props.item?.storeName || props.item?.productName || t('common.unknown'))
 const image = computed(() => getMidnightFoodImage(props.item, DEFAULT_DISH_IMAGE))
+const imageFailed = ref(false)
+watch(image, () => { imageFailed.value = false })
+const displayedImage = computed(() => imageFailed.value ? DEFAULT_DISH_IMAGE : image.value)
+const foodAnchorBottom = computed(() => getMidnightFoodAnchorBottom(props.item, DEFAULT_DISH_IMAGE, displayedImage.value))
 const price = computed(() => {
   const value = Number(props.item?.price)
   return Number.isFinite(value) ? value.toFixed(2) : '0.00'
@@ -86,9 +94,8 @@ const handleActivate = event => {
 }
 const handleImageError = event => {
   const target = event?.target
-  if (!target || target.dataset.fallbackApplied === '1') return
-  target.dataset.fallbackApplied = '1'
-  target.src = DEFAULT_DISH_IMAGE
+  if (!target || displayedImage.value === DEFAULT_DISH_IMAGE) return
+  imageFailed.value = true
 }
 </script>
 
@@ -175,13 +182,18 @@ const handleImageError = event => {
 .midnight-dish-trolley__dish {
   position: absolute;
   left: 50%;
-  bottom: 58%;
+  bottom: var(--midnight-food-anchor-bottom, 10%);
   z-index: 2;
-  width: var(--midnight-food-width, clamp(170px, 5.2vw, 200px));
-  height: var(--midnight-food-height, clamp(115px, 3.5vw, 134px));
-  overflow: hidden;
+  width: min(84%, 470px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  overflow: visible;
   transform: translateX(-50%);
   pointer-events: none;
+}
+
+.midnight-dish-trolley__dish.is-fallback {
+  aspect-ratio: 240 / 170;
 }
 
 .midnight-dish-trolley__dish img {
@@ -193,7 +205,7 @@ const handleImageError = event => {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  object-position: center bottom;
+  object-position: center;
   filter: drop-shadow(0 2px 2px rgba(20, 20, 17, .28));
   user-select: none;
   -webkit-user-drag: none;
@@ -384,10 +396,12 @@ const handleImageError = event => {
   .midnight-dish-trolley {
     height: 214px;
     --midnight-body-width: min(88vw, 250px);
-    --midnight-food-width: clamp(150px, 66vw, 180px);
-    --midnight-food-height: clamp(108px, 47vw, 128px);
     --station-product-title: 19px;
     --station-product-price: 20px;
+  }
+
+  .midnight-dish-trolley__dish {
+    width: min(84%, 220px);
   }
 
   .midnight-dish-trolley__soldout {

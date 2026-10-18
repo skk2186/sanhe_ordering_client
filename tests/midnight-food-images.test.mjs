@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import manifest from '../docs/theme-midnight-station-v2/PHASE_04R9_MENU_IMAGE_MANIFEST.json' with { type: 'json' }
-import { getMidnightFoodImage } from '../src/utils/midnightFoodImages.js'
+import { getMidnightFoodAnchorBottom, getMidnightFoodImage } from '../src/utils/midnightFoodImages.js'
 
 test('Midnight food image mapping is keyed by shop and product id', () => {
   assert.equal(
@@ -33,4 +33,16 @@ test('manifest keeps complete API coverage and explicit reuse for identical sour
   assert.equal(duplicateToast?.sourceImageIdentifier, originalToast?.sourceImageIdentifier)
   assert.equal(duplicateToast?.newImagePath, originalToast?.newImagePath)
   assert.equal(duplicateToast?.reusedFromProductId, 19)
+})
+
+test('food image lower edges anchor to the same cargo deck across tall and low dishes', () => {
+  const anchors = [15, 16, 17, 18, 19, 20, 21, 22, 23]
+    .map(id => getMidnightFoodAnchorBottom({ id, shopId: 2 }))
+  assert.equal(anchors.length, 9)
+  assert.ok(new Set(anchors).size >= 8)
+  assert.equal(getMidnightFoodAnchorBottom({ id: 19, shopId: 2 }), '14.02%')
+  assert.equal(getMidnightFoodAnchorBottom({ id: 18, shopId: 2 }), '51.42%')
+  assert.equal(getMidnightFoodAnchorBottom({ id: 27, shopId: 2 }), '52.54%')
+  assert.ok(anchors.every(value => Number.parseFloat(value) >= 0 && Number.parseFloat(value) < 62))
+  assert.equal(Object.keys(manifest.presentationGeometry.contentBottomRatioByAsset).length, 10)
 })

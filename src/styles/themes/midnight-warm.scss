@@ -30,11 +30,10 @@
 }
 
 :root[data-theme="midnight-station"] .scenic-dish-stage.is-midnight-theme {
-  /* R8R adds one measured scale step to the complete trolley and its food. */
+  /* Body and copy share one Midnight scale. Food frames size from the cargo
+     width and use measured per-image deck anchors in MidnightDishTrolley. */
   --midnight-trolley-height: clamp(345px, 10vw, 390px);
   --midnight-body-width: clamp(435px, 13.7vw, 530px);
-  --midnight-food-width: clamp(260px, 8.05vw, 310px);
-  --midnight-food-height: clamp(175px, 5.75vw, 225px);
   --station-product-title: clamp(26px, .83vw, 32px);
   --station-product-price: clamp(27px, .9vw, 35px);
   --station-category-label: clamp(18px, .54vw, 22px);
