@@ -5,27 +5,23 @@
   const VIEW_WIDTH = { full: 3840, center: 1920 }
 
   // Initial centerline fit follows the generated conveyor's visible belt surface.
-  // The stage is vertically scaled to 84% around the canvas center to preserve the bottom UI zone.
-  const stageScale = 0.84
-  const stageOffsetY = CANVAS.height * (1 - stageScale) / 2
-  const stagePoint = (x, y) => ({ x, y: stageOffsetY + y * stageScale })
-  // Sampled from the shared rear/surface mask contours, then mapped through the vertical stage scale.
+  // These canvas points are sampled from the shared rear/surface mask contours after the stage's 84% vertical scale.
   const controlPoints = [
-    stagePoint(-340, 350),
-    stagePoint(0, 380),
-    stagePoint(247, 416),
-    stagePoint(548, 448),
-    stagePoint(902, 473),
-    stagePoint(1273, 491),
-    stagePoint(1591, 502),
-    stagePoint(1919, 510),
-    stagePoint(2244, 502),
-    stagePoint(2559, 491),
-    stagePoint(2931, 473),
-    stagePoint(3288, 448),
-    stagePoint(3590, 416),
-    stagePoint(3840, 380),
-    stagePoint(4170, 350)
+    { x: -340, y: 350 },
+    { x: 0, y: 381 },
+    { x: 248, y: 416 },
+    { x: 548, y: 448 },
+    { x: 902, y: 473 },
+    { x: 1273, y: 491 },
+    { x: 1591, y: 502 },
+    { x: 1920, y: 510 },
+    { x: 2245, y: 502 },
+    { x: 2564, y: 491 },
+    { x: 2935, y: 473 },
+    { x: 3288, y: 448 },
+    { x: 3589, y: 416 },
+    { x: 3840, y: 381 },
+    { x: 4170, y: 350 }
   ]
   const DISH_COUNT = 6
   const PLATE_RATIO = 210 / 340
