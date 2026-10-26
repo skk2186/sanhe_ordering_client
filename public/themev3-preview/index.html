@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Theme V3 独立 3840×1080 场景构图与弧形传送动线验证原型" />
+    <title>Theme V3 · 场景与传送动线原型</title>
+    <link rel="stylesheet" href="./preview.css" />
+  </head>
+  <body>
+    <header class="prototype-header">
+      <div class="heading">
+        <p class="eyebrow">THEME V3 · PHASE 02</p>
+        <h1>樱花猫咪寿司屋 · 构图与传送原型</h1>
+        <p class="lede">独立调试页。虚线、色块和移动圆盘均为验证标记，不是正式美术资产。</p>
+      </div>
+
+      <div class="controls" aria-label="原型控制">
+        <div class="control-group view-switch" role="group" aria-label="画面视图">
+          <button type="button" class="control-button is-active" data-view="full" aria-pressed="true">3840 全景</button>
+          <button type="button" class="control-button" data-view="center" aria-pressed="false">1920 中央视图</button>
+        </div>
+        <label class="check-control"><input id="show-guides" type="checkbox" checked />显示区域边界</label>
+        <label class="check-control"><input id="simulate-reduced-motion" type="checkbox" />模拟减少动态</label>
+        <button type="button" id="motion-toggle" class="control-button" aria-pressed="false">暂停</button>
+        <button type="button" id="direction-toggle" class="control-button">方向：左 → 右</button>
+        <label class="speed-control" for="speed-range">速度 <output id="speed-value">220</output> px/s
+          <input id="speed-range" type="range" min="80" max="360" step="10" value="220" />
+        </label>
+        <button type="button" id="reset-motion" class="control-button">重置位置</button>
+      </div>
+      <p id="live-status" class="live-status" role="status" aria-live="polite">默认左到右，轨迹与交互热区均为调试原型。</p>
+    </header>
+
+    <main>
+      <div id="view-caption" class="view-caption">3840×1080 母版全景 · 当前浏览器按可用空间等比缩放显示</div>
+      <div id="viewport-host" class="viewport-host view-full" aria-label="场景画布视图">
+        <div id="viewport-frame" class="viewport-frame">
+          <div id="scene-canvas" class="scene-canvas" data-canvas-width="3840" data-canvas-height="1080">
+            <div class="side-extension side-extension--left"><span>480px 待重绘扩展</span></div>
+            <div class="side-extension side-extension--right"><span>480px 待重绘扩展</span></div>
+            <img class="reference-demo" src="./reference-demo.png" alt="用户提供的 2048×768 樱花猫咪寿司店静态参考图；仅作原型背景参照，图中猫咪与餐盘目前不可动。" draggable="false" />
+            <div class="source-outline debug-only" aria-hidden="true"><span>原图 2048×768 · 等比放置 2880×1080 · 未拉伸/未裁切</span></div>
+
+            <div class="scene-wash debug-only" aria-hidden="true"></div>
+
+            <svg id="route-debug" class="route-debug debug-only" viewBox="0 0 3840 1080" aria-label="调试用传送带路径、控制点和调试圆盘位置">
+              <path id="route-path" class="route-line" d="" />
+              <g id="control-points"></g>
+            </svg>
+
+            <div class="debug-zone debug-zone--top debug-only" data-label="顶部信息安全带 y=0–196"></div>
+            <div class="debug-zone debug-zone--brand debug-only" data-label="品牌区"></div>
+            <div class="debug-zone debug-zone--progress debug-only" data-label="进度区 · 941px"></div>
+            <div class="debug-zone debug-zone--assistant debug-only" data-label="AI 助手区"></div>
+            <div class="debug-zone debug-zone--stage debug-only" data-label="舞台 / 盘子点击热区活动层"></div>
+            <div class="debug-zone debug-zone--left-cart debug-only" data-label="左购物盘 · 827×217"></div>
+            <div class="debug-zone debug-zone--right-cart debug-only" data-label="右购物盘 · 827×217"></div>
+            <div class="debug-zone debug-zone--console debug-only" data-label="中央独立点餐台目标边界 · 约 940×260"></div>
+            <div class="button-safety button-safety--menu debug-only" data-label="菜单"></div>
+            <div class="button-safety button-safety--nav debug-only" data-label="导航"></div>
+            <div class="button-safety button-safety--history debug-only" data-label="历史"></div>
+            <div class="button-safety button-safety--settings debug-only" data-label="设置"></div>
+            <div class="button-safety button-safety--waiter debug-only" data-label="呼叫"></div>
+
+            <div class="cat-station cat-station--prep debug-only"><b>切菜猫</b><span>源图约 x=300–520 / y=150–350</span><small>刀具＋前爪独立；固定肘/腕锚点</small></div>
+            <div class="cat-station cat-station--plate debug-only"><b>摆盘猫</b><span>源图约 x=520–790 / y=135–355</span><small>手臂、寿司和盘子独立层</small></div>
+            <div class="cat-station cat-station--serve debug-only"><b>端菜猫</b><span>源图约 x=1370–1610 / y=135–355</span><small>托盘与双手同组，入口在右侧</small></div>
+            <div class="cat-station cat-station--cook debug-only"><b>炒菜猫</b><span>源图约 x=1610–1880 / y=130–360</span><small>锅铲转轴、锅沿与火/蒸汽分层</small></div>
+
+            <div id="moving-plates" class="moving-plates" role="group" aria-label="沿拟合传送线运动的测试餐盘"></div>
+            <div class="static-dish-note debug-only">原图餐盘是静态像素：正式背景制作时全部移除，另做 DOM 可点击餐盘</div>
+            <div class="console-button-labels debug-only" aria-hidden="true">
+              <span>菜单</span><span>导航</span><span>历史</span><span>设置</span><span>呼叫店员</span>
+            </div>
+            <div class="canvas-legend debug-only" aria-hidden="true">调试图层 ON · 蓝框=保留区 · 粉框=需拆分角色 · 青线=拟合路径 · 黄圆=可点击测试热区</div>
+          </div>
+        </div>
+      </div>
+
+      <section class="analysis-panel" aria-label="原图测量与素材边界">
+        <article>
+          <h2>比例换算</h2>
+          <p><strong>2048×768（8:3）</strong> → 等比适配 1080 高时为 2880×1080；32:9 画布左右各余 480px。此原型不拉伸图片、不裁切人物，以两侧斜纹表示待重新绘制的扩展区。</p>
+        </article>
+        <article>
+          <h2>静态参考内容</h2>
+          <p>原图已有四只静态猫、两侧货架与蒸笼、多盏灯笼、中央窗外樱花小镇、弧形餐台、约 8 张固定餐盘，以及右前景碗碟。原图没有点餐台，顶部主体较拥挤。</p>
+        </article>
+        <article>
+          <h2>正式资产边界</h2>
+          <p>背景保留固定建筑、货架、窗景、灯笼外壳与地面；猫、餐台前后遮挡、餐盘和中央点餐台均独立制作。菜名、价格、进度、购物车与按钮标签由 DOM 承载。</p>
+        </article>
+      </section>
+    </main>
+    <script src="./preview.js" defer></script>
+  </body>
+</html>

@@ -4,6 +4,7 @@ node_modules
 /public/img
 .visual-review/
 docs/theme-midnight-station-v2/
+public/themev3-preview/reference-demo.png
 # local env files
 .env.local
 .env.*.local
