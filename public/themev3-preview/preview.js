@@ -4,21 +4,24 @@
   const CANVAS = { width: 3840, height: 1080 }
   const VIEW_WIDTH = { full: 3840, center: 1920 }
 
-  // Control points are the source image's plate-center lane mapped uniformly
-  // from 2048x768 into a centered 2880x1080 image. Endpoints extend off-screen.
+  // The nine measured centers follow the reference image's plate contact lane:
+  // source y rises toward the center (closer to the guest), then recedes at both ends.
+  // Mapping is x=480+sourceX*1.40625, y=sourceY*1.40625. Endpoints are offscreen.
   const controlPoints = [
-    { x: -240, y: 557 },
-    { x: 480, y: 548 },
-    { x: 900, y: 545 },
-    { x: 1320, y: 556 },
-    { x: 1740, y: 570 },
-    { x: 2160, y: 571 },
-    { x: 2580, y: 558 },
-    { x: 3000, y: 543 },
-    { x: 3360, y: 534 },
-    { x: 4080, y: 515 }
+    { x: -340, y: 552 },
+    { x: 480, y: 547, sourceX: 0, sourceY: 389 },
+    { x: 840, y: 537, sourceX: 256, sourceY: 382 },
+    { x: 1200, y: 546, sourceX: 512, sourceY: 388 },
+    { x: 1560, y: 563, sourceX: 768, sourceY: 400 },
+    { x: 1920, y: 577, sourceX: 1024, sourceY: 410 },
+    { x: 2280, y: 565, sourceX: 1280, sourceY: 402 },
+    { x: 2640, y: 548, sourceX: 1536, sourceY: 390 },
+    { x: 3000, y: 537, sourceX: 1792, sourceY: 382 },
+    { x: 3360, y: 529, sourceX: 2048, sourceY: 376 },
+    { x: 4170, y: 520 }
   ]
-  const DISH_COUNT = 8
+  const DISH_COUNT = 6
+  const PLATE_RATIO = 210 / 340
   const SAMPLES_PER_SEGMENT = 48
 
   const host = document.querySelector('#viewport-host')
@@ -33,6 +36,11 @@
   const directionToggle = document.querySelector('#direction-toggle')
   const speedRange = document.querySelector('#speed-range')
   const speedValue = document.querySelector('#speed-value')
+  const plateSizeRange = document.querySelector('#plate-size-range')
+  const plateSizeValue = document.querySelector('#plate-size-value')
+  const businessOverlay = document.querySelector('#business-overlay')
+  const zoomValue = document.querySelector('#zoom-value')
+  const focusButtons = [...document.querySelectorAll('[data-focus]')]
   const resetButton = document.querySelector('#reset-motion')
   const status = document.querySelector('#live-status')
   const caption = document.querySelector('#view-caption')
@@ -40,6 +48,13 @@
   const reduceMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 
   let viewMode = 'full'
+  let plateWidth = Number(plateSizeRange.value)
+  let zoom = 1
+  let panX = -1320
+  let panY = -210
+  let activeScale = 1
+  let dragging = false
+  let lastPointer = null
   let direction = 1
   let speed = Number(speedRange.value)
   let paused = reduceMedia.matches
@@ -117,6 +132,11 @@
       circle.setAttribute('cy', point.y)
       circle.setAttribute('r', '8')
       circle.setAttribute('class', 'route-point')
+      if (Number.isFinite(point.sourceX)) {
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
+        title.textContent = `原图盘心估测 (${point.sourceX}, ${point.sourceY}) → 3840 母版 (${Math.round(point.x)}, ${Math.round(point.y)}) px`
+        circle.append(title)
+      }
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text')
       label.setAttribute('x', point.x + 10)
       label.setAttribute('y', point.y - 12)
@@ -133,7 +153,7 @@
       plate.type = 'button'
       plate.className = 'debug-plate'
       plate.dataset.plateIndex = String(index + 1)
-      plate.setAttribute('aria-label', `测试餐盘 ${index + 1}；调试形状，点击用于验证移动热区`)
+      plate.setAttribute('aria-label', `测试餐盘 ${index + 1}；${plateWidth}×${Math.round(plateWidth * PLATE_RATIO)} 逻辑像素；调试形状，点击用于验证移动热区`)
       plate.title = '点击热区跟随移动；本按钮不接触任何菜单或订单数据'
       plate.addEventListener('click', () => {
         plate.classList.add('is-clicked')
@@ -147,44 +167,68 @@
   const renderPlates = () => {
     const plates = [...platesRoot.children]
     const spacing = pathLength / plates.length
+    platesRoot.dataset.pathLength = pathLength.toFixed(1)
+    platesRoot.dataset.spacing = spacing.toFixed(1)
+    routePath.dataset.pathLength = pathLength.toFixed(1)
     plates.forEach((plate, index) => {
       const rawDistance = phase + index * spacing
       const distance = ((rawDistance % pathLength) + pathLength) % pathLength
       const point = pointAtDistance(distance)
-      const tilt = Math.max(-2.5, Math.min(2.5, point.angle * 180 / Math.PI))
-      const scale = 0.96 + Math.max(0, point.y - 535) / 1000
+      const tilt = Math.max(-1.2, Math.min(1.2, point.angle * 180 / Math.PI * 0.08))
+      const centerDepth = Math.max(0, 1 - Math.abs(point.x - 1920) / 1920)
+      const scale = 0.94 + centerDepth * 0.08
+      const plateHeight = Math.round(plateWidth * PLATE_RATIO)
+      plate.style.width = `${plateWidth}px`
+      plate.style.height = `${plateHeight}px`
       plate.style.left = `${point.x}px`
       plate.style.top = `${point.y}px`
-      plate.style.zIndex = String(100 + Math.round(point.y))
+      plate.style.zIndex = String(100 + Math.round(point.y * 10))
       plate.style.transform = `translate(-50%, -52%) rotate(${tilt.toFixed(2)}deg) scale(${scale.toFixed(3)})`
       plate.dataset.position = `${point.x.toFixed(1)},${point.y.toFixed(1)}`
+      plate.dataset.logicalWidth = String(plateWidth)
+      plate.dataset.logicalHeight = String(plateHeight)
+      plate.dataset.spacing = spacing.toFixed(1)
+      plate.setAttribute('aria-label', `测试餐盘 ${index + 1}；${plateWidth}×${plateHeight} 逻辑像素；调试形状，点击用于验证移动热区`)
     })
   }
 
   const updateViewport = () => {
-    const logicalWidth = VIEW_WIDTH[viewMode]
+    const logicalWidth = VIEW_WIDTH[viewMode] || CANVAS.width
+    const localMode = viewMode === 'local'
     const centerOffset = viewMode === 'center' ? (CANVAS.width - logicalWidth) / 2 : 0
     const availableWidth = Math.max(320, window.innerWidth - 32)
     const availableHeight = Math.max(250, window.innerHeight - document.querySelector('.prototype-header').getBoundingClientRect().height - 150)
-    const scale = Math.min(availableWidth / logicalWidth, availableHeight / CANVAS.height, 1)
-    const renderedWidth = logicalWidth * scale
-    const renderedHeight = CANVAS.height * scale
+    const localWidth = Math.min(1440, availableWidth)
+    const localHeight = Math.min(760, availableHeight)
+    const scale = localMode ? zoom : Math.min(availableWidth / logicalWidth, availableHeight / CANVAS.height, 1)
+    const renderedWidth = localMode ? localWidth : logicalWidth * scale
+    const renderedHeight = localMode ? localHeight : CANVAS.height * scale
 
     host.style.width = `${renderedWidth}px`
     host.style.height = `${renderedHeight}px`
     frame.style.width = `${renderedWidth}px`
     frame.style.height = `${renderedHeight}px`
-    canvas.style.left = `${-centerOffset}px`
+    canvas.style.left = localMode ? `${panX * scale}px` : `${-centerOffset * scale}px`
+    canvas.style.top = localMode ? `${panY * scale}px` : '0px'
     canvas.style.transform = `scale(${scale})`
     host.classList.toggle('view-center', viewMode === 'center')
+    host.classList.toggle('view-business', viewMode === 'business')
+    host.classList.toggle('view-local', localMode)
+    activeScale = scale
+    zoomValue.textContent = `${Math.round(scale * 100)}%`
     caption.textContent = viewMode === 'full'
-      ? `3840×1080 母版全景 · 当前浏览器按可用空间等比缩放显示 · 原图不裁切`
-      : `1920×1080 中央视图 · 显示母版 x=960–2880 · 等比 1:1 内容裁窗，原图不拉伸`
+      ? `3840×1080 全景 · 几何固定 · 当前显示缩放 ${Math.round(scale * 100)}%`
+      : viewMode === 'center'
+        ? `1920×1080 中央视图 · 母版 x=960–2880 · 当前显示缩放 ${Math.round(scale * 100)}%`
+        : viewMode === 'business'
+          ? `3840×1080 全景业务布局对照 · 底部三栏按 /display DOM 实测坐标 · 显示缩放 ${Math.round(scale * 100)}%`
+          : `局部查看 · 场景逻辑像素缩放 ${Math.round(scale * 100)}% · 100% 表示 1 CSS px = 1 逻辑 px · 拖动画布平移`
     viewButtons.forEach((button) => {
       const active = button.dataset.view === viewMode
       button.classList.toggle('is-active', active)
       button.setAttribute('aria-pressed', String(active))
     })
+    canvas.classList.toggle('business-hidden', !businessOverlay.checked || (viewMode !== 'business' && viewMode !== 'full' && viewMode !== 'center'))
   }
 
   const effectiveReducedMotion = () => simulateReducedMotion || reduceMedia.matches
@@ -194,6 +238,9 @@
     directionToggle.textContent = direction > 0 ? '方向：左 → 右' : '方向：右 → 左'
     speedValue.value = String(speed)
     speedValue.textContent = String(speed)
+    const plateHeight = Math.round(plateWidth * PLATE_RATIO)
+    plateSizeValue.value = `${plateWidth}×${plateHeight}`
+    plateSizeValue.textContent = `${plateWidth}×${plateHeight}`
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
     const reduceNotice = effectiveReducedMotion() ? ' 减少动态模式：自动运动已停，盘子静态分布。' : ''
     status.textContent = `${paused ? '已暂停' : '运行中'} · ${direction > 0 ? '左→右' : '右→左'} · ${speed} px/s${reduceNotice}`
@@ -215,6 +262,7 @@
     updateViewport()
   }))
   showGuides.addEventListener('change', () => canvas.classList.toggle('guides-hidden', !showGuides.checked))
+  businessOverlay.addEventListener('change', updateViewport)
   reducedToggle.addEventListener('change', () => {
     simulateReducedMotion = reducedToggle.checked
     updateMotionControls()
@@ -231,6 +279,55 @@
     speed = Number(speedRange.value)
     updateMotionControls()
   })
+  plateSizeRange.addEventListener('input', () => {
+    plateWidth = Number(plateSizeRange.value)
+    renderPlates()
+    updateMotionControls()
+  })
+  document.querySelector('#zoom-in').addEventListener('click', () => {
+    zoom = Math.min(2, Math.round((zoom + 0.1) * 10) / 10)
+    viewMode = 'local'
+    updateViewport()
+  })
+  document.querySelector('#zoom-out').addEventListener('click', () => {
+    zoom = Math.max(0.25, Math.round((zoom - 0.1) * 10) / 10)
+    viewMode = 'local'
+    updateViewport()
+  })
+  focusButtons.forEach((button) => button.addEventListener('click', () => {
+    viewMode = 'local'
+    zoom = 1
+    const targets = {
+      plate: { x: 1920, y: 577 },
+      curve: { x: 1920, y: 570 },
+      console: { x: 1920, y: 970 }
+    }
+    const target = targets[button.dataset.focus]
+    const width = Math.min(1440, Math.max(320, window.innerWidth - 32))
+    const height = Math.min(760, Math.max(250, window.innerHeight - document.querySelector('.prototype-header').getBoundingClientRect().height - 150))
+    panX = width / 2 - target.x
+    panY = height / 2 - target.y
+    updateViewport()
+  }))
+  document.querySelector('#pan-reset').addEventListener('click', () => {
+    panX = -1320
+    panY = -210
+    updateViewport()
+  })
+  frame.addEventListener('pointerdown', (event) => {
+    if (viewMode !== 'local' || event.target.closest('button')) return
+    dragging = true
+    lastPointer = { x: event.clientX, y: event.clientY }
+    frame.setPointerCapture(event.pointerId)
+  })
+  frame.addEventListener('pointermove', (event) => {
+    if (!dragging || !lastPointer) return
+    panX += (event.clientX - lastPointer.x) / activeScale
+    panY += (event.clientY - lastPointer.y) / activeScale
+    lastPointer = { x: event.clientX, y: event.clientY }
+    updateViewport()
+  })
+  frame.addEventListener('pointerup', () => { dragging = false; lastPointer = null })
   resetButton.addEventListener('click', () => {
     phase = 0
     renderPlates()

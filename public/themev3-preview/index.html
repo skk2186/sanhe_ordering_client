@@ -19,13 +19,28 @@
         <div class="control-group view-switch" role="group" aria-label="画面视图">
           <button type="button" class="control-button is-active" data-view="full" aria-pressed="true">3840 全景</button>
           <button type="button" class="control-button" data-view="center" aria-pressed="false">1920 中央视图</button>
+          <button type="button" class="control-button" data-view="business" aria-pressed="false">业务布局对照</button>
+          <button type="button" class="control-button" data-view="local" aria-pressed="false">100% 局部</button>
+        </div>
+        <div class="control-group local-controls" aria-label="逻辑像素局部查看">
+          <button type="button" class="control-button" id="zoom-out" aria-label="缩小画布">−</button>
+          <output id="zoom-value" aria-live="polite">100%</output>
+          <button type="button" class="control-button" id="zoom-in" aria-label="放大画布">+</button>
+          <button type="button" class="control-button" data-focus="plate">看餐盘</button>
+          <button type="button" class="control-button" data-focus="curve">看弧线</button>
+          <button type="button" class="control-button" data-focus="console">看点餐台</button>
+          <button type="button" class="control-button" id="pan-reset">重置平移</button>
         </div>
         <label class="check-control"><input id="show-guides" type="checkbox" checked />显示区域边界</label>
+        <label class="check-control"><input id="business-overlay" type="checkbox" checked />显示真实组件对照</label>
         <label class="check-control"><input id="simulate-reduced-motion" type="checkbox" />模拟减少动态</label>
         <button type="button" id="motion-toggle" class="control-button" aria-pressed="false">暂停</button>
         <button type="button" id="direction-toggle" class="control-button">方向：左 → 右</button>
         <label class="speed-control" for="speed-range">速度 <output id="speed-value">220</output> px/s
           <input id="speed-range" type="range" min="80" max="360" step="10" value="220" />
+        </label>
+        <label class="plate-size-control" for="plate-size-range">餐盘逻辑宽度 <output id="plate-size-value">340×210</output> px
+          <input id="plate-size-range" type="range" min="300" max="380" step="10" value="340" />
         </label>
         <button type="button" id="reset-motion" class="control-button">重置位置</button>
       </div>
@@ -54,14 +69,36 @@
             <div class="debug-zone debug-zone--progress debug-only" data-label="进度区 · 941px"></div>
             <div class="debug-zone debug-zone--assistant debug-only" data-label="AI 助手区"></div>
             <div class="debug-zone debug-zone--stage debug-only" data-label="舞台 / 盘子点击热区活动层"></div>
-            <div class="debug-zone debug-zone--left-cart debug-only" data-label="左购物盘 · 827×217"></div>
-            <div class="debug-zone debug-zone--right-cart debug-only" data-label="右购物盘 · 827×217"></div>
-            <div class="debug-zone debug-zone--console debug-only" data-label="中央独立点餐台目标边界 · 约 940×260"></div>
-            <div class="button-safety button-safety--menu debug-only" data-label="菜单"></div>
-            <div class="button-safety button-safety--nav debug-only" data-label="导航"></div>
-            <div class="button-safety button-safety--history debug-only" data-label="历史"></div>
-            <div class="button-safety button-safety--settings debug-only" data-label="设置"></div>
-            <div class="button-safety button-safety--waiter debug-only" data-label="呼叫"></div>
+            <div class="debug-zone debug-zone--left-cart debug-only" data-label="左购物盘 DOM 实测 x=668–1495 · 4 槽 · 下单靠中"></div>
+            <div class="debug-zone debug-zone--right-cart debug-only" data-label="右购物盘 DOM 实测 x=2345–3172 · 下单靠中 · 4 槽"></div>
+            <div class="business-console debug-only" id="business-console" aria-label="真实底部组件结构调试对照">
+              <section class="business-cart business-cart--left" aria-label="左购物盘四槽位布局">
+                <div class="business-order"><strong>下单</strong><span>0 / 4</span></div>
+                <div class="business-slots">
+                  <div class="business-slot"><i>＋</i><span>商品槽 1</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 2</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 3</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 4</span><small>−　0　＋</small></div>
+                </div>
+              </section>
+              <section class="business-center" aria-label="中央点餐功能台布局">
+                <div class="business-menu">打开商品菜单<br />左菜单</div>
+                <div class="business-functions">
+                  <div class="function-grid-button">寿司导航</div><div class="function-grid-button">点餐记录</div>
+                  <div class="function-grid-button">系统设置</div><div class="function-grid-button">呼叫店员</div>
+                </div>
+                <div class="business-menu">打开商品菜单<br />右菜单</div>
+              </section>
+              <section class="business-cart business-cart--right" aria-label="右购物盘四槽位布局">
+                <div class="business-order"><strong>下单</strong><span>0 / 4</span></div>
+                <div class="business-slots">
+                  <div class="business-slot"><i>＋</i><span>商品槽 1</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 2</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 3</span><small>−　0　＋</small></div>
+                  <div class="business-slot"><i>＋</i><span>商品槽 4</span><small>−　0　＋</small></div>
+                </div>
+              </section>
+            </div>
 
             <div class="cat-station cat-station--prep debug-only"><b>切菜猫</b><span>源图约 x=300–520 / y=150–350</span><small>刀具＋前爪独立；固定肘/腕锚点</small></div>
             <div class="cat-station cat-station--plate debug-only"><b>摆盘猫</b><span>源图约 x=520–790 / y=135–355</span><small>手臂、寿司和盘子独立层</small></div>
@@ -70,10 +107,7 @@
 
             <div id="moving-plates" class="moving-plates" role="group" aria-label="沿拟合传送线运动的测试餐盘"></div>
             <div class="static-dish-note debug-only">原图餐盘是静态像素：正式背景制作时全部移除，另做 DOM 可点击餐盘</div>
-            <div class="console-button-labels debug-only" aria-hidden="true">
-              <span>菜单</span><span>导航</span><span>历史</span><span>设置</span><span>呼叫店员</span>
-            </div>
-            <div class="canvas-legend debug-only" aria-hidden="true">调试图层 ON · 蓝框=保留区 · 粉框=需拆分角色 · 青线=拟合路径 · 黄圆=可点击测试热区</div>
+            <div class="canvas-legend debug-only" aria-hidden="true">调试图层 ON · 蓝框=DOM实际布局 · 粉框=角色工位 · 青线=图像拟合路径 · 黄圈=可点击测试热区</div>
           </div>
         </div>
       </div>
@@ -90,6 +124,10 @@
         <article>
           <h2>正式资产边界</h2>
           <p>背景保留固定建筑、货架、窗景、灯笼外壳与地面；猫、餐台前后遮挡、餐盘和中央点餐台均独立制作。菜名、价格、进度、购物车与按钮标签由 DOM 承载。</p>
+        </article>
+        <article>
+          <h2>真实组件实测</h2>
+          <p>3840×1080 浏览器中，购物盘约 x=668 / 2345、827×217；中央功能台 x=1525、790×217。实际 y=865（目标参考 y=863，约差 2px，由底部 flex 居中造成）。中心为左右两个纵向菜单按钮，中央 2×2 功能按钮。下方示意仅复刻布局，不含真实商品或事件。</p>
         </article>
       </section>
     </main>
