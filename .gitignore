@@ -2,6 +2,8 @@
 node_modules
 /dist
 /public/img
+.visual-review/
+docs/theme-midnight-station-v2/
 # local env files
 .env.local
 .env.*.local
