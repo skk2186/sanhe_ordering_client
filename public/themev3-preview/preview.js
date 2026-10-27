@@ -4,23 +4,21 @@
   const CANVAS = { width: 3840, height: 1080 }
   const VIEW_WIDTH = { full: 3840, center: 1920 }
 
-  // Centerline follows the new shared belt contact contour in logical 3840×1080 pixels.
+  // The nine measured centers follow the reference image's plate contact lane:
+  // source y rises toward the center (closer to the guest), then recedes at both ends.
+  // Mapping is x=480+sourceX*1.40625, y=sourceY*1.40625. Endpoints are offscreen.
   const controlPoints = [
-    { x: -340, y: 550 },
-    { x: 0, y: 573 },
-    { x: 248, y: 590 },
-    { x: 548, y: 604 },
-    { x: 902, y: 613 },
-    { x: 1273, y: 618 },
-    { x: 1591, y: 621 },
-    { x: 1920, y: 624 },
-    { x: 2245, y: 621 },
-    { x: 2564, y: 618 },
-    { x: 2935, y: 613 },
-    { x: 3288, y: 604 },
-    { x: 3589, y: 590 },
-    { x: 3840, y: 573 },
-    { x: 4170, y: 550 }
+    { x: -340, y: 552 },
+    { x: 480, y: 547, sourceX: 0, sourceY: 389 },
+    { x: 840, y: 537, sourceX: 256, sourceY: 382 },
+    { x: 1200, y: 546, sourceX: 512, sourceY: 388 },
+    { x: 1560, y: 563, sourceX: 768, sourceY: 400 },
+    { x: 1920, y: 577, sourceX: 1024, sourceY: 410 },
+    { x: 2280, y: 565, sourceX: 1280, sourceY: 402 },
+    { x: 2640, y: 548, sourceX: 1536, sourceY: 390 },
+    { x: 3000, y: 537, sourceX: 1792, sourceY: 382 },
+    { x: 3360, y: 529, sourceX: 2048, sourceY: 376 },
+    { x: 4170, y: 520 }
   ]
   const DISH_COUNT = 6
   const PLATE_RATIO = 210 / 340
@@ -33,9 +31,6 @@
   const routePath = document.querySelector('#route-path')
   const controlPointRoot = document.querySelector('#control-points')
   const showGuides = document.querySelector('#show-guides')
-  const backdropButtons = [...document.querySelectorAll('[data-backdrop]')]
-  const layerView = document.querySelector('#layer-view')
-  const showConveyorFront = document.querySelector('#show-conveyor-front')
   const reducedToggle = document.querySelector('#simulate-reduced-motion')
   const motionToggle = document.querySelector('#motion-toggle')
   const directionToggle = document.querySelector('#direction-toggle')
@@ -53,7 +48,6 @@
   const reduceMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 
   let viewMode = 'full'
-  let backdropMode = 'production'
   let plateWidth = Number(plateSizeRange.value)
   let zoom = 1
   let panX = -1320
@@ -138,9 +132,11 @@
       circle.setAttribute('cy', point.y)
       circle.setAttribute('r', '8')
       circle.setAttribute('class', 'route-point')
-      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
-      title.textContent = `餐台缩放后的带面中心线试拟合：画布 (${Math.round(point.x)}, ${Math.round(point.y)}) px`
-      circle.append(title)
+      if (Number.isFinite(point.sourceX)) {
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
+        title.textContent = `原图盘心估测 (${point.sourceX}, ${point.sourceY}) → 3840 母版 (${Math.round(point.x)}, ${Math.round(point.y)}) px`
+        circle.append(title)
+      }
       const label = document.createElementNS('http://www.w3.org/2000/svg', 'text')
       label.setAttribute('x', point.x + 10)
       label.setAttribute('y', point.y - 12)
@@ -218,29 +214,17 @@
     host.classList.toggle('view-center', viewMode === 'center')
     host.classList.toggle('view-business', viewMode === 'business')
     host.classList.toggle('view-local', localMode)
-    canvas.classList.toggle('guides-hidden', !showGuides.checked)
-    canvas.classList.toggle('backdrop-reference', backdropMode === 'reference')
-    canvas.classList.toggle('front-hidden', !showConveyorFront.checked)
-    canvas.classList.remove('layer-view--background', 'layer-view--rear', 'layer-view--surface', 'layer-view--front')
-    if (layerView.value !== 'composite') canvas.classList.add(`layer-view--${layerView.value}`)
     activeScale = scale
     zoomValue.textContent = `${Math.round(scale * 100)}%`
-    const layerNames = { composite: '完整合成', background: '单看母背景', rear: '单看餐台后沿', surface: '单看传送带面', front: '单看餐台前缘' }
-    const backdropName = backdropMode === 'reference' ? '原始参考' : '正式背景'
-    caption.textContent = (viewMode === 'full'
+    caption.textContent = viewMode === 'full'
       ? `3840×1080 全景 · 几何固定 · 当前显示缩放 ${Math.round(scale * 100)}%`
       : viewMode === 'center'
         ? `1920×1080 中央视图 · 母版 x=960–2880 · 当前显示缩放 ${Math.round(scale * 100)}%`
         : viewMode === 'business'
           ? `3840×1080 全景业务布局对照 · 底部三栏按 /display DOM 实测坐标 · 显示缩放 ${Math.round(scale * 100)}%`
-          : `局部查看 · 场景逻辑像素缩放 ${Math.round(scale * 100)}% · 100% 表示 1 CSS px = 1 逻辑 px · 拖动画布平移`) + ` · ${backdropName} · ${layerNames[layerView.value]}`
+          : `局部查看 · 场景逻辑像素缩放 ${Math.round(scale * 100)}% · 100% 表示 1 CSS px = 1 逻辑 px · 拖动画布平移`
     viewButtons.forEach((button) => {
       const active = button.dataset.view === viewMode
-      button.classList.toggle('is-active', active)
-      button.setAttribute('aria-pressed', String(active))
-    })
-    backdropButtons.forEach((button) => {
-      const active = button.dataset.backdrop === backdropMode
       button.classList.toggle('is-active', active)
       button.setAttribute('aria-pressed', String(active))
     })
@@ -277,12 +261,6 @@
     viewMode = button.dataset.view
     updateViewport()
   }))
-  backdropButtons.forEach((button) => button.addEventListener('click', () => {
-    backdropMode = button.dataset.backdrop
-    updateViewport()
-  }))
-  layerView.addEventListener('change', updateViewport)
-  showConveyorFront.addEventListener('change', updateViewport)
   showGuides.addEventListener('change', () => canvas.classList.toggle('guides-hidden', !showGuides.checked))
   businessOverlay.addEventListener('change', updateViewport)
   reducedToggle.addEventListener('change', () => {
@@ -320,8 +298,8 @@
     viewMode = 'local'
     zoom = 1
     const targets = {
-      plate: { x: 1920, y: 624 },
-      curve: { x: 1920, y: 624 },
+      plate: { x: 1920, y: 577 },
+      curve: { x: 1920, y: 570 },
       console: { x: 1920, y: 970 }
     }
     const target = targets[button.dataset.focus]
@@ -370,7 +348,7 @@
     canvas: CANVAS,
     controlPoints,
     getPathLength: () => pathLength,
-    getState: () => ({ viewMode, backdropMode, layerView: layerView.value, frontVisible: showConveyorFront.checked, guidesVisible: showGuides.checked, direction, speed, paused, reducedMotion: effectiveReducedMotion(), phase }),
+    getState: () => ({ viewMode, direction, speed, paused, reducedMotion: effectiveReducedMotion(), phase }),
     getPlatePositions: () => [...platesRoot.children].map((plate) => plate.dataset.position),
     stop: () => window.cancelAnimationFrame(frameId)
   }
