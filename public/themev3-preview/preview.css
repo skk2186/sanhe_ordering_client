@@ -92,11 +92,11 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 
 .production-background, .stage-master, .stage-layer { position: absolute; inset: 0; width: 3840px; height: 1080px; user-select: none; pointer-events: none; }
 .production-background { z-index: 1; }
-.stage-master { display: none; z-index: 4; transform: scaleY(.84); transform-origin: center center; }
+.stage-master { display: none; z-index: 4; }
 .stage-layer--rear { z-index: 4; }
 .stage-layer--surface { z-index: 5; }
 .stage-layer--front { z-index: 24; }
-.stage-layer { transform: scaleY(.84); transform-origin: center center; }
+
 .reference-demo { display: none; position: absolute; z-index: 1; left: 480px; top: 0; width: 2880px; height: 1080px; user-select: none; pointer-events: none; }
 .backdrop-reference .reference-demo { display: block; }
 .backdrop-reference .production-background, .backdrop-reference .stage-master, .backdrop-reference .stage-layer { display: none; }
@@ -144,7 +144,7 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .debug-zone--brand { left: 28px; top: 14px; width: 760px; height: 160px; }
 .debug-zone--progress { left: 1449px; top: 8px; width: 941px; height: 110px; border-color: #69ebaf; background: rgba(37, 175, 126, .13); }
 .debug-zone--assistant { left: 2500px; top: 14px; width: 1312px; height: 168px; border-color: #a1c1ff; }
-.debug-zone--stage { left: 18px; top: 196px; width: 3804px; height: 667px; border-color: rgba(255, 255, 255, .9); background: transparent; }
+.debug-zone--stage { left: 0; top: 460px; width: 3840px; height: 355px; border-color: rgba(255, 255, 255, .9); background: transparent; }
 .debug-zone--left-cart { left: 668px; top: 865px; width: 827px; height: 215px; border-color: #ffc36c; background: rgba(255, 185, 80, .08); }
 .debug-zone--right-cart { left: 2345px; top: 865px; width: 827px; height: 215px; border-color: #ffc36c; background: rgba(255, 185, 80, .08); }
 .business-console { position: absolute; inset: 0; z-index: 16; pointer-events: none; }
@@ -179,10 +179,10 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .cat-station span, .cat-station small { position: absolute; left: 6px; right: 6px; padding: 5px 7px; color: #432b30; background: rgba(255, 250, 240, .9); font-size: 14px; line-height: 1.25; }
 .cat-station span { top: 47px; }
 .cat-station small { bottom: 6px; }
-.cat-station--prep { left: 902px; top: 205px; width: 307px; height: 305px; }
-.cat-station--plate { left: 1211px; top: 190px; width: 390px; height: 310px; }
-.cat-station--serve { left: 2413px; top: 190px; width: 340px; height: 310px; }
-.cat-station--cook { left: 2750px; top: 182px; width: 380px; height: 320px; }
+.cat-station--prep { left: 810px; top: 342px; width: 335px; height: 185px; }
+.cat-station--plate { left: 1150px; top: 342px; width: 420px; height: 185px; }
+.cat-station--serve { left: 2265px; top: 342px; width: 370px; height: 185px; }
+.cat-station--cook { left: 2635px; top: 342px; width: 390px; height: 185px; }
 
 .moving-plates { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 .debug-plate {

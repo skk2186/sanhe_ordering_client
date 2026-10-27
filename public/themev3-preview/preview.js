@@ -4,24 +4,23 @@
   const CANVAS = { width: 3840, height: 1080 }
   const VIEW_WIDTH = { full: 3840, center: 1920 }
 
-  // Initial centerline fit follows the generated conveyor's visible belt surface.
-  // These canvas points are sampled from the shared rear/surface mask contours after the stage's 84% vertical scale.
+  // Centerline follows the new shared belt contact contour in logical 3840×1080 pixels.
   const controlPoints = [
-    { x: -340, y: 350 },
-    { x: 0, y: 381 },
-    { x: 248, y: 416 },
-    { x: 548, y: 448 },
-    { x: 902, y: 473 },
-    { x: 1273, y: 491 },
-    { x: 1591, y: 502 },
-    { x: 1920, y: 510 },
-    { x: 2245, y: 502 },
-    { x: 2564, y: 491 },
-    { x: 2935, y: 473 },
-    { x: 3288, y: 448 },
-    { x: 3589, y: 416 },
-    { x: 3840, y: 381 },
-    { x: 4170, y: 350 }
+    { x: -340, y: 550 },
+    { x: 0, y: 573 },
+    { x: 248, y: 590 },
+    { x: 548, y: 604 },
+    { x: 902, y: 613 },
+    { x: 1273, y: 618 },
+    { x: 1591, y: 621 },
+    { x: 1920, y: 624 },
+    { x: 2245, y: 621 },
+    { x: 2564, y: 618 },
+    { x: 2935, y: 613 },
+    { x: 3288, y: 604 },
+    { x: 3589, y: 590 },
+    { x: 3840, y: 573 },
+    { x: 4170, y: 550 }
   ]
   const DISH_COUNT = 6
   const PLATE_RATIO = 210 / 340
@@ -321,8 +320,8 @@
     viewMode = 'local'
     zoom = 1
     const targets = {
-      plate: { x: 1920, y: 577 },
-      curve: { x: 1920, y: 570 },
+      plate: { x: 1920, y: 624 },
+      curve: { x: 1920, y: 624 },
       console: { x: 1920, y: 970 }
     }
     const target = targets[button.dataset.focus]

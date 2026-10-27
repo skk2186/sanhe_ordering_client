@@ -2,13 +2,13 @@
 
 Theme V3「樱花猫咪回转寿司屋」视觉资产。场景母版统一为 3840×1080。
 
-Phase 03 已实际生成：
+Phase 03R 已替换并校准：
 
-- `background/sakura-shop-background.png`：完整无 UI 的店内母背景。
-- `stage/conveyor-stage.png`：统一透视的整套餐台绘制母稿。
-- `stage/conveyor-rear.png`、`stage/conveyor-surface.png`、`stage/conveyor-front.png`：从同一母稿按轮廓拆出的三张透明分层图。
+- `background/sakura-shop-background.png`：3840×1080、无 UI 的店内母背景。
+- `stage/conveyor-stage.png`：3840×1080、含 alpha 的浅弧餐台合成母稿。
+- `stage/conveyor-rear.png`、`stage/conveyor-surface.png`、`stage/conveyor-front.png`：3840×1080、含 alpha 的后沿、带面与前缘层，使用共同接触线。
 
-这些图片是本阶段主题插画素材；商品盘、猫咪、正式点餐台和商品内容仍未制作。
+餐台在中部为约 150px 带面、约 115px 前缘、约 305px 总高度。Phase 03 的高挡板失败方案已替换；空间复核细节见 `docs/theme-sakura-cat-sushi-v3/PHASE_03R_STAGE_REDO_REPORT.md`。商品盘、猫咪、正式点餐台和商品内容仍未制作。
 
 - `background/`：完整店内与窗外樱花小镇母背景。
 - `stage/`：弧形回转台、轨道与遮挡前后景。

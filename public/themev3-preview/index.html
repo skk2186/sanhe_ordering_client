@@ -3,16 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Theme V3 正式场景资产与弧形传送动线预览" />
-    <title>Theme V3 · 正式场景资产预览</title>
+    <meta name="description" content="Theme V3 Phase 03R 母背景、低矮弧形餐台与运动轨迹预览" />
+    <title>Theme V3 · Phase 03R 空间关系复核</title>
     <link rel="stylesheet" href="./preview.css" />
   </head>
   <body>
     <header class="prototype-header">
       <div class="heading">
-          <p class="eyebrow">THEME V3 · PHASE 03</p>
-        <h1>樱花猫咪寿司屋 · 正式资产预览</h1>
-        <p class="lede">正式插画与原始参考可切换；调试标记和运动测试盘可单独隐藏。</p>
+          <p class="eyebrow">THEME V3 · PHASE 03R</p>
+        <h1>樱花猫咪寿司屋 · 空间关系复核</h1>
+        <p class="lede">重做店内母背景与低矮弧形餐台；调试标记、测试盘和前缘可单独切换。</p>
       </div>
 
       <div class="controls" aria-label="原型控制">
@@ -85,7 +85,7 @@
             <div class="debug-zone debug-zone--brand debug-only" data-label="品牌区"></div>
             <div class="debug-zone debug-zone--progress debug-only" data-label="进度区 · 941px"></div>
             <div class="debug-zone debug-zone--assistant debug-only" data-label="AI 助手区"></div>
-            <div class="debug-zone debug-zone--stage debug-only" data-label="舞台 / 盘子点击热区活动层"></div>
+            <div class="debug-zone debug-zone--stage debug-only" data-label="餐台与盘子运动层 y=460–815"></div>
             <div class="debug-zone debug-zone--left-cart debug-only" data-label="左购物盘 DOM 实测 x=668–1495 · 4 槽 · 下单靠中"></div>
             <div class="debug-zone debug-zone--right-cart debug-only" data-label="右购物盘 DOM 实测 x=2345–3172 · 下单靠中 · 4 槽"></div>
             <div class="business-console debug-only" id="business-console" aria-label="真实底部组件结构调试对照">
@@ -129,22 +129,26 @@
         </div>
       </div>
 
-      <section class="analysis-panel" aria-label="阶段三资产说明">
+      <section class="analysis-panel" aria-label="Phase 03R 空间复核结论">
+        <article class="assessment">
+          <h2>空间结论</h2>
+          <p>大面积遮挡：已解决，中央窗景和店内结构恢复为主体。餐台透视失真：已解决，后沿、带面、前缘使用统一浅弧接触线；中部前缘约 115px，带面约 150px。台面仍会自然遮住窗下沿与柜体下部；正式餐盘加入后仍需做最终接触校验。</p>
+        </article>
         <article>
           <h2>正式母背景</h2>
-          <p>生成的全新室内插画按等比缩放、垂直居中裁切输出为 3840×1080；没有使用或横向拉伸 2048×768 参考图。母图不含角色、寿司盘、回转带或业务 UI。</p>
+          <p>新绘的全景室内插画输出为 3840×1080；没有使用或拉伸原始 2048×768 参考图。母图保留顶部安全区、中央樱花窗景、两侧货架与后厨工作台，不含角色、寿司盘、回转带或业务 UI。</p>
         </article>
         <article>
           <h2>场景分层</h2>
-          <p>完整合成按母背景、角色预留、餐台后沿、传送带面、动态盘、餐台前缘、底部 UI 预留顺序组成。单层查看及前缘显隐用于检查资产边界；后厨猫咪本阶段保持空位。</p>
+          <p>合成层序为母背景、角色预留、餐台后沿、传送带面、调试餐盘、餐台前缘、底部 UI 预留。单层查看及前缘显隐用于检查资产边界；猫咪工位保持空位，没有以几何占位形状伪装角色。</p>
         </article>
         <article>
           <h2>传送带接触线</h2>
-          <p>三份结构层由同一整套餐台母稿按轮廓分离，保持共同透视；动态盘位于带面与前缘之间。中心线已按新带面做首轮上移校准，仍需美术定稿后微调接触线。</p>
+          <p>餐台后沿、带面和前缘沿同一浅弧拆分：中心运动线约 y=624px，向两侧平缓收至 y=573px。中部带面约 150px、前挡板约 115px；三层共享曲线，动态盘底部由前缘遮挡。</p>
         </article>
         <article>
           <h2>底部空间</h2>
-          <p>保留 02R 三栏结构：左四槽购物盘加右侧下单；中央双菜单加 2×2 功能区；右侧下单加四槽购物盘。底部示意是调试覆盖，复杂点餐台尚未制作正式插画。</p>
+          <p>保留 02R 三栏结构：左四槽购物盘加右侧下单；中央双菜单加 2×2 功能区；右侧下单加四槽购物盘。示意仅为调试覆盖，不会作为正式点餐台素材。</p>
         </article>
       </section>
     </main>
