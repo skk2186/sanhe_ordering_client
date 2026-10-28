@@ -20,7 +20,13 @@
     { x: 3360, y: 529, sourceX: 2048, sourceY: 376 },
     { x: 4170, y: 520 }
   ]
-  const DISH_COUNT = 6
+  const SIGN_WIDTH = 252
+  const MOCK_PRODUCTS = [
+    { id: 'mock-salmon', name: '炙烧三文鱼腹肉握寿司', price: 32, available: true, recommended: true },
+    { id: 'mock-scallop', name: '北海道生食级帆立贝双贯寿司', price: 58.5, available: true, recommended: false },
+    { id: 'mock-seasonal', name: '樱花季限定海鲜拼盘（特选组合）', price: 88, available: false, status: 'OFF_SHELF', recommended: false },
+    { id: 'mock-egg', name: '玉子烧', price: 12, available: true, recommended: true }
+  ]
   const PLATE_RATIO = 210 / 340
   const SAMPLES_PER_SEGMENT = 48
 
@@ -31,6 +37,7 @@
   const routePath = document.querySelector('#route-path')
   const controlPointRoot = document.querySelector('#control-points')
   const showGuides = document.querySelector('#show-guides')
+  const sceneModeButtons = [...document.querySelectorAll('[data-scene-mode]')]
   const reducedToggle = document.querySelector('#simulate-reduced-motion')
   const motionToggle = document.querySelector('#motion-toggle')
   const directionToggle = document.querySelector('#direction-toggle')
@@ -38,6 +45,9 @@
   const speedValue = document.querySelector('#speed-value')
   const plateSizeRange = document.querySelector('#plate-size-range')
   const plateSizeValue = document.querySelector('#plate-size-value')
+  const signGapRange = document.querySelector('#sign-gap-range')
+  const signGapValue = document.querySelector('#sign-gap-value')
+  const unitMetrics = document.querySelector('#unit-metrics')
   const businessOverlay = document.querySelector('#business-overlay')
   const zoomValue = document.querySelector('#zoom-value')
   const focusButtons = [...document.querySelectorAll('[data-focus]')]
@@ -48,7 +58,9 @@
   const reduceMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 
   let viewMode = 'full'
+  let sceneMode = 'confirmed'
   let plateWidth = Number(plateSizeRange.value)
+  let signGap = Number(signGapRange.value)
   let zoom = 1
   let panX = -1320
   let panY = -210
@@ -148,28 +160,79 @@
 
   const createPlates = () => {
     platesRoot.replaceChildren()
-    for (let index = 0; index < DISH_COUNT; index += 1) {
-      const plate = document.createElement('button')
-      plate.type = 'button'
-      plate.className = 'debug-plate'
-      plate.dataset.plateIndex = String(index + 1)
-      plate.setAttribute('aria-label', `测试餐盘 ${index + 1}；${plateWidth}×${Math.round(plateWidth * PLATE_RATIO)} 逻辑像素；调试形状，点击用于验证移动热区`)
-      plate.title = '点击热区跟随移动；本按钮不接触任何菜单或订单数据'
-      plate.addEventListener('click', () => {
-        plate.classList.add('is-clicked')
-        status.textContent = `已点中移动测试盘 ${index + 1} · 热区与该主体同一 DOM 节点，无业务数据。`
-        window.setTimeout(() => plate.classList.remove('is-clicked'), 600)
+    MOCK_PRODUCTS.forEach((product) => {
+      const unit = document.createElement('button')
+      unit.type = 'button'
+      unit.className = 'debug-unit'
+      unit.dataset.productId = product.id
+      unit.dataset.eventSemantic = 'dish-click'
+      unit.setAttribute('aria-label', `${product.name}，价格 ${product.price} 元，${product.available ? '在售' : '售罄'}${product.recommended ? '，推荐' : ''}。餐盘与调试牌匾组合，按 Enter 或空格触发 dish-click。`)
+      unit.title = '调试热区覆盖餐盘和牌匾；触发 dish-click mock 事件，不连接真实订单接口。'
+
+      const plate = document.createElement('span')
+      plate.className = 'debug-unit__plate'
+      plate.setAttribute('aria-hidden', 'true')
+
+      const sign = document.createElement('span')
+      sign.className = 'debug-sign'
+      sign.setAttribute('aria-hidden', 'true')
+      const signTag = document.createElement('span')
+      signTag.className = 'debug-sign__tag'
+      signTag.textContent = '调试木牌 · 非正式素材'
+      const name = document.createElement('span')
+      name.className = 'debug-sign__name'
+      name.textContent = product.name
+      name.title = product.name
+      const footer = document.createElement('span')
+      footer.className = 'debug-sign__footer'
+      const price = document.createElement('span')
+      price.className = 'debug-sign__price'
+      price.textContent = `¥${Number.isInteger(product.price) ? product.price : product.price.toFixed(2)}`
+      const state = document.createElement('span')
+      state.className = 'debug-sign__state'
+      state.textContent = !product.available || product.status === 'OFF_SHELF'
+        ? '售罄'
+        : product.recommended ? '推荐' : 'mock'
+      footer.append(price, state)
+      sign.append(signTag, name, footer)
+      unit.append(plate, sign)
+      unit.classList.toggle('is-recommended', product.recommended)
+      unit.classList.toggle('is-sold-out', !product.available || product.status === 'OFF_SHELF')
+      unit.addEventListener('click', (originalEvent) => {
+        const clickX = originalEvent.clientX || window.innerWidth / 2
+        const side = clickX < window.innerWidth / 2 ? 'left' : 'right'
+        unit.dispatchEvent(new CustomEvent('dish-click', {
+          bubbles: true,
+          detail: { item: product, originalEvent, side }
+        }))
       })
-      platesRoot.append(plate)
-    }
+      platesRoot.append(unit)
+    })
   }
+
+  platesRoot.addEventListener('dish-click', (event) => {
+    const { item, side } = event.detail
+    const unit = event.target
+    platesRoot.querySelectorAll('.debug-unit.is-selected').forEach((selected) => selected.classList.remove('is-selected'))
+    unit.classList.add('is-selected')
+    if (!item.available || item.status === 'OFF_SHELF') {
+      status.textContent = `dish-click → handleSushiClick(${item.id})：售罄提示；未加入购物盘（mock）。`
+      return
+    }
+    status.textContent = `dish-click → handleSushiClick(${item.id})：测试加入${side === 'left' ? '左' : '右'}购物盘；mock only，未调用下单接口。`
+  })
 
   const renderPlates = () => {
     const plates = [...platesRoot.children]
     const spacing = pathLength / plates.length
+    const plateHeight = Math.round(plateWidth * PLATE_RATIO)
+    const unitWidth = plateWidth + signGap + SIGN_WIDTH
+    const maxUnitWidth = 380 + 64 + SIGN_WIDTH
     platesRoot.dataset.pathLength = pathLength.toFixed(1)
     platesRoot.dataset.spacing = spacing.toFixed(1)
+    platesRoot.dataset.unitWidth = String(unitWidth)
     routePath.dataset.pathLength = pathLength.toFixed(1)
+    unitMetrics.textContent = `${plates.length} 个同步运动单元 · 弧长间距 ${Math.round(spacing)}px · 当前组合宽度 ${unitWidth}px · 当前净距约 ${Math.round(spacing - unitWidth)}px · 最大规格 ${maxUnitWidth}px 时仍不重叠`
     plates.forEach((plate, index) => {
       const rawDistance = phase + index * spacing
       const distance = ((rawDistance % pathLength) + pathLength) % pathLength
@@ -177,18 +240,24 @@
       const tilt = Math.max(-1.2, Math.min(1.2, point.angle * 180 / Math.PI * 0.08))
       const centerDepth = Math.max(0, 1 - Math.abs(point.x - 1920) / 1920)
       const scale = 0.94 + centerDepth * 0.08
-      const plateHeight = Math.round(plateWidth * PLATE_RATIO)
-      plate.style.width = `${plateWidth}px`
+      plate.style.width = `${unitWidth}px`
       plate.style.height = `${plateHeight}px`
       plate.style.left = `${point.x}px`
       plate.style.top = `${point.y}px`
       plate.style.zIndex = String(100 + Math.round(point.y * 10))
-      plate.style.transform = `translate(-50%, -52%) rotate(${tilt.toFixed(2)}deg) scale(${scale.toFixed(3)})`
+      plate.style.setProperty('--plate-width', `${plateWidth}px`)
+      plate.style.setProperty('--plate-height', `${plateHeight}px`)
+      plate.style.setProperty('--plate-pivot', `${plateWidth / 2}px`)
+      plate.style.setProperty('--sign-gap', `${signGap}px`)
+      plate.style.setProperty('--sign-width', `${SIGN_WIDTH}px`)
+      plate.style.transform = `translate(${-plateWidth / 2}px, -50%) rotate(${tilt.toFixed(2)}deg) scale(${scale.toFixed(3)})`
       plate.dataset.position = `${point.x.toFixed(1)},${point.y.toFixed(1)}`
       plate.dataset.logicalWidth = String(plateWidth)
       plate.dataset.logicalHeight = String(plateHeight)
       plate.dataset.spacing = spacing.toFixed(1)
-      plate.setAttribute('aria-label', `测试餐盘 ${index + 1}；${plateWidth}×${plateHeight} 逻辑像素；调试形状，点击用于验证移动热区`)
+      plate.dataset.unitWidth = String(unitWidth)
+      plate.dataset.productName = MOCK_PRODUCTS[index].name
+      plate.setAttribute('aria-label', `${MOCK_PRODUCTS[index].name}，${plateWidth}×${plateHeight} 餐盘 + ${signGap}px 间距 + ${SIGN_WIDTH}px 调试牌匾；点击或按键触发 dish-click`)
     })
   }
 
@@ -214,21 +283,29 @@
     host.classList.toggle('view-center', viewMode === 'center')
     host.classList.toggle('view-business', viewMode === 'business')
     host.classList.toggle('view-local', localMode)
+    canvas.classList.toggle('scene-mode-confirmed', sceneMode === 'confirmed')
+    canvas.classList.toggle('scene-mode-unit', sceneMode === 'unit')
+    sceneModeButtons.forEach((button) => {
+      const active = button.dataset.sceneMode === sceneMode
+      button.classList.toggle('is-active', active)
+      button.setAttribute('aria-pressed', String(active))
+    })
     activeScale = scale
     zoomValue.textContent = `${Math.round(scale * 100)}%`
+    const sceneLabel = sceneMode === 'confirmed' ? '已确认构图参考' : '中性画布 · 餐盘—牌匾运动单元调试'
     caption.textContent = viewMode === 'full'
-      ? `3840×1080 全景 · 几何固定 · 当前显示缩放 ${Math.round(scale * 100)}%`
+      ? `${sceneLabel} · 3840×1080 全景 · 显示缩放 ${Math.round(scale * 100)}%`
       : viewMode === 'center'
-        ? `1920×1080 中央视图 · 母版 x=960–2880 · 当前显示缩放 ${Math.round(scale * 100)}%`
+        ? `${sceneLabel} · 1920×1080 中央视图 x=960–2880 · 显示缩放 ${Math.round(scale * 100)}%`
         : viewMode === 'business'
-          ? `3840×1080 全景业务布局对照 · 底部三栏按 /display DOM 实测坐标 · 显示缩放 ${Math.round(scale * 100)}%`
-          : `局部查看 · 场景逻辑像素缩放 ${Math.round(scale * 100)}% · 100% 表示 1 CSS px = 1 逻辑 px · 拖动画布平移`
+          ? `中性画布 · 3840×1080 全景业务布局对照 · 底部三栏按 /display DOM 实测坐标 · 显示缩放 ${Math.round(scale * 100)}%`
+          : `${sceneLabel} · 局部逻辑像素缩放 ${Math.round(scale * 100)}% · 100% 表示 1 CSS px = 1 逻辑 px · 拖动画布平移`
     viewButtons.forEach((button) => {
       const active = button.dataset.view === viewMode
       button.classList.toggle('is-active', active)
       button.setAttribute('aria-pressed', String(active))
     })
-    canvas.classList.toggle('business-hidden', !businessOverlay.checked || (viewMode !== 'business' && viewMode !== 'full' && viewMode !== 'center'))
+    canvas.classList.toggle('business-hidden', sceneMode === 'confirmed' || !businessOverlay.checked || (viewMode !== 'business' && viewMode !== 'full' && viewMode !== 'center'))
   }
 
   const effectiveReducedMotion = () => simulateReducedMotion || reduceMedia.matches
@@ -241,9 +318,11 @@
     const plateHeight = Math.round(plateWidth * PLATE_RATIO)
     plateSizeValue.value = `${plateWidth}×${plateHeight}`
     plateSizeValue.textContent = `${plateWidth}×${plateHeight}`
+    signGapValue.value = String(signGap)
+    signGapValue.textContent = String(signGap)
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
     const reduceNotice = effectiveReducedMotion() ? ' 减少动态模式：自动运动已停，盘子静态分布。' : ''
-    status.textContent = `${paused ? '已暂停' : '运行中'} · ${direction > 0 ? '左→右' : '右→左'} · ${speed} px/s${reduceNotice}`
+    status.textContent = `${sceneMode === 'confirmed' ? '确认构图静态参考' : '运动单元调试'} · ${paused ? '已暂停' : '运行中'} · ${direction > 0 ? '左→右' : '右→左'} · ${speed} px/s${reduceNotice}`
   }
 
   const tick = (time) => {
@@ -259,7 +338,15 @@
 
   viewButtons.forEach((button) => button.addEventListener('click', () => {
     viewMode = button.dataset.view
+    if (viewMode === 'business') sceneMode = 'unit'
     updateViewport()
+    updateMotionControls()
+  }))
+  sceneModeButtons.forEach((button) => button.addEventListener('click', () => {
+    sceneMode = button.dataset.sceneMode
+    if (sceneMode === 'confirmed' && viewMode === 'business') viewMode = 'full'
+    updateViewport()
+    updateMotionControls()
   }))
   showGuides.addEventListener('change', () => canvas.classList.toggle('guides-hidden', !showGuides.checked))
   businessOverlay.addEventListener('change', updateViewport)
@@ -284,6 +371,11 @@
     renderPlates()
     updateMotionControls()
   })
+  signGapRange.addEventListener('input', () => {
+    signGap = Number(signGapRange.value)
+    renderPlates()
+    updateMotionControls()
+  })
   document.querySelector('#zoom-in').addEventListener('click', () => {
     zoom = Math.min(2, Math.round((zoom + 0.1) * 10) / 10)
     viewMode = 'local'
@@ -298,7 +390,7 @@
     viewMode = 'local'
     zoom = 1
     const targets = {
-      plate: { x: 1920, y: 577 },
+      plate: { x: 1920 + (signGap + SIGN_WIDTH) / 2, y: 577 },
       curve: { x: 1920, y: 570 },
       console: { x: 1920, y: 970 }
     }
@@ -348,8 +440,9 @@
     canvas: CANVAS,
     controlPoints,
     getPathLength: () => pathLength,
-    getState: () => ({ viewMode, direction, speed, paused, reducedMotion: effectiveReducedMotion(), phase }),
-    getPlatePositions: () => [...platesRoot.children].map((plate) => plate.dataset.position),
+    getState: () => ({ viewMode, sceneMode, direction, speed, paused, plateWidth, signGap, reducedMotion: effectiveReducedMotion(), phase }),
+    getPlatePositions: () => [...platesRoot.children].map((unit) => unit.dataset.position),
+    getUnits: () => [...platesRoot.children].map((unit) => ({ productId: unit.dataset.productId, productName: unit.dataset.productName, position: unit.dataset.position, unitWidth: unit.dataset.unitWidth, spacing: unit.dataset.spacing })),
     stop: () => window.cancelAnimationFrame(frameId)
   }
 })()

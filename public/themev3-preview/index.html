@@ -3,19 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Theme V3 独立 3840×1080 场景构图与弧形传送动线验证原型" />
-    <title>Theme V3 · 场景与传送动线原型</title>
+    <meta name="description" content="Theme V3 Phase 03A 已确认构图参考与餐盘—牌匾同步运动调试预览" />
+    <title>Theme V3 · Phase 03A 餐盘—牌匾运动单元</title>
     <link rel="stylesheet" href="./preview.css" />
   </head>
   <body>
     <header class="prototype-header">
       <div class="heading">
-        <p class="eyebrow">THEME V3 · PHASE 02</p>
-        <h1>樱花猫咪寿司屋 · 构图与传送原型</h1>
-        <p class="lede">独立调试页。虚线、色块和移动圆盘均为验证标记，不是正式美术资产。</p>
+        <p class="eyebrow">THEME V3 · PHASE 03A</p>
+        <h1>樱花猫咪寿司屋 · 运动单元调试</h1>
+        <p class="lede">已确认构图仅作原比例参考；餐盘与菜品牌匾在独立中性画布中同步验证。</p>
       </div>
 
       <div class="controls" aria-label="原型控制">
+        <div class="control-group scene-mode-switch" role="group" aria-label="场景模式">
+          <button type="button" class="control-button is-active" data-scene-mode="confirmed" aria-pressed="true">已确认构图</button>
+          <button type="button" class="control-button" data-scene-mode="unit" aria-pressed="false">运动单元调试</button>
+        </div>
         <div class="control-group view-switch" role="group" aria-label="画面视图">
           <button type="button" class="control-button is-active" data-view="full" aria-pressed="true">3840 全景</button>
           <button type="button" class="control-button" data-view="center" aria-pressed="false">1920 中央视图</button>
@@ -42,9 +46,13 @@
         <label class="plate-size-control" for="plate-size-range">餐盘逻辑宽度 <output id="plate-size-value">340×210</output> px
           <input id="plate-size-range" type="range" min="300" max="380" step="10" value="340" />
         </label>
+        <label class="plate-size-control" for="sign-gap-range">盘牌水平间距 <output id="sign-gap-value">24</output> px
+          <input id="sign-gap-range" type="range" min="16" max="64" step="4" value="24" />
+        </label>
         <button type="button" id="reset-motion" class="control-button">重置位置</button>
       </div>
-      <p id="live-status" class="live-status" role="status" aria-live="polite">默认左到右，轨迹与交互热区均为调试原型。</p>
+      <p id="live-status" class="live-status" role="status" aria-live="polite">已确认构图静态展示。切换到运动单元调试以查看 mock 商品与同步点击热区。</p>
+      <p id="unit-metrics" class="unit-metrics" aria-live="polite">4 个同步运动单元 · 默认盘牌间距 24px</p>
     </header>
 
     <main>
@@ -52,10 +60,10 @@
       <div id="viewport-host" class="viewport-host view-full" aria-label="场景画布视图">
         <div id="viewport-frame" class="viewport-frame">
           <div id="scene-canvas" class="scene-canvas" data-canvas-width="3840" data-canvas-height="1080">
-            <div class="side-extension side-extension--left"><span>480px 待重绘扩展</span></div>
-            <div class="side-extension side-extension--right"><span>480px 待重绘扩展</span></div>
-            <img class="reference-demo" src="./reference-demo.png" alt="用户提供的 2048×768 樱花猫咪寿司店静态参考图；仅作原型背景参照，图中猫咪与餐盘目前不可动。" draggable="false" />
-            <div class="source-outline debug-only" aria-hidden="true"><span>原图 2048×768 · 等比放置 2880×1080 · 未拉伸/未裁切</span></div>
+            <div class="side-extension side-extension--left"><span>原图未覆盖区 · 非构图</span></div>
+            <div class="side-extension side-extension--right"><span>原图未覆盖区 · 非构图</span></div>
+            <img class="confirmed-composition" src="./confirmed-composition.png" alt="用户确认的樱花猫咪寿司屋构图参考，原始 2048×768 图片，保持比例展示，不是正式母背景。" draggable="false" />
+            <div class="source-outline debug-only" aria-hidden="true"><span>用户确认原图 2048×768 · 等比放置 2880×1080 · 非正式运行素材</span></div>
 
             <div class="scene-wash debug-only" aria-hidden="true"></div>
 
@@ -105,29 +113,29 @@
             <div class="cat-station cat-station--serve debug-only"><b>端菜猫</b><span>源图约 x=1370–1610 / y=135–355</span><small>托盘与双手同组，入口在右侧</small></div>
             <div class="cat-station cat-station--cook debug-only"><b>炒菜猫</b><span>源图约 x=1610–1880 / y=130–360</span><small>锅铲转轴、锅沿与火/蒸汽分层</small></div>
 
-            <div id="moving-plates" class="moving-plates" role="group" aria-label="沿拟合传送线运动的测试餐盘"></div>
-            <div class="static-dish-note debug-only">原图餐盘是静态像素：正式背景制作时全部移除，另做 DOM 可点击餐盘</div>
-            <div class="canvas-legend debug-only" aria-hidden="true">调试图层 ON · 蓝框=DOM实际布局 · 粉框=角色工位 · 青线=图像拟合路径 · 黄圈=可点击测试热区</div>
+            <div id="moving-plates" class="moving-plates" role="group" aria-label="mock 餐盘与菜品牌匾同步运动调试单元"></div>
+            <div class="static-dish-note debug-only">中性调试画布 · 单元与确认构图分开展示；所有牌匾、名称和价格均为 DOM mock</div>
+            <div class="canvas-legend debug-only" aria-hidden="true">运动单元调试 ON · 青线=轨迹 · 粉虚框=点击热区 · 牌匾标记=非正式素材</div>
           </div>
         </div>
       </div>
 
-      <section class="analysis-panel" aria-label="原图测量与素材边界">
+      <section class="analysis-panel" aria-label="Phase 03A 参考与调试素材边界">
         <article>
-          <h2>比例换算</h2>
-          <p><strong>2048×768（8:3）</strong> → 等比适配 1080 高时为 2880×1080；32:9 画布左右各余 480px。此原型不拉伸图片、不裁切人物，以两侧斜纹表示待重新绘制的扩展区。</p>
+          <h2>确认构图参考</h2>
+          <p><strong>2048×768（8:3）</strong> 原图以 2880×1080 等比例放在 3840×1080 画布中央；两侧各留 480px。未拉伸、裁切或替换为历史失败背景，参考图不是正式运行资产。</p>
         </article>
         <article>
-          <h2>静态参考内容</h2>
-          <p>原图已有四只静态猫、两侧货架与蒸笼、多盏灯笼、中央窗外樱花小镇、弧形餐台、约 8 张固定餐盘，以及右前景碗碟。原图没有点餐台，顶部主体较拥挤。</p>
+          <h2>组合单元数据</h2>
+          <p>每个调试单元从同一 mock 商品对象读取 id、名称、价格、推荐/售罄状态；盘体与简单调试牌匾共用一个 button 根节点、运动变换和点击热区。</p>
         </article>
         <article>
-          <h2>正式资产边界</h2>
-          <p>背景保留固定建筑、货架、窗景、灯笼外壳与地面；猫、餐台前后遮挡、餐盘和中央点餐台均独立制作。菜名、价格、进度、购物车与按钮标签由 DOM 承载。</p>
+          <h2>单元间距与交互</h2>
+          <p>默认盘牌间距 24px，可调 16–64px。四个单元沿 02R 弧线等弧长分布；点击或键盘激活触发 `dish-click` 调试事件，并显示对应的 mock 购物侧和售罄反馈，不连接真实订单接口。</p>
         </article>
         <article>
-          <h2>真实组件实测</h2>
-          <p>3840×1080 浏览器中，购物盘约 x=668 / 2345、827×217；中央功能台 x=1525、790×217。实际 y=865（目标参考 y=863，约差 2px，由底部 flex 居中造成）。中心为左右两个纵向菜单按钮，中央 2×2 功能按钮。下方示意仅复刻布局，不含真实商品或事件。</p>
+          <h2>正式素材依赖</h2>
+          <p>仍须独立制作 3840×1080 母背景、回转台后沿/带面/前缘、四只猫咪角色与动作层、正式餐盘及独立木牌匾。当前所有运动单元外观明确标注为调试示意，不能交付为正式美术。</p>
         </article>
       </section>
     </main>
