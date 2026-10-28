@@ -29,11 +29,39 @@
   ]
   const PLATE_RATIO = 210 / 340
   const SAMPLES_PER_SEGMENT = 48
+  const CAT_STATIONS = [
+    {
+      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-static.png',
+      x: 900, y: 495, scale: 0.23, z: 22,
+      note: '固定头身/围裙/尾巴；切刀、双爪、鱼与砧板仍为烘焙静态姿势。脚底与砧板底缘作为接触锚点；后续需让工作台前沿遮住下缘。'
+    },
+    {
+      id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-static.png',
+      x: 1300, y: 495, scale: 0.23, z: 23,
+      note: '固定头身/围裙/尾巴；双臂与寿司盘为烘焙静态姿势。以脚底为锚点；盘沿靠近台面，角色下缘应落在柜台后侧。'
+    },
+    {
+      id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-static.png',
+      x: 2700, y: 495, scale: 0.23, z: 23,
+      note: '固定头身/围裙/尾巴；双臂和餐碗为烘焙静态姿势。以脚底为锚点；后续柜台前沿需覆盖下缘，碗保持在工作台上方。'
+    },
+    {
+      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-static.png',
+      x: 3150, y: 495, scale: 0.23, z: 24,
+      note: '固定头身/围裙/尾巴；手臂、锅铲、锅、火焰和蒸汽为烘焙静态姿势。以脚/锅底接触线为锚点；柜台前沿需遮住下缘，蒸汽保持在上方。'
+    }
+  ]
 
   const host = document.querySelector('#viewport-host')
   const frame = document.querySelector('#viewport-frame')
   const canvas = document.querySelector('#scene-canvas')
   const platesRoot = document.querySelector('#moving-plates')
+  const catsRoot = document.querySelector('#static-cats')
+  const catGuidesRoot = document.querySelector('#cat-placement-guides')
+  const catAdjustments = document.querySelector('#cat-adjustments')
+  const catAdjustmentPanel = document.querySelector('#cat-adjustment-panel')
+  const cleanSceneImage = document.querySelector('#clean-scene-reference')
+  const cleanSceneStatus = document.querySelector('#clean-scene-status')
   const routePath = document.querySelector('#route-path')
   const controlPointRoot = document.querySelector('#control-points')
   const showGuides = document.querySelector('#show-guides')
@@ -76,6 +104,7 @@
   let frameId = 0
   let pathSamples = []
   let pathLength = 0
+  const catState = new Map(CAT_STATIONS.map((cat) => [cat.id, { ...cat, visible: true }]))
 
   const catmullPoint = (p0, p1, p2, p3, t) => {
     const t2 = t * t
@@ -210,6 +239,109 @@
     })
   }
 
+  const addCatRange = (card, cat, prop, label, min, max, step, digits = 0) => {
+    const row = document.createElement('label')
+    row.className = 'cat-control-row'
+    const title = document.createElement('span')
+    title.textContent = label
+    const input = document.createElement('input')
+    input.type = 'range'
+    input.min = String(min)
+    input.max = String(max)
+    input.step = String(step)
+    input.value = String(cat[prop])
+    input.setAttribute('aria-label', `${cat.name} ${label}`)
+    const output = document.createElement('output')
+    output.value = Number(cat[prop]).toFixed(digits)
+    output.textContent = output.value
+    input.addEventListener('input', () => {
+      const current = catState.get(cat.id)
+      current[prop] = Number(input.value)
+      output.value = Number(input.value).toFixed(digits)
+      output.textContent = output.value
+      renderCats()
+    })
+    row.append(title, input, output)
+    card.append(row)
+  }
+
+  const createCats = () => {
+    catsRoot.replaceChildren()
+    catGuidesRoot.replaceChildren()
+    catAdjustments.replaceChildren()
+    CAT_STATIONS.forEach((station) => {
+      const cat = catState.get(station.id)
+      const image = document.createElement('img')
+      image.className = 'static-cat'
+      image.dataset.catId = cat.id
+      image.src = cat.image
+      image.alt = `${cat.name}静态角色素材，1122×1402透明 PNG；当前手臂与道具未拆分。`
+      image.draggable = false
+      image.title = cat.note
+      catsRoot.append(image)
+
+      const guide = document.createElement('div')
+      guide.className = 'cat-placement-guide'
+      guide.dataset.catId = cat.id
+      const guideLabel = document.createElement('span')
+      guideLabel.className = 'cat-placement-guide__label'
+      const anchor = document.createElement('span')
+      anchor.className = 'cat-placement-guide__anchor'
+      guide.append(guideLabel, anchor)
+      catGuidesRoot.append(guide)
+
+      const card = document.createElement('fieldset')
+      card.className = 'cat-adjustment-card'
+      const legend = document.createElement('legend')
+      legend.textContent = `${cat.name} · 静态`
+      card.append(legend)
+      const note = document.createElement('p')
+      note.className = 'cat-role-note'
+      note.textContent = cat.note
+      card.append(note)
+      addCatRange(card, cat, 'x', 'X 脚底锚点', 300, 3540, 10)
+      addCatRange(card, cat, 'y', 'Y 脚底锚点', 120, 820, 5)
+      addCatRange(card, cat, 'scale', '缩放', 0.15, 0.38, 0.01, 2)
+      addCatRange(card, cat, 'z', '层级', 18, 40, 1)
+      const visibleLabel = document.createElement('label')
+      visibleLabel.className = 'cat-visible-control'
+      const visibleInput = document.createElement('input')
+      visibleInput.type = 'checkbox'
+      visibleInput.checked = true
+      visibleInput.setAttribute('aria-label', `显示${cat.name}`)
+      visibleInput.addEventListener('change', () => {
+        cat.visible = visibleInput.checked
+        renderCats()
+      })
+      visibleLabel.append(visibleInput, document.createTextNode(`显示${cat.name}`))
+      card.append(visibleLabel)
+      catAdjustments.append(card)
+    })
+    renderCats()
+  }
+
+  const renderCats = () => {
+    CAT_STATIONS.forEach((station) => {
+      const cat = catState.get(station.id)
+      const image = catsRoot.querySelector(`[data-cat-id="${cat.id}"]`)
+      const guide = catGuidesRoot.querySelector(`[data-cat-id="${cat.id}"]`)
+      const width = 1122 * cat.scale
+      const height = 1402 * cat.scale
+      image.style.left = `${cat.x}px`
+      image.style.top = `${cat.y}px`
+      image.style.width = `${width}px`
+      image.style.zIndex = String(cat.z)
+      image.hidden = !cat.visible
+      guide.style.left = `${cat.x}px`
+      guide.style.top = `${cat.y}px`
+      guide.style.width = `${width}px`
+      guide.style.height = `${height}px`
+      guide.style.zIndex = String(cat.z + 10)
+      guide.hidden = !cat.visible
+      guide.firstElementChild.textContent = `${cat.name} · ${cat.x}, ${cat.y} · ${Math.round(height)}px高 · z${cat.z}`
+    })
+  }
+
   platesRoot.addEventListener('dish-click', (event) => {
     const { item, side } = event.detail
     const unit = event.target
@@ -232,7 +364,9 @@
     platesRoot.dataset.spacing = spacing.toFixed(1)
     platesRoot.dataset.unitWidth = String(unitWidth)
     routePath.dataset.pathLength = pathLength.toFixed(1)
-    unitMetrics.textContent = `${plates.length} 个同步运动单元 · 弧长间距 ${Math.round(spacing)}px · 当前组合宽度 ${unitWidth}px · 当前净距约 ${Math.round(spacing - unitWidth)}px · 最大规格 ${maxUnitWidth}px 时仍不重叠`
+    unitMetrics.textContent = sceneMode === 'cats'
+      ? '4 张透明静态角色 · 底图 2172×724（3:1）等比显示为 3240×1080 · 左右各留 300px'
+      : `${plates.length} 个同步运动单元 · 弧长间距 ${Math.round(spacing)}px · 当前组合宽度 ${unitWidth}px · 当前净距约 ${Math.round(spacing - unitWidth)}px · 最大规格 ${maxUnitWidth}px 时仍不重叠`
     plates.forEach((plate, index) => {
       const rawDistance = phase + index * spacing
       const distance = ((rawDistance % pathLength) + pathLength) % pathLength
@@ -285,6 +419,9 @@
     host.classList.toggle('view-local', localMode)
     canvas.classList.toggle('scene-mode-confirmed', sceneMode === 'confirmed')
     canvas.classList.toggle('scene-mode-unit', sceneMode === 'unit')
+    canvas.classList.toggle('scene-mode-cats', sceneMode === 'cats')
+    document.body.classList.toggle('cat-mode-active', sceneMode === 'cats')
+    catAdjustmentPanel.hidden = sceneMode !== 'cats'
     sceneModeButtons.forEach((button) => {
       const active = button.dataset.sceneMode === sceneMode
       button.classList.toggle('is-active', active)
@@ -292,7 +429,9 @@
     })
     activeScale = scale
     zoomValue.textContent = `${Math.round(scale * 100)}%`
-    const sceneLabel = sceneMode === 'confirmed' ? '已确认构图参考' : '中性画布 · 餐盘—牌匾运动单元调试'
+    const sceneLabel = sceneMode === 'confirmed'
+      ? '已确认构图参考'
+      : sceneMode === 'cats' ? '静态猫咪 + 干净场景临时参考' : '中性画布 · 餐盘—牌匾运动单元调试'
     caption.textContent = viewMode === 'full'
       ? `${sceneLabel} · 3840×1080 全景 · 显示缩放 ${Math.round(scale * 100)}%`
       : viewMode === 'center'
@@ -321,6 +460,11 @@
     signGapValue.value = String(signGap)
     signGapValue.textContent = String(signGap)
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
+    if (sceneMode === 'cats') {
+      status.textContent = '静态角色合成：猫咪不播放动画，手臂与道具仍是同一张静态图；四只角色可分别调位、缩放、排序或隐藏。'
+      unitMetrics.textContent = '4 张透明静态角色 · 底图 2172×724（3:1）等比显示为 3240×1080 · 左右各留 300px'
+      return
+    }
     const reduceNotice = effectiveReducedMotion() ? ' 减少动态模式：自动运动已停，盘子静态分布。' : ''
     status.textContent = `${sceneMode === 'confirmed' ? '确认构图静态参考' : '运动单元调试'} · ${paused ? '已暂停' : '运行中'} · ${direction > 0 ? '左→右' : '右→左'} · ${speed} px/s${reduceNotice}`
   }
@@ -392,6 +536,7 @@
     const targets = {
       plate: { x: 1920 + (signGap + SIGN_WIDTH) / 2, y: 577 },
       curve: { x: 1920, y: 570 },
+      cats: { x: 1050, y: 350 },
       console: { x: 1920, y: 970 }
     }
     const target = targets[button.dataset.focus]
@@ -427,10 +572,26 @@
   })
   window.addEventListener('resize', updateViewport)
   reduceMedia.addEventListener?.('change', updateMotionControls)
+  const reportCleanSceneLoaded = () => {
+    const ratio = cleanSceneImage.naturalWidth / cleanSceneImage.naturalHeight
+    cleanSceneStatus.textContent = `干净场景已加载：${cleanSceneImage.naturalWidth}×${cleanSceneImage.naturalHeight} · ${ratio.toFixed(3)}:1 原比例 · 本地临时参考`
+    cleanSceneStatus.classList.remove('is-error')
+  }
+  const reportCleanSceneError = () => {
+    cleanSceneStatus.textContent = '干净场景临时文件未加载。请将已验收 background_clean_approved.png 解压到仓库根目录 .visual-review/themev3-phase03b2/。'
+    cleanSceneStatus.classList.add('is-error')
+  }
+  cleanSceneImage.addEventListener('load', reportCleanSceneLoaded)
+  cleanSceneImage.addEventListener('error', reportCleanSceneError)
+  if (cleanSceneImage.complete) {
+    if (cleanSceneImage.naturalWidth > 0) reportCleanSceneLoaded()
+    else reportCleanSceneError()
+  }
 
   buildPathSamples()
   drawRoute()
   createPlates()
+  createCats()
   renderPlates()
   updateViewport()
   updateMotionControls()
@@ -443,6 +604,7 @@
     getState: () => ({ viewMode, sceneMode, direction, speed, paused, plateWidth, signGap, reducedMotion: effectiveReducedMotion(), phase }),
     getPlatePositions: () => [...platesRoot.children].map((unit) => unit.dataset.position),
     getUnits: () => [...platesRoot.children].map((unit) => ({ productId: unit.dataset.productId, productName: unit.dataset.productName, position: unit.dataset.position, unitWidth: unit.dataset.unitWidth, spacing: unit.dataset.spacing })),
+    getCats: () => [...catState.values()].map(({ id, name, x, y, scale, z, visible, image }) => ({ id, name, x, y, scale, z, visible, image })),
     stop: () => window.cancelAnimationFrame(frameId)
   }
 })()
