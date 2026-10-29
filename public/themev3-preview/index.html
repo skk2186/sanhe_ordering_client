@@ -3,22 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Theme V3 独立预览：确认构图、静态猫咪场景合成与餐盘—牌匾运动调试" />
-    <title>Theme V3 · 静态猫咪场景合成预览</title>
+    <meta name="description" content="Theme V3 独立预览：确认构图、猫咪工位遮挡、插画点餐台与餐盘运动调试" />
+    <title>Theme V3 · 工位与插画点餐台预览</title>
     <link rel="stylesheet" href="./preview.css" />
   </head>
   <body>
     <header class="prototype-header">
       <div class="heading">
-        <p class="eyebrow">THEME V3 · PHASE 03B-2</p>
-        <h1>樱花猫咪寿司屋 · 静态场景合成</h1>
-        <p class="lede">静态猫咪仅在独立预览叠加到干净场景；确认构图与餐盘运动仍可分别查看。</p>
+        <p class="eyebrow">THEME V3 · PHASE 03B-2R</p>
+        <h1>樱花猫咪寿司屋 · 工位与点餐台合成检查</h1>
+        <p class="lede">使用已确认的场景参考、独立猫咪与透明点餐台插画检查空间关系；正式 /display 页面未改动。</p>
       </div>
 
       <div class="controls" aria-label="原型控制">
         <div class="control-group scene-mode-switch" role="group" aria-label="场景模式">
           <button type="button" class="control-button is-active" data-scene-mode="confirmed" aria-pressed="true">已确认构图</button>
-          <button type="button" class="control-button" data-scene-mode="cats" aria-pressed="false">猫咪场景合成</button>
+          <button type="button" class="control-button" data-scene-mode="cats" aria-pressed="false">修复后猫咪工位</button>
+          <button type="button" class="control-button" data-scene-mode="console" aria-pressed="false">插画点餐台</button>
+          <button type="button" class="control-button" data-scene-mode="composite" aria-pressed="false">完整静态合成</button>
           <button type="button" class="control-button" data-scene-mode="unit" aria-pressed="false">运动单元调试</button>
         </div>
         <div class="control-group view-switch" role="group" aria-label="画面视图">
@@ -37,8 +39,9 @@
           <button type="button" class="control-button" data-focus="console">看点餐台</button>
           <button type="button" class="control-button" id="pan-reset">重置平移</button>
         </div>
-        <label class="check-control"><input id="show-guides" type="checkbox" checked />显示区域边界</label>
-        <label class="check-control"><input id="business-overlay" type="checkbox" checked />显示真实组件对照</label>
+        <label class="check-control"><input id="show-guides" type="checkbox" />显示区域边界</label>
+        <label class="check-control"><input id="business-overlay" type="checkbox" checked />显示旧 CSS 结构对照</label>
+        <label class="check-control"><input id="legacy-cat-layout" type="checkbox" />对照修复前猫咪摆位</label>
         <label class="check-control"><input id="simulate-reduced-motion" type="checkbox" />模拟减少动态</label>
         <button type="button" id="motion-toggle" data-unit-control class="control-button" aria-pressed="false">暂停</button>
         <button type="button" id="direction-toggle" data-unit-control class="control-button">方向：左 → 右</button>
@@ -61,7 +64,7 @@
       <div class="cat-adjustment-heading">
         <div>
           <h2>静态角色摆位 · 逻辑像素</h2>
-          <p>每只猫以脚底接触点为 x/y 锚点；缩放与层级仅用于合成检查，不代表动画拆件或最终 /display 资产。</p>
+          <p>每只猫分别按工位台面调整 x/y；缩放与层级仅用于静态合成检查，不代表动画拆件或最终 /display 资产。</p>
         </div>
         <span id="clean-scene-status" role="status">背景参考加载中…</span>
       </div>
@@ -93,7 +96,7 @@
             <div class="debug-zone debug-zone--stage debug-only" data-label="舞台 / 盘子点击热区活动层"></div>
             <div class="debug-zone debug-zone--left-cart debug-only" data-label="左购物盘 DOM 实测 x=668–1495 · 4 槽 · 下单靠中"></div>
             <div class="debug-zone debug-zone--right-cart debug-only" data-label="右购物盘 DOM 实测 x=2345–3172 · 下单靠中 · 4 槽"></div>
-            <div class="business-console debug-only" id="business-console" aria-label="真实底部组件结构调试对照">
+            <div class="business-console" id="business-console" aria-label="旧 CSS 底部结构调试对照">
               <section class="business-cart business-cart--left" aria-label="左购物盘四槽位布局">
                 <div class="business-order"><strong>下单</strong><span>0 / 4</span></div>
                 <div class="business-slots">
@@ -129,6 +132,29 @@
 
             <div id="moving-plates" class="moving-plates" role="group" aria-label="mock 餐盘与菜品牌匾同步运动调试单元"></div>
             <div id="static-cats" class="static-cats" role="group" aria-label="四只已验收静态猫咪角色"></div>
+            <img class="workstation-prop workstation-prop--ingredients" src="../images/ui/sakura-cat-sushi/cats/prep-ingredients-static.png" alt="切菜台上的鱼片、醋饭和料理盘插画" draggable="false" />
+            <img class="workstation-prop workstation-prop--hob" src="../images/ui/sakura-cat-sushi/cats/cook-hob-static.png" alt="炒锅下方的独立灶台插画" draggable="false" />
+            <img class="workstation-front" src="../images/ui/sakura-cat-sushi/cats/workstation-front-extract.png" alt="" aria-hidden="true" draggable="false" />
+            <div class="illustrated-console" aria-label="三组独立插画点餐台预览；交互仅显示 mock 反馈">
+              <section class="illustrated-cart illustrated-cart--left" aria-label="左购物盘">
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-left-shell.png" alt="" draggable="false" />
+                <button class="illustrated-order illustrated-order--left" type="button" data-preview-action="左侧下单">下单<span>0/4</span></button>
+                <div class="illustrated-slots illustrated-slots--left">
+                  <button type="button" data-preview-action="左侧槽位 1" aria-label="左侧购物盘槽位 1"></button><button type="button" data-preview-action="左侧槽位 2" aria-label="左侧购物盘槽位 2"></button><button type="button" data-preview-action="左侧槽位 3" aria-label="左侧购物盘槽位 3"></button><button type="button" data-preview-action="左侧槽位 4" aria-label="左侧购物盘槽位 4"></button>
+                </div>
+              </section>
+              <section class="illustrated-center" aria-label="中央功能台">
+                <img src="../images/ui/sakura-cat-sushi/console/center-console-shell.png" alt="" draggable="false" />
+                <button class="illustrated-menu illustrated-menu--left" type="button" data-preview-action="左侧商品菜单">打开<br />商品<br />菜单</button>
+                <div class="illustrated-functions"><button type="button" data-preview-action="寿司导航">寿司导航</button><button type="button" data-preview-action="点餐记录">点餐记录</button><button type="button" data-preview-action="设置变更">设置变更</button><button type="button" data-preview-action="呼叫店员">呼叫店员</button></div>
+                <button class="illustrated-menu illustrated-menu--right" type="button" data-preview-action="右侧商品菜单">打开<br />商品<br />菜单</button>
+              </section>
+              <section class="illustrated-cart illustrated-cart--right" aria-label="右购物盘">
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-right-shell.png" alt="" draggable="false" />
+                <button class="illustrated-order illustrated-order--right" type="button" data-preview-action="右侧下单">下单<span>0/4</span></button>
+                <div class="illustrated-slots illustrated-slots--right"><button type="button" data-preview-action="右侧槽位 1" aria-label="右侧购物盘槽位 1"></button><button type="button" data-preview-action="右侧槽位 2" aria-label="右侧购物盘槽位 2"></button><button type="button" data-preview-action="右侧槽位 3" aria-label="右侧购物盘槽位 3"></button><button type="button" data-preview-action="右侧槽位 4" aria-label="右侧购物盘槽位 4"></button></div>
+              </section>
+            </div>
             <div id="cat-placement-guides" class="cat-placement-guides debug-only" aria-hidden="true"></div>
             <div class="static-dish-note debug-only">中性调试画布 · 单元与确认构图分开展示；所有牌匾、名称和价格均为 DOM mock</div>
             <div class="canvas-legend debug-only" aria-hidden="true">运动单元调试 ON · 青线=轨迹 · 粉虚框=点击热区 · 牌匾标记=非正式素材</div>
@@ -136,22 +162,22 @@
         </div>
       </div>
 
-      <section class="analysis-panel" aria-label="Phase 03A 参考与调试素材边界">
+      <section class="analysis-panel" aria-label="Phase 03B-2R 参考与素材边界">
         <article>
           <h2>确认构图参考</h2>
           <p><strong>2048×768（8:3）</strong> 原图以 2880×1080 等比例放在 3840×1080 画布中央；两侧各留 480px。未拉伸、裁切或替换为历史失败背景，参考图不是正式运行资产。</p>
         </article>
         <article>
-          <h2>组合单元数据</h2>
-          <p>每个调试单元从同一 mock 商品对象读取 id、名称、价格、推荐/售罄状态；盘体与简单调试牌匾共用一个 button 根节点、运动变换和点击热区。</p>
+          <h2>猫咪工位</h2>
+          <p>四只静态猫按不同台面接触线摆位；后厨柜台前沿从干净场景实际像素提取并遮挡下半身。切菜台新增料理盘，炒锅下新增独立灶台插画。可切换旧摆位对照。</p>
         </article>
         <article>
-          <h2>单元间距与交互</h2>
-          <p>默认盘牌间距 24px，可调 16–64px。四个单元沿 02R 弧线等弧长分布；点击或键盘激活触发 `dish-click` 调试事件，并显示对应的 mock 购物侧和售罄反馈，不连接真实订单接口。</p>
+          <h2>底部插画点餐台</h2>
+          <p>左购物盘、中央功能台、右购物盘为三张独立透明 PNG。四个粉色盘位、左右菜单与中央 2×2 功能、四个青绿色盘位均由图像承载；文字、数量和点击热区在 DOM 中，预览点击只返回 mock 反馈。</p>
         </article>
         <article>
-          <h2>正式素材依赖</h2>
-          <p>仍须独立制作 3840×1080 母背景、回转台后沿/带面/前缘、四只猫咪角色与动作层、正式餐盘及独立木牌匾。当前所有运动单元外观明确标注为调试示意，不能交付为正式美术。</p>
+          <h2>交付边界</h2>
+          <p>干净场景仍是 2172×724 本地临时参考，未作为 3840×1080 正式母背景提交。新点餐台与工位道具只接入独立预览；正式 /display、购物盘业务与订单接口保持原状。动态餐盘外观仍为调试示意。</p>
         </article>
       </section>
     </main>

@@ -32,23 +32,23 @@
   const CAT_STATIONS = [
     {
       id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-static.png',
-      x: 900, y: 495, scale: 0.23, z: 22,
-      note: '固定头身/围裙/尾巴；切刀、双爪、鱼与砧板仍为烘焙静态姿势。脚底与砧板底缘作为接触锚点；后续需让工作台前沿遮住下缘。'
+      x: 865, y: 510, scale: 0.21, z: 22,
+      note: '砧板底缘落在左侧木桌面，旁边另放食材盘；切刀、双爪、鱼与砧板仍为烘焙静态姿势。'
     },
     {
       id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-static.png',
-      x: 1300, y: 495, scale: 0.23, z: 23,
-      note: '固定头身/围裙/尾巴；双臂与寿司盘为烘焙静态姿势。以脚底为锚点；盘沿靠近台面，角色下缘应落在柜台后侧。'
+      x: 1300, y: 530, scale: 0.23, z: 23,
+      note: '双臂与寿司盘仍为烘焙静态姿势；脚部落在提取自干净场景的后厨柜台前沿后方。'
     },
     {
       id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-static.png',
-      x: 2700, y: 495, scale: 0.23, z: 23,
-      note: '固定头身/围裙/尾巴；双臂和餐碗为烘焙静态姿势。以脚底为锚点；后续柜台前沿需覆盖下缘，碗保持在工作台上方。'
+      x: 2580, y: 530, scale: 0.23, z: 23,
+      note: '双臂和餐碗仍为烘焙静态姿势；下半身位于后厨柜台前沿后方，碗高于台面。'
     },
     {
       id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-static.png',
-      x: 3150, y: 495, scale: 0.23, z: 24,
-      note: '固定头身/围裙/尾巴；手臂、锅铲、锅、火焰和蒸汽为烘焙静态姿势。以脚/锅底接触线为锚点；柜台前沿需遮住下缘，蒸汽保持在上方。'
+      x: 2950, y: 500, scale: 0.23, z: 24,
+      note: '锅具下方放独立灶台插画，脚部由真实柜台前沿覆盖；锅、火焰和蒸汽尚与角色烘焙在同一张 PNG。'
     }
   ]
 
@@ -77,6 +77,8 @@
   const signGapValue = document.querySelector('#sign-gap-value')
   const unitMetrics = document.querySelector('#unit-metrics')
   const businessOverlay = document.querySelector('#business-overlay')
+  const legacyCatLayout = document.querySelector('#legacy-cat-layout')
+  const illustratedConsole = document.querySelector('.illustrated-console')
   const zoomValue = document.querySelector('#zoom-value')
   const focusButtons = [...document.querySelectorAll('[data-focus]')]
   const resetButton = document.querySelector('#reset-motion')
@@ -272,7 +274,7 @@
     CAT_STATIONS.forEach((station) => {
       const cat = catState.get(station.id)
       const image = document.createElement('img')
-      image.className = 'static-cat'
+      image.className = `static-cat static-cat--${cat.id}`
       image.dataset.catId = cat.id
       image.src = cat.image
       image.alt = `${cat.name}静态角色素材，1122×1402透明 PNG；当前手臂与道具未拆分。`
@@ -321,24 +323,27 @@
   }
 
   const renderCats = () => {
+    const oldLayout = legacyCatLayout.checked
+    const oldPositions = { cat01: [900, 495, 0.23], cat02: [1300, 495, 0.23], cat03: [2700, 495, 0.23], cat04: [3150, 495, 0.23] }
     CAT_STATIONS.forEach((station) => {
       const cat = catState.get(station.id)
+      const [x, y, scale] = oldLayout ? oldPositions[cat.id] : [cat.x, cat.y, cat.scale]
       const image = catsRoot.querySelector(`[data-cat-id="${cat.id}"]`)
       const guide = catGuidesRoot.querySelector(`[data-cat-id="${cat.id}"]`)
-      const width = 1122 * cat.scale
-      const height = 1402 * cat.scale
-      image.style.left = `${cat.x}px`
-      image.style.top = `${cat.y}px`
+      const width = 1122 * scale
+      const height = 1402 * scale
+      image.style.left = `${x}px`
+      image.style.top = `${y}px`
       image.style.width = `${width}px`
       image.style.zIndex = String(cat.z)
       image.hidden = !cat.visible
-      guide.style.left = `${cat.x}px`
-      guide.style.top = `${cat.y}px`
+      guide.style.left = `${x}px`
+      guide.style.top = `${y}px`
       guide.style.width = `${width}px`
       guide.style.height = `${height}px`
       guide.style.zIndex = String(cat.z + 10)
       guide.hidden = !cat.visible
-      guide.firstElementChild.textContent = `${cat.name} · ${cat.x}, ${cat.y} · ${Math.round(height)}px高 · z${cat.z}`
+      guide.firstElementChild.textContent = `${cat.name} · ${x}, ${y} · ${Math.round(height)}px高 · z${cat.z}`
     })
   }
 
@@ -420,8 +425,11 @@
     canvas.classList.toggle('scene-mode-confirmed', sceneMode === 'confirmed')
     canvas.classList.toggle('scene-mode-unit', sceneMode === 'unit')
     canvas.classList.toggle('scene-mode-cats', sceneMode === 'cats')
-    document.body.classList.toggle('cat-mode-active', sceneMode === 'cats')
-    catAdjustmentPanel.hidden = sceneMode !== 'cats'
+    canvas.classList.toggle('scene-mode-console', sceneMode === 'console')
+    canvas.classList.toggle('scene-mode-composite', sceneMode === 'composite')
+    canvas.classList.toggle('scene-legacy-cats', legacyCatLayout.checked)
+    document.body.classList.toggle('cat-mode-active', sceneMode === 'cats' || sceneMode === 'composite')
+    catAdjustmentPanel.hidden = sceneMode !== 'cats' && sceneMode !== 'composite'
     sceneModeButtons.forEach((button) => {
       const active = button.dataset.sceneMode === sceneMode
       button.classList.toggle('is-active', active)
@@ -431,7 +439,9 @@
     zoomValue.textContent = `${Math.round(scale * 100)}%`
     const sceneLabel = sceneMode === 'confirmed'
       ? '已确认构图参考'
-      : sceneMode === 'cats' ? '静态猫咪 + 干净场景临时参考' : '中性画布 · 餐盘—牌匾运动单元调试'
+      : sceneMode === 'cats' ? '修复后猫咪工位 + 干净场景临时参考'
+        : sceneMode === 'console' ? '三组独立插画点餐台'
+          : sceneMode === 'composite' ? '猫咪工位 + 插画点餐台静态合成' : '中性画布 · 餐盘—牌匾运动单元调试'
     caption.textContent = viewMode === 'full'
       ? `${sceneLabel} · 3840×1080 全景 · 显示缩放 ${Math.round(scale * 100)}%`
       : viewMode === 'center'
@@ -444,7 +454,7 @@
       button.classList.toggle('is-active', active)
       button.setAttribute('aria-pressed', String(active))
     })
-    canvas.classList.toggle('business-hidden', sceneMode === 'confirmed' || !businessOverlay.checked || (viewMode !== 'business' && viewMode !== 'full' && viewMode !== 'center'))
+    canvas.classList.toggle('business-hidden', sceneMode !== 'unit' || !businessOverlay.checked || (viewMode !== 'business' && viewMode !== 'full' && viewMode !== 'center'))
   }
 
   const effectiveReducedMotion = () => simulateReducedMotion || reduceMedia.matches
@@ -460,9 +470,14 @@
     signGapValue.value = String(signGap)
     signGapValue.textContent = String(signGap)
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
-    if (sceneMode === 'cats') {
-      status.textContent = '静态角色合成：猫咪不播放动画，手臂与道具仍是同一张静态图；四只角色可分别调位、缩放、排序或隐藏。'
-      unitMetrics.textContent = '4 张透明静态角色 · 底图 2172×724（3:1）等比显示为 3240×1080 · 左右各留 300px'
+    if (sceneMode === 'cats' || sceneMode === 'composite') {
+      status.textContent = `静态工位合成：${legacyCatLayout.checked ? '修复前摆位对照' : '按桌面接触线调整，柜台前沿从干净场景提取'}；手臂与道具仍是静态图。`
+      unitMetrics.textContent = '4 张静态角色 · 底图 2172×724 等比显示为 3240×1080 · 三组独立点餐台仅供预览'
+      return
+    }
+    if (sceneMode === 'console') {
+      status.textContent = '独立透明插画点餐台：按钮文字与点击区域由 DOM 叠加；点击仅反馈 mock 事件。'
+      unitMetrics.textContent = '左 827×217 · 中 790×217 · 右 827×217 · 3840×1080 逻辑画布'
       return
     }
     const reduceNotice = effectiveReducedMotion() ? ' 减少动态模式：自动运动已停，盘子静态分布。' : ''
@@ -494,6 +509,12 @@
   }))
   showGuides.addEventListener('change', () => canvas.classList.toggle('guides-hidden', !showGuides.checked))
   businessOverlay.addEventListener('change', updateViewport)
+  legacyCatLayout.addEventListener('change', () => { renderCats(); updateViewport(); updateMotionControls() })
+  illustratedConsole.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-preview-action]')
+    if (!button) return
+    status.textContent = `插画点餐台热区：${button.dataset.previewAction} · mock 点击反馈，未连接真实订单。`
+  })
   reducedToggle.addEventListener('change', () => {
     simulateReducedMotion = reducedToggle.checked
     updateMotionControls()
@@ -593,6 +614,7 @@
   createPlates()
   createCats()
   renderPlates()
+  canvas.classList.toggle('guides-hidden', !showGuides.checked)
   updateViewport()
   updateMotionControls()
   frameId = window.requestAnimationFrame(tick)
