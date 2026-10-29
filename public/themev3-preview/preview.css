@@ -205,19 +205,7 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .moving-plates { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 .static-cats { display: none; position: absolute; inset: 0; z-index: 18; pointer-events: none; }
 .static-cat { position: absolute; display: block; height: auto; max-width: none; transform: translate(-50%, -100%); transform-origin: center bottom; user-select: none; pointer-events: none; }
-.static-cat--cat04 { -webkit-mask-image: url('../images/ui/sakura-cat-sushi/cats/cat04-foot-mask.png'); mask-image: url('../images/ui/sakura-cat-sushi/cats/cat04-foot-mask.png'); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
-.scene-legacy-cats .static-cat--cat04 { -webkit-mask-image: none; mask-image: none; }
 .static-cat[hidden], .cat-placement-guide[hidden] { display: none !important; }
-.workstation-prop, .workstation-front { display: none; position: absolute; max-width: none; user-select: none; pointer-events: none; }
-.scene-mode-cats .workstation-prop,
-.scene-mode-composite .workstation-prop,
-.scene-mode-cats .workstation-front,
-.scene-mode-composite .workstation-front { display: block; }
-.workstation-prop--ingredients { z-index: 17; left: 635px; top: 393px; width: 130px; height: 70px; }
-.workstation-prop--hob { z-index: 17; left: 2920px; top: 380px; width: 185px; height: 82px; }
-.workstation-front { z-index: 19; left: 1045.856px; top: 417.680px; width: 1894.475px; height: 156.630px; }
-.scene-legacy-cats .workstation-prop,
-.scene-legacy-cats .workstation-front { display: none !important; }
 .illustrated-console { display: none; position: absolute; inset: 0; z-index: 25; pointer-events: none; }
 .scene-mode-console .illustrated-console,
 .scene-mode-composite .illustrated-console { display: block; }
@@ -360,3 +348,60 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
+
+/* Phase 03B-3: approved raster art is positioned without changing its aspect ratio. */
+.clean-scene-reference { left: 0; width: 3840px; height: auto; object-fit: contain; }
+.scene-mode-background .clean-scene-reference { display: block; }
+.scene-mode-background .confirmed-composition,
+.scene-mode-background .side-extension,
+.scene-mode-background .moving-plates,
+.scene-mode-background .static-cats,
+.scene-mode-background .illustrated-console,
+.scene-mode-background .debug-only { display: none !important; }
+.scene-mode-cats .side-extension,
+.scene-mode-composite .side-extension { display: none; }
+.workstation-occluder { display: none; position: absolute; z-index: 19; top: 526px; height: 54px; overflow: hidden; pointer-events: none; }
+.workstation-occluder--plate { left: 1000px; width: 480px; }
+.workstation-occluder--serve { left: 2350px; width: 500px; }
+.workstation-occluder img { position: absolute; left: 0; top: -526px; width: 3840px; height: auto; max-width: none; transform: translateX(calc(-1 * var(--occluder-left))); }
+.workstation-occluder--plate { --occluder-left: 1000px; }
+.workstation-occluder--serve { --occluder-left: 2350px; }
+.scene-mode-cats .workstation-occluder,
+.scene-mode-composite .workstation-occluder { display: block; }
+
+.illustrated-cart, .illustrated-center { top: 760px; width: 960px; height: 320px; }
+.illustrated-cart--left { left: 420px; }
+.illustrated-center { left: 1440px; }
+.illustrated-cart--right { left: 2460px; }
+.illustrated-cart > img, .illustrated-center > img { object-fit: contain; }
+.illustrated-console button { color: #634135; font: 800 30px/1.2 "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; text-shadow: 0 1px 1px rgba(255,255,255,.45); touch-action: manipulation; }
+.illustrated-console button:hover { filter: brightness(1.08); }
+.illustrated-console button:focus-visible { outline: 4px solid #9d5545; outline-offset: -4px; border-radius: 12px; }
+.illustrated-console button:active { transform: translateY(2px); }
+.illustrated-order { top: 70px; width: 158px; height: 214px; font-size: 34px !important; }
+.illustrated-order span { margin-top: 11px; font-size: 28px; }
+.illustrated-order--left { left: 729px; }
+.illustrated-order--right { left: 88px; }
+.illustrated-slots { top: 99px; width: 620px; height: 132px; gap: 4px; }
+.illustrated-slots--left { left: 89px; }
+.illustrated-slots--right { left: 252px; }
+.illustrated-menu { top: 77px; width: 105px; height: 150px; font-size: 29px !important; }
+.illustrated-menu--left { left: 94px; }
+.illustrated-menu--right { right: 94px; }
+.illustrated-functions { left: 213px; top: 70px; width: 534px; height: 168px; gap: 8px 9px; }
+.illustrated-functions button { font-size: 30px; white-space: nowrap; }
+
+.scene-check-guide, .scene-contact-line { display: none; position: absolute; pointer-events: none; z-index: 32; }
+.scene-check-guide { left: 30px; width: 3780px; padding: 5px 9px; border: 3px dashed #7de6dd; background: rgba(35, 201, 188, .08); color: #fff; font: 800 22px/1.2 "Microsoft YaHei UI", sans-serif; text-shadow: 0 1px 3px #30231f; }
+.scene-check-guide--top { top: 0; height: 190px; }
+.scene-check-guide--work { top: 250px; height: 330px; }
+.scene-check-guide--bottom { top: 760px; height: 320px; }
+.scene-contact-line { height: 0; border-top: 4px dashed #ffed70; }
+.scene-contact-line--cut { left: 385px; top: 546px; width: 470px; }
+.scene-contact-line--plate { left: 1000px; top: 526px; width: 480px; }
+.scene-contact-line--serve { left: 2350px; top: 526px; width: 500px; }
+.scene-contact-line--cook { left: 2890px; top: 516px; width: 525px; }
+.scene-mode-cats:not(.guides-hidden) .scene-check-guide,
+.scene-mode-composite:not(.guides-hidden) .scene-check-guide,
+.scene-mode-cats:not(.guides-hidden) .scene-contact-line,
+.scene-mode-composite:not(.guides-hidden) .scene-contact-line { display: block; }

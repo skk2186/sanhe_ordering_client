@@ -10,17 +10,18 @@
   <body>
     <header class="prototype-header">
       <div class="heading">
-        <p class="eyebrow">THEME V3 · PHASE 03B-2R</p>
-        <h1>樱花猫咪寿司屋 · 工位与点餐台合成检查</h1>
-        <p class="lede">使用已确认的场景参考、独立猫咪与透明点餐台插画检查空间关系；正式 /display 页面未改动。</p>
+        <p class="eyebrow">THEME V3 · PHASE 03B-3</p>
+        <h1>樱花猫咪寿司屋 · 已审批素材合成检查</h1>
+        <p class="lede">使用本批审批的背景、猫咪和三组点餐台；正式 /display 页面未改动。</p>
       </div>
 
       <div class="controls" aria-label="原型控制">
         <div class="control-group scene-mode-switch" role="group" aria-label="场景模式">
-          <button type="button" class="control-button is-active" data-scene-mode="confirmed" aria-pressed="true">已确认构图</button>
-          <button type="button" class="control-button" data-scene-mode="cats" aria-pressed="false">修复后猫咪工位</button>
+          <button type="button" class="control-button" data-scene-mode="confirmed" aria-pressed="false">已确认构图</button>
+          <button type="button" class="control-button" data-scene-mode="background" aria-pressed="false">新版背景</button>
+          <button type="button" class="control-button" data-scene-mode="cats" aria-pressed="false">新版猫咪工位</button>
           <button type="button" class="control-button" data-scene-mode="console" aria-pressed="false">插画点餐台</button>
-          <button type="button" class="control-button" data-scene-mode="composite" aria-pressed="false">完整静态合成</button>
+          <button type="button" class="control-button is-active" data-scene-mode="composite" aria-pressed="true">完整静态合成</button>
           <button type="button" class="control-button" data-scene-mode="unit" aria-pressed="false">运动单元调试</button>
         </div>
         <div class="control-group view-switch" role="group" aria-label="画面视图">
@@ -40,8 +41,8 @@
           <button type="button" class="control-button" id="pan-reset">重置平移</button>
         </div>
         <label class="check-control"><input id="show-guides" type="checkbox" />显示区域边界</label>
+        <label class="check-control"><input id="interim-background" type="checkbox" checked />临时增强背景（切换原始图对照）</label>
         <label class="check-control"><input id="business-overlay" type="checkbox" checked />显示旧 CSS 结构对照</label>
-        <label class="check-control"><input id="legacy-cat-layout" type="checkbox" />对照修复前猫咪摆位</label>
         <label class="check-control"><input id="simulate-reduced-motion" type="checkbox" />模拟减少动态</label>
         <button type="button" id="motion-toggle" data-unit-control class="control-button" aria-pressed="false">暂停</button>
         <button type="button" id="direction-toggle" data-unit-control class="control-button">方向：左 → 右</button>
@@ -64,7 +65,7 @@
       <div class="cat-adjustment-heading">
         <div>
           <h2>静态角色摆位 · 逻辑像素</h2>
-          <p>每只猫分别按工位台面调整 x/y；缩放与层级仅用于静态合成检查，不代表动画拆件或最终 /display 资产。</p>
+          <p>每只猫按新版工作台接触线调整 x/y；缩放与层级仅用于静态合成检查，不代表动画拆件或最终 /display 资产。</p>
         </div>
         <span id="clean-scene-status" role="status">背景参考加载中…</span>
       </div>
@@ -78,7 +79,7 @@
           <div id="scene-canvas" class="scene-canvas" data-canvas-width="3840" data-canvas-height="1080">
             <div class="side-extension side-extension--left"><span>原图未覆盖区 · 非构图</span></div>
             <div class="side-extension side-extension--right"><span>原图未覆盖区 · 非构图</span></div>
-            <img id="clean-scene-reference" class="clean-scene-reference" src="../../.visual-review/themev3-phase03b2/background_clean_approved.png" alt="已验收干净场景临时参考，2172×724，保持3:1原比例显示；不是3840×1080正式背景。" draggable="false" />
+            <img id="clean-scene-reference" class="clean-scene-reference" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="已审批干净场景的临时插值增强版，3840×1080；原图为2365×665，不是原生高清重绘。" draggable="false" />
             <img class="confirmed-composition" src="./confirmed-composition.png" alt="用户确认的樱花猫咪寿司屋构图参考，原始 2048×768 图片，保持比例展示，不是正式母背景。" draggable="false" />
             <div class="source-outline debug-only" aria-hidden="true"><span>用户确认原图 2048×768 · 等比放置 2880×1080 · 非正式运行素材</span></div>
 
@@ -132,52 +133,58 @@
 
             <div id="moving-plates" class="moving-plates" role="group" aria-label="mock 餐盘与菜品牌匾同步运动调试单元"></div>
             <div id="static-cats" class="static-cats" role="group" aria-label="四只已验收静态猫咪角色"></div>
-            <img class="workstation-prop workstation-prop--ingredients" src="../images/ui/sakura-cat-sushi/cats/prep-ingredients-static.png" alt="切菜台上的鱼片、醋饭和料理盘插画" draggable="false" />
-            <img class="workstation-prop workstation-prop--hob" src="../images/ui/sakura-cat-sushi/cats/cook-hob-static.png" alt="炒锅下方的独立灶台插画" draggable="false" />
-            <img class="workstation-front" src="../images/ui/sakura-cat-sushi/cats/workstation-front-extract.png" alt="" aria-hidden="true" draggable="false" />
+            <div class="workstation-occluder workstation-occluder--plate" aria-hidden="true"><img src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /></div>
+            <div class="workstation-occluder workstation-occluder--serve" aria-hidden="true"><img src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /></div>
             <div class="illustrated-console" aria-label="三组独立插画点餐台预览；交互仅显示 mock 反馈">
               <section class="illustrated-cart illustrated-cart--left" aria-label="左购物盘">
-                <img src="../images/ui/sakura-cat-sushi/cart/cart-left-shell.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-left-approved.png" alt="" draggable="false" />
                 <button class="illustrated-order illustrated-order--left" type="button" data-preview-action="左侧下单">下单<span>0/4</span></button>
                 <div class="illustrated-slots illustrated-slots--left">
                   <button type="button" data-preview-action="左侧槽位 1" aria-label="左侧购物盘槽位 1"></button><button type="button" data-preview-action="左侧槽位 2" aria-label="左侧购物盘槽位 2"></button><button type="button" data-preview-action="左侧槽位 3" aria-label="左侧购物盘槽位 3"></button><button type="button" data-preview-action="左侧槽位 4" aria-label="左侧购物盘槽位 4"></button>
                 </div>
               </section>
               <section class="illustrated-center" aria-label="中央功能台">
-                <img src="../images/ui/sakura-cat-sushi/console/center-console-shell.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/console/console-center-approved.png" alt="" draggable="false" />
                 <button class="illustrated-menu illustrated-menu--left" type="button" data-preview-action="左侧商品菜单">打开<br />商品<br />菜单</button>
                 <div class="illustrated-functions"><button type="button" data-preview-action="寿司导航">寿司导航</button><button type="button" data-preview-action="点餐记录">点餐记录</button><button type="button" data-preview-action="设置变更">设置变更</button><button type="button" data-preview-action="呼叫店员">呼叫店员</button></div>
                 <button class="illustrated-menu illustrated-menu--right" type="button" data-preview-action="右侧商品菜单">打开<br />商品<br />菜单</button>
               </section>
               <section class="illustrated-cart illustrated-cart--right" aria-label="右购物盘">
-                <img src="../images/ui/sakura-cat-sushi/cart/cart-right-shell.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-right-approved.png" alt="" draggable="false" />
                 <button class="illustrated-order illustrated-order--right" type="button" data-preview-action="右侧下单">下单<span>0/4</span></button>
                 <div class="illustrated-slots illustrated-slots--right"><button type="button" data-preview-action="右侧槽位 1" aria-label="右侧购物盘槽位 1"></button><button type="button" data-preview-action="右侧槽位 2" aria-label="右侧购物盘槽位 2"></button><button type="button" data-preview-action="右侧槽位 3" aria-label="右侧购物盘槽位 3"></button><button type="button" data-preview-action="右侧槽位 4" aria-label="右侧购物盘槽位 4"></button></div>
               </section>
             </div>
             <div id="cat-placement-guides" class="cat-placement-guides debug-only" aria-hidden="true"></div>
+            <div class="scene-check-guide scene-check-guide--top" aria-hidden="true">顶部信息安全区</div>
+            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 柜台接触线 y≈526</div>
+            <div class="scene-check-guide scene-check-guide--bottom" aria-hidden="true">底部点餐台预留与点击区</div>
+            <div class="scene-contact-line scene-contact-line--cut" aria-hidden="true"></div>
+            <div class="scene-contact-line scene-contact-line--plate" aria-hidden="true"></div>
+            <div class="scene-contact-line scene-contact-line--serve" aria-hidden="true"></div>
+            <div class="scene-contact-line scene-contact-line--cook" aria-hidden="true"></div>
             <div class="static-dish-note debug-only">中性调试画布 · 单元与确认构图分开展示；所有牌匾、名称和价格均为 DOM mock</div>
             <div class="canvas-legend debug-only" aria-hidden="true">运动单元调试 ON · 青线=轨迹 · 粉虚框=点击热区 · 牌匾标记=非正式素材</div>
           </div>
         </div>
       </div>
 
-      <section class="analysis-panel" aria-label="Phase 03B-2R 参考与素材边界">
+      <section class="analysis-panel" aria-label="Phase 03B-3 审批素材与预览边界">
         <article>
-          <h2>确认构图参考</h2>
-          <p><strong>2048×768（8:3）</strong> 原图以 2880×1080 等比例放在 3840×1080 画布中央；两侧各留 480px。未拉伸、裁切或替换为历史失败背景，参考图不是正式运行资产。</p>
+          <h2>构图与背景清晰度</h2>
+          <p>原始确认构图仍供对照。新版干净背景原图为 2365×665；3840×1080 版本仅为插值增强预览，可随时切换原图比较，不代表原生高清重绘。</p>
         </article>
         <article>
           <h2>猫咪工位</h2>
-          <p>四只静态猫按不同台面接触线摆位；后厨柜台前沿从干净场景实际像素提取并遮挡下半身。切菜台新增料理盘，炒锅下新增独立灶台插画。可切换旧摆位对照。</p>
+          <p>四只审批静态猫按新版台面摆位。摆盘猫、端菜猫下身由新版背景同位置的柜台前沿像素遮挡；切菜道具和炒锅炉灶已含在审批角色图片中。</p>
         </article>
         <article>
           <h2>底部插画点餐台</h2>
-          <p>左购物盘、中央功能台、右购物盘为三张独立透明 PNG。四个粉色盘位、左右菜单与中央 2×2 功能、四个青绿色盘位均由图像承载；文字、数量和点击热区在 DOM 中，预览点击只返回 mock 反馈。</p>
+          <p>左购物盘、中央功能台、右购物盘分别为 2172×724 审批透明 PNG，各以 960×320 等比显示。文字、数量和点击热区在 DOM 中，预览点击只返回 mock 反馈。</p>
         </article>
         <article>
           <h2>交付边界</h2>
-          <p>干净场景仍是 2172×724 本地临时参考，未作为 3840×1080 正式母背景提交。新点餐台与工位道具只接入独立预览；正式 /display、购物盘业务与订单接口保持原状。动态餐盘外观仍为调试示意。</p>
+          <p>本轮只改独立预览；正式 /display、购物盘业务与订单接口保持原状。动态餐盘和菜品牌匾仍为 Phase 03A 调试示意，未接入正式商品美术。</p>
         </article>
       </section>
     </main>

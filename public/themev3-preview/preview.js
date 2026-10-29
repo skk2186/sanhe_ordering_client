@@ -31,24 +31,24 @@
   const SAMPLES_PER_SEGMENT = 48
   const CAT_STATIONS = [
     {
-      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-static.png',
-      x: 865, y: 510, scale: 0.21, z: 22,
-      note: '砧板底缘落在左侧木桌面，旁边另放食材盘；切刀、双爪、鱼与砧板仍为烘焙静态姿势。'
+      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-approved.png',
+      x: 600, y: 575, scale: 0.30, z: 22,
+      note: '砧板四脚落在左侧木质操作台；食材已包含于本批审批角色素材中。'
     },
     {
-      id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-static.png',
-      x: 1300, y: 530, scale: 0.23, z: 23,
-      note: '双臂与寿司盘仍为烘焙静态姿势；脚部落在提取自干净场景的后厨柜台前沿后方。'
+      id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png',
+      x: 1230, y: 560, scale: 0.28, z: 23,
+      note: '柜台前沿遮住下身；头部、双臂及寿司盘保持完整可见。'
     },
     {
-      id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-static.png',
-      x: 2580, y: 530, scale: 0.23, z: 23,
-      note: '双臂和餐碗仍为烘焙静态姿势；下半身位于后厨柜台前沿后方，碗高于台面。'
+      id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-approved.png',
+      x: 2570, y: 565, scale: 0.28, z: 23,
+      note: '碗沿保持水平；柜台前沿仅遮住下身，保留腰部与双臂。'
     },
     {
-      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-static.png',
-      x: 2950, y: 500, scale: 0.23, z: 24,
-      note: '锅具下方放独立灶台插画，脚部由真实柜台前沿覆盖；锅、火焰和蒸汽尚与角色烘焙在同一张 PNG。'
+      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-approved.png',
+      x: 3115, y: 540, scale: 0.29, z: 24,
+      note: '角色自带锅、炉和火焰压在新版背景原有炉灶上；蒸汽仍烘焙于静态角色。'
     }
   ]
 
@@ -62,6 +62,8 @@
   const catAdjustmentPanel = document.querySelector('#cat-adjustment-panel')
   const cleanSceneImage = document.querySelector('#clean-scene-reference')
   const cleanSceneStatus = document.querySelector('#clean-scene-status')
+  const interimBackground = document.querySelector('#interim-background')
+  const occluderImages = [...document.querySelectorAll('.workstation-occluder img')]
   const routePath = document.querySelector('#route-path')
   const controlPointRoot = document.querySelector('#control-points')
   const showGuides = document.querySelector('#show-guides')
@@ -77,7 +79,6 @@
   const signGapValue = document.querySelector('#sign-gap-value')
   const unitMetrics = document.querySelector('#unit-metrics')
   const businessOverlay = document.querySelector('#business-overlay')
-  const legacyCatLayout = document.querySelector('#legacy-cat-layout')
   const illustratedConsole = document.querySelector('.illustrated-console')
   const zoomValue = document.querySelector('#zoom-value')
   const focusButtons = [...document.querySelectorAll('[data-focus]')]
@@ -88,7 +89,7 @@
   const reduceMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
 
   let viewMode = 'full'
-  let sceneMode = 'confirmed'
+  let sceneMode = 'composite'
   let plateWidth = Number(plateSizeRange.value)
   let signGap = Number(signGapRange.value)
   let zoom = 1
@@ -323,11 +324,9 @@
   }
 
   const renderCats = () => {
-    const oldLayout = legacyCatLayout.checked
-    const oldPositions = { cat01: [900, 495, 0.23], cat02: [1300, 495, 0.23], cat03: [2700, 495, 0.23], cat04: [3150, 495, 0.23] }
     CAT_STATIONS.forEach((station) => {
       const cat = catState.get(station.id)
-      const [x, y, scale] = oldLayout ? oldPositions[cat.id] : [cat.x, cat.y, cat.scale]
+      const { x, y, scale } = cat
       const image = catsRoot.querySelector(`[data-cat-id="${cat.id}"]`)
       const guide = catGuidesRoot.querySelector(`[data-cat-id="${cat.id}"]`)
       const width = 1122 * scale
@@ -423,11 +422,11 @@
     host.classList.toggle('view-business', viewMode === 'business')
     host.classList.toggle('view-local', localMode)
     canvas.classList.toggle('scene-mode-confirmed', sceneMode === 'confirmed')
+    canvas.classList.toggle('scene-mode-background', sceneMode === 'background')
     canvas.classList.toggle('scene-mode-unit', sceneMode === 'unit')
     canvas.classList.toggle('scene-mode-cats', sceneMode === 'cats')
     canvas.classList.toggle('scene-mode-console', sceneMode === 'console')
     canvas.classList.toggle('scene-mode-composite', sceneMode === 'composite')
-    canvas.classList.toggle('scene-legacy-cats', legacyCatLayout.checked)
     document.body.classList.toggle('cat-mode-active', sceneMode === 'cats' || sceneMode === 'composite')
     catAdjustmentPanel.hidden = sceneMode !== 'cats' && sceneMode !== 'composite'
     sceneModeButtons.forEach((button) => {
@@ -439,9 +438,10 @@
     zoomValue.textContent = `${Math.round(scale * 100)}%`
     const sceneLabel = sceneMode === 'confirmed'
       ? '已确认构图参考'
-      : sceneMode === 'cats' ? '修复后猫咪工位 + 干净场景临时参考'
-        : sceneMode === 'console' ? '三组独立插画点餐台'
-          : sceneMode === 'composite' ? '猫咪工位 + 插画点餐台静态合成' : '中性画布 · 餐盘—牌匾运动单元调试'
+      : sceneMode === 'background' ? '本批审批干净背景'
+        : sceneMode === 'cats' ? '新版猫咪工位 + 审批背景'
+          : sceneMode === 'console' ? '三组审批点餐台插画'
+            : sceneMode === 'composite' ? '审批素材完整静态合成' : '中性画布 · 餐盘—牌匾运动单元调试'
     caption.textContent = viewMode === 'full'
       ? `${sceneLabel} · 3840×1080 全景 · 显示缩放 ${Math.round(scale * 100)}%`
       : viewMode === 'center'
@@ -471,13 +471,18 @@
     signGapValue.textContent = String(signGap)
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
     if (sceneMode === 'cats' || sceneMode === 'composite') {
-      status.textContent = `静态工位合成：${legacyCatLayout.checked ? '修复前摆位对照' : '按桌面接触线调整，柜台前沿从干净场景提取'}；手臂与道具仍是静态图。`
-      unitMetrics.textContent = '4 张静态角色 · 底图 2172×724 等比显示为 3240×1080 · 三组独立点餐台仅供预览'
+      status.textContent = '静态工位合成：四只审批角色按新版工作台接触线摆位；手臂与道具仍是静态图。'
+      unitMetrics.textContent = `4 张 1122×1402 透明角色 · 背景：${interimBackground.checked ? '3840×1080 临时插值增强' : '2365×665 原图等比显示'} · 三组审批点餐台仅供预览`
       return
     }
     if (sceneMode === 'console') {
       status.textContent = '独立透明插画点餐台：按钮文字与点击区域由 DOM 叠加；点击仅反馈 mock 事件。'
-      unitMetrics.textContent = '左 827×217 · 中 790×217 · 右 827×217 · 3840×1080 逻辑画布'
+      unitMetrics.textContent = '三张 2172×724 原图 · 各等比显示 960×320 · 3840×1080 逻辑画布'
+      return
+    }
+    if (sceneMode === 'background') {
+      status.textContent = `本批审批干净背景：${interimBackground.checked ? '临时 3840×1080 插值增强' : '2365×665 原图等比放大'}；请用 100% 局部检查清晰度。`
+      unitMetrics.textContent = '保留原始图片 · 增强图只是插值预览，不是原生 3840 高清绘画。'
       return
     }
     const reduceNotice = effectiveReducedMotion() ? ' 减少动态模式：自动运动已停，盘子静态分布。' : ''
@@ -509,7 +514,14 @@
   }))
   showGuides.addEventListener('change', () => canvas.classList.toggle('guides-hidden', !showGuides.checked))
   businessOverlay.addEventListener('change', updateViewport)
-  legacyCatLayout.addEventListener('change', () => { renderCats(); updateViewport(); updateMotionControls() })
+  interimBackground.addEventListener('change', () => {
+    const path = interimBackground.checked
+      ? '../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png'
+      : '../images/ui/sakura-cat-sushi/background/sakura-shop-clean-source.png'
+    cleanSceneImage.src = path
+    occluderImages.forEach((image) => { image.src = path })
+    updateMotionControls()
+  })
   illustratedConsole.addEventListener('click', (event) => {
     const button = event.target.closest('[data-preview-action]')
     if (!button) return
@@ -595,11 +607,11 @@
   reduceMedia.addEventListener?.('change', updateMotionControls)
   const reportCleanSceneLoaded = () => {
     const ratio = cleanSceneImage.naturalWidth / cleanSceneImage.naturalHeight
-    cleanSceneStatus.textContent = `干净场景已加载：${cleanSceneImage.naturalWidth}×${cleanSceneImage.naturalHeight} · ${ratio.toFixed(3)}:1 原比例 · 本地临时参考`
+    cleanSceneStatus.textContent = `审批背景已加载：${cleanSceneImage.naturalWidth}×${cleanSceneImage.naturalHeight} · ${ratio.toFixed(3)}:1 原比例 · ${interimBackground.checked ? '插值增强预览' : '原始图等比预览'}`
     cleanSceneStatus.classList.remove('is-error')
   }
   const reportCleanSceneError = () => {
-    cleanSceneStatus.textContent = '干净场景临时文件未加载。请将已验收 background_clean_approved.png 解压到仓库根目录 .visual-review/themev3-phase03b2/。'
+    cleanSceneStatus.textContent = '审批背景未加载：请检查本批 background/ 图片是否已导入。'
     cleanSceneStatus.classList.add('is-error')
   }
   cleanSceneImage.addEventListener('load', reportCleanSceneLoaded)
