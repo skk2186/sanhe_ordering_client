@@ -351,6 +351,9 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 
 /* Phase 03B-3: approved raster art is positioned without changing its aspect ratio. */
 .clean-scene-reference { left: 0; width: 3840px; height: auto; object-fit: contain; }
+.cook-worktop-inset { display: none; position: absolute; z-index: 4; left: 2820px; top: 300px; width: 580px; height: auto; pointer-events: none; -webkit-mask-image: radial-gradient(ellipse 55% 55% at center, #000 45%, transparent 90%); mask-image: radial-gradient(ellipse 55% 55% at center, #000 45%, transparent 90%); }
+.scene-mode-cats .cook-worktop-inset,
+.scene-mode-composite .cook-worktop-inset { display: block; }
 .scene-mode-background .clean-scene-reference { display: block; }
 .scene-mode-background .confirmed-composition,
 .scene-mode-background .side-extension,
@@ -360,10 +363,10 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .scene-mode-background .debug-only { display: none !important; }
 .scene-mode-cats .side-extension,
 .scene-mode-composite .side-extension { display: none; }
-.workstation-occluder { display: none; position: absolute; z-index: 19; top: 575px; height: 75px; overflow: hidden; pointer-events: none; }
+.workstation-occluder { display: none; position: absolute; z-index: 19; top: 620px; height: 75px; overflow: hidden; pointer-events: none; }
 .workstation-occluder--plate { left: 990px; width: 460px; }
 .workstation-occluder--serve { left: 2350px; width: 470px; }
-.workstation-occluder img { position: absolute; left: 0; top: -575px; width: 3840px; height: auto; max-width: none; transform: translateX(calc(-1 * var(--occluder-left))); }
+.workstation-occluder img { position: absolute; left: 0; top: -620px; width: 3840px; height: auto; max-width: none; transform: translateX(calc(-1 * var(--occluder-left))); }
 .workstation-occluder--plate { --occluder-left: 990px; }
 .workstation-occluder--serve { --occluder-left: 2350px; }
 .scene-mode-cats .workstation-occluder,
@@ -394,13 +397,13 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .scene-check-guide, .scene-contact-line { display: none; position: absolute; pointer-events: none; z-index: 32; }
 .scene-check-guide { left: 30px; width: 3780px; padding: 5px 9px; border: 3px dashed #7de6dd; background: rgba(35, 201, 188, .08); color: #fff; font: 800 22px/1.2 "Microsoft YaHei UI", sans-serif; text-shadow: 0 1px 3px #30231f; }
 .scene-check-guide--top { top: 0; height: 190px; }
-.scene-check-guide--work { top: 250px; height: 330px; }
+.scene-check-guide--work { top: 250px; height: 420px; }
 .scene-check-guide--bottom { top: 740px; height: 340px; }
 .scene-contact-line { height: 0; border-top: 4px dashed #ffed70; }
-.scene-contact-line--cut { left: 385px; top: 546px; width: 470px; }
-.scene-contact-line--plate { left: 990px; top: 575px; width: 460px; }
-.scene-contact-line--serve { left: 2350px; top: 575px; width: 470px; }
-.scene-contact-line--cook { left: 2890px; top: 516px; width: 525px; }
+.scene-contact-line--cut { left: 385px; top: 551px; width: 470px; }
+.scene-contact-line--plate { left: 990px; top: 620px; width: 460px; }
+.scene-contact-line--serve { left: 2350px; top: 620px; width: 470px; }
+.scene-contact-line--cook { left: 2890px; top: 522px; width: 525px; }
 .scene-mode-cats:not(.guides-hidden) .scene-check-guide,
 .scene-mode-composite:not(.guides-hidden) .scene-check-guide,
 .scene-mode-cats:not(.guides-hidden) .scene-contact-line,

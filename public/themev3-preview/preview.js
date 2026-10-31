@@ -32,23 +32,23 @@
   const CAT_STATIONS = [
     {
       id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-approved.png',
-      x: 600, y: 575, scale: 0.30, z: 22,
-      note: '审批切菜猫组件顺时针 3°；砧板四脚与左桌面长边对齐。'
+      x: 600, y: 585, scale: 0.30, z: 22,
+      note: '切菜猫工作组顺时针 6°，砧板前缘与左桌面长边平行，四脚落在桌面内。'
     },
     {
       id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png',
-      x: 1230, y: 625, scale: 0.28, z: 23,
-      note: '按红箭头下移至左侧前方操作位，前台口遮住下身，保留双臂和寿司盘。'
+      x: 1230, y: 665, scale: 0.28, z: 23,
+      note: '站位靠近左台口前缘；台面可见纵深缩短，前沿遮住下身，保留双臂和寿司盘。'
     },
     {
       id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-approved.png',
-      x: 2570, y: 625, scale: 0.28, z: 23,
-      note: '按红箭头下移至右侧前方操作位，并镜像使端菜方向朝向中央。'
+      x: 2570, y: 665, scale: 0.28, z: 23,
+      note: '站位靠近右台口前缘；镜像后向中央端碗，为向前递菜留出动作空间。'
     },
     {
       id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-recessed.png',
-      x: 3075, y: 560, scale: 0.29, z: 24,
-      note: '由审批图局部去除独立炉台与便携灶框，锅与火叠合新版背景原有灶位。'
+      x: 3075, y: 595, scale: 0.29, z: 24,
+      note: '锅与火压在局部嵌入式灶眼上，猫身完整站在后厨操作台后方。'
     }
   ]
 
@@ -336,7 +336,7 @@
       image.style.width = `${width}px`
       image.style.zIndex = String(cat.z)
       image.style.transform = cat.id === 'cat01'
-        ? 'translate(-50%, -100%) rotate(3deg)'
+        ? 'translate(-50%, -100%) rotate(6deg)'
         : cat.id === 'cat03'
           ? 'translate(-50%, -100%) scaleX(-1)'
           : 'translate(-50%, -100%)'

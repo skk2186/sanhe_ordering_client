@@ -80,6 +80,7 @@
             <div class="side-extension side-extension--left"><span>原图未覆盖区 · 非构图</span></div>
             <div class="side-extension side-extension--right"><span>原图未覆盖区 · 非构图</span></div>
             <img id="clean-scene-reference" class="clean-scene-reference" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="已审批干净场景的临时插值增强版，3840×1080；原图为2365×665，不是原生高清重绘。" draggable="false" />
+            <img class="cook-worktop-inset" src="../images/ui/sakura-cat-sushi/background/cook-worktop-inset-s.png" alt="" aria-hidden="true" draggable="false" />
             <img class="confirmed-composition" src="./confirmed-composition.png" alt="用户确认的樱花猫咪寿司屋构图参考，原始 2048×768 图片，保持比例展示，不是正式母背景。" draggable="false" />
             <div class="source-outline debug-only" aria-hidden="true"><span>用户确认原图 2048×768 · 等比放置 2880×1080 · 非正式运行素材</span></div>
 
@@ -137,27 +138,27 @@
             <div class="workstation-occluder workstation-occluder--serve" aria-hidden="true"><img src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /></div>
             <div class="illustrated-console" aria-label="三组独立插画点餐台预览；交互仅显示 mock 反馈">
               <section class="illustrated-cart illustrated-cart--left" aria-label="左购物盘">
-                <img src="../images/ui/sakura-cat-sushi/cart/cart-left-approved.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-left-matte.png" alt="" draggable="false" />
                 <button class="illustrated-order illustrated-order--left" type="button" data-preview-action="左侧下单">下单<span>0/4</span></button>
                 <div class="illustrated-slots illustrated-slots--left">
                   <button type="button" data-preview-action="左侧槽位 1" aria-label="左侧购物盘槽位 1"></button><button type="button" data-preview-action="左侧槽位 2" aria-label="左侧购物盘槽位 2"></button><button type="button" data-preview-action="左侧槽位 3" aria-label="左侧购物盘槽位 3"></button><button type="button" data-preview-action="左侧槽位 4" aria-label="左侧购物盘槽位 4"></button>
                 </div>
               </section>
               <section class="illustrated-center" aria-label="中央功能台">
-                <img src="../images/ui/sakura-cat-sushi/console/console-center-approved.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/console/console-center-matte.png" alt="" draggable="false" />
                 <button class="illustrated-menu illustrated-menu--left" type="button" data-preview-action="左侧商品菜单"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/cat.png" alt="" /><span class="menu-button-label">打开<br />商品<br />菜单</span></button>
                 <div class="illustrated-functions"><button type="button" data-preview-action="寿司导航"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/sushi.png" alt="" /><span>寿司导航</span></button><button type="button" data-preview-action="点餐记录"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/record.png" alt="" /><span>点餐记录</span></button><button type="button" data-preview-action="设置变更"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/settings.png" alt="" /><span>设置变更</span></button><button type="button" data-preview-action="呼叫店员"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/bell.png" alt="" /><span>呼叫店员</span></button></div>
                 <button class="illustrated-menu illustrated-menu--right" type="button" data-preview-action="右侧商品菜单"><img class="console-icon" src="../images/ui/sakura-cat-sushi/console/icons/cat.png" alt="" /><span class="menu-button-label">打开<br />商品<br />菜单</span></button>
               </section>
               <section class="illustrated-cart illustrated-cart--right" aria-label="右购物盘">
-                <img src="../images/ui/sakura-cat-sushi/cart/cart-right-approved.png" alt="" draggable="false" />
+                <img src="../images/ui/sakura-cat-sushi/cart/cart-right-matte.png" alt="" draggable="false" />
                 <button class="illustrated-order illustrated-order--right" type="button" data-preview-action="右侧下单">下单<span>0/4</span></button>
                 <div class="illustrated-slots illustrated-slots--right"><button type="button" data-preview-action="右侧槽位 1" aria-label="右侧购物盘槽位 1"></button><button type="button" data-preview-action="右侧槽位 2" aria-label="右侧购物盘槽位 2"></button><button type="button" data-preview-action="右侧槽位 3" aria-label="右侧购物盘槽位 3"></button><button type="button" data-preview-action="右侧槽位 4" aria-label="右侧购物盘槽位 4"></button></div>
               </section>
             </div>
             <div id="cat-placement-guides" class="cat-placement-guides debug-only" aria-hidden="true"></div>
             <div class="scene-check-guide scene-check-guide--top" aria-hidden="true">顶部信息安全区</div>
-            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 前方台口接触线 y≈575</div>
+            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 前方台口接触线 y≈620</div>
             <div class="scene-check-guide scene-check-guide--bottom" aria-hidden="true">底部点餐台预留与点击区</div>
             <div class="scene-contact-line scene-contact-line--cut" aria-hidden="true"></div>
             <div class="scene-contact-line scene-contact-line--plate" aria-hidden="true"></div>
@@ -176,11 +177,11 @@
         </article>
         <article>
           <h2>猫咪工位</h2>
-          <p>摆盘和端菜猫按红箭头移至前方操作位，台口遮挡下身；端菜猫朝中央端碗。切菜猫局部顺时针微调，炒菜猫使用由审批图局部去除独立炉台的版本，叠合背景原有灶位。</p>
+          <p>切菜猫组件顺时针调整到砧板与桌边平行；摆盘和端菜猫贴近前方台口。炒菜猫与局部嵌入式灶位共用工作台，锅、火和灶眼直接接触。</p>
         </article>
         <article>
           <h2>底部插画点餐台</h2>
-          <p>左购物盘、中央功能台、右购物盘分别为 2172×724 审批透明 PNG，各以 1020×340 等比显示。中央六按钮图标从已确认构图提取，与原生 DOM 文字排版；预览点击只返回 mock 反馈。</p>
+          <p>三组点餐台沿用审批插画的结构，以减纹样、减高光的独立 PNG 等比显示；中央六按钮继续使用从确认构图提取的图标与原生 DOM 文字。</p>
         </article>
         <article>
           <h2>交付边界</h2>
