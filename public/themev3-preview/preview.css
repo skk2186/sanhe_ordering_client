@@ -52,7 +52,7 @@ body { margin: 0; min-width: 320px; }
 .plate-size-control { display: grid; grid-template-columns: auto auto auto; column-gap: 5px; align-items: center; font-size: 12px; white-space: nowrap; }
 .plate-size-control input { grid-column: 1 / -1; width: 130px; accent-color: #914e44; }
 .plate-size-control output, #zoom-value { font-weight: 800; }
-.local-controls { align-items: center; }
+.local-controls { align-items: center; flex-wrap: wrap; }
 #zoom-value { min-width: 42px; text-align: center; font-size: 12px; }
 .live-status { grid-column: 1 / -1; margin: -7px 0 0; color: #735c4e; font-size: 11px; }
 .unit-metrics { grid-column: 1 / -1; margin: -12px 0 0; color: #765b48; font-size: 11px; }
@@ -351,9 +351,12 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 
 /* Phase 03B-3: approved raster art is positioned without changing its aspect ratio. */
 .clean-scene-reference { left: 0; width: 3840px; height: auto; object-fit: contain; }
-.cook-worktop-inset { display: none; position: absolute; z-index: 4; left: 2820px; top: 300px; width: 580px; height: auto; pointer-events: none; -webkit-mask-image: radial-gradient(ellipse 55% 55% at center, #000 45%, transparent 90%); mask-image: radial-gradient(ellipse 55% 55% at center, #000 45%, transparent 90%); }
-.scene-mode-cats .cook-worktop-inset,
-.scene-mode-composite .cook-worktop-inset { display: block; }
+.worktop-refinement { display: none; position: absolute; z-index: 4; height: auto; pointer-events: none; }
+.worktop-refinement--plate { left: 900px; top: 330px; width: 620px; }
+.worktop-refinement--serve { left: 2280px; top: 330px; width: 620px; }
+.worktop-refinement--cook { left: 2770px; top: 280px; width: 730px; }
+.scene-mode-cats .worktop-refinement,
+.scene-mode-composite .worktop-refinement { display: block; }
 .scene-mode-background .clean-scene-reference { display: block; }
 .scene-mode-background .confirmed-composition,
 .scene-mode-background .side-extension,
@@ -366,7 +369,10 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .workstation-occluder { display: none; position: absolute; z-index: 19; top: 620px; height: 75px; overflow: hidden; pointer-events: none; }
 .workstation-occluder--plate { left: 990px; width: 460px; }
 .workstation-occluder--serve { left: 2350px; width: 470px; }
-.workstation-occluder img { position: absolute; left: 0; top: -620px; width: 3840px; height: auto; max-width: none; transform: translateX(calc(-1 * var(--occluder-left))); }
+.workstation-occluder .occluder-background { position: absolute; left: 0; top: -620px; width: 3840px; height: auto; max-width: none; transform: translateX(calc(-1 * var(--occluder-left))); }
+.workstation-occluder .worktop-occlusion-patch { position: absolute; top: -290px; width: 620px; height: 370px; max-width: none; }
+.workstation-occluder--plate .worktop-occlusion-patch { left: -90px; }
+.workstation-occluder--serve .worktop-occlusion-patch { left: -70px; }
 .workstation-occluder--plate { --occluder-left: 990px; }
 .workstation-occluder--serve { --occluder-left: 2350px; }
 .scene-mode-cats .workstation-occluder,

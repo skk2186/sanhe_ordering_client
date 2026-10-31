@@ -32,23 +32,23 @@
   const CAT_STATIONS = [
     {
       id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-approved.png',
-      x: 600, y: 585, scale: 0.30, z: 22,
-      note: '切菜猫工作组顺时针 6°，砧板前缘与左桌面长边平行，四脚落在桌面内。'
+      x: 600, y: 585, scale: 0.30, rotation: 11.5, z: 22,
+      note: '按红、蓝箭头夹角约 5.5° 校准：工作组由 6° 顺时针调到 11.5°，砧板长边顺着桌面长边。'
     },
     {
       id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png',
-      x: 1230, y: 665, scale: 0.28, z: 23,
-      note: '站位靠近左台口前缘；台面可见纵深缩短，前沿遮住下身，保留双臂和寿司盘。'
+      x: 1230, y: 630, scale: 0.28, z: 23,
+      note: '按红线回到左侧窄台面后方；下身由台口遮挡，头、双手与寿司盘完整可见。'
     },
     {
       id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-approved.png',
-      x: 2570, y: 665, scale: 0.28, z: 23,
-      note: '站位靠近右台口前缘；镜像后向中央端碗，为向前递菜留出动作空间。'
+      x: 2670, y: 640, scale: 0.27, z: 23,
+      note: '按红箭头靠近后厨台面右缘；保持朝中央端碗，左侧留出配菜器皿。'
     },
     {
       id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-recessed.png',
-      x: 3075, y: 595, scale: 0.29, z: 24,
-      note: '锅与火压在局部嵌入式灶眼上，猫身完整站在后厨操作台后方。'
+      x: 3090, y: 625, scale: 0.29, z: 24,
+      note: '整体向前贴近传送带；锅与火落在低位木台的嵌入式灶眼上。'
     }
   ]
 
@@ -63,7 +63,7 @@
   const cleanSceneImage = document.querySelector('#clean-scene-reference')
   const cleanSceneStatus = document.querySelector('#clean-scene-status')
   const interimBackground = document.querySelector('#interim-background')
-  const occluderImages = [...document.querySelectorAll('.workstation-occluder img')]
+  const occluderImages = [...document.querySelectorAll('.workstation-occluder .occluder-background')]
   const routePath = document.querySelector('#route-path')
   const controlPointRoot = document.querySelector('#control-points')
   const showGuides = document.querySelector('#show-guides')
@@ -305,6 +305,7 @@
       addCatRange(card, cat, 'x', 'X 脚底锚点', 300, 3540, 10)
       addCatRange(card, cat, 'y', 'Y 脚底锚点', 120, 820, 5)
       addCatRange(card, cat, 'scale', '缩放', 0.15, 0.38, 0.01, 2)
+      if (cat.id === 'cat01') addCatRange(card, cat, 'rotation', '工作组顺时针角度', 0, 20, 0.5, 1)
       addCatRange(card, cat, 'z', '层级', 18, 40, 1)
       const visibleLabel = document.createElement('label')
       visibleLabel.className = 'cat-visible-control'
@@ -336,7 +337,7 @@
       image.style.width = `${width}px`
       image.style.zIndex = String(cat.z)
       image.style.transform = cat.id === 'cat01'
-        ? 'translate(-50%, -100%) rotate(6deg)'
+        ? `translate(-50%, -100%) rotate(${cat.rotation}deg)`
         : cat.id === 'cat03'
           ? 'translate(-50%, -100%) scaleX(-1)'
           : 'translate(-50%, -100%)'
@@ -574,7 +575,10 @@
     const targets = {
       plate: { x: 1920 + (signGap + SIGN_WIDTH) / 2, y: 577 },
       curve: { x: 1920, y: 570 },
-      cats: { x: 1050, y: 350 },
+      cut: { x: 600, y: 440 },
+      plating: { x: 1230, y: 450 },
+      serving: { x: 2670, y: 450 },
+      cooking: { x: 3090, y: 450 },
       console: { x: 1920, y: 970 }
     }
     const target = targets[button.dataset.focus]
