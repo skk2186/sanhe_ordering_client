@@ -85,7 +85,7 @@
             <img id="clean-scene-reference" class="clean-scene-reference" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="已审批干净场景的临时插值增强版，3840×1080；原图为2365×665，不是原生高清重绘。" draggable="false" />
             <img class="worktop-refinement worktop-refinement--plate" src="../images/ui/sakura-cat-sushi/background/plate-worktop-narrow.png" alt="" aria-hidden="true" draggable="false" />
             <img class="worktop-refinement worktop-refinement--serve" src="../images/ui/sakura-cat-sushi/background/serve-worktop-edge.png" alt="" aria-hidden="true" draggable="false" />
-            <img class="worktop-refinement worktop-refinement--cook" src="../images/ui/sakura-cat-sushi/background/cook-worktop-forward.png" alt="" aria-hidden="true" draggable="false" />
+            <img class="worktop-refinement worktop-refinement--cook" src="../images/ui/sakura-cat-sushi/background/cook-worktop-linked.png" alt="" aria-hidden="true" draggable="false" />
             <img class="confirmed-composition" src="./confirmed-composition.png" alt="用户确认的樱花猫咪寿司屋构图参考，原始 2048×768 图片，保持比例展示，不是正式母背景。" draggable="false" />
             <div class="source-outline debug-only" aria-hidden="true"><span>用户确认原图 2048×768 · 等比放置 2880×1080 · 非正式运行素材</span></div>
 
@@ -141,6 +141,8 @@
             <div id="static-cats" class="static-cats" role="group" aria-label="四只已验收静态猫咪角色"></div>
             <div class="workstation-occluder workstation-occluder--plate" aria-hidden="true"><img class="occluder-background" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /><img class="worktop-occlusion-patch" src="../images/ui/sakura-cat-sushi/background/plate-worktop-narrow.png" alt="" draggable="false" /></div>
             <div class="workstation-occluder workstation-occluder--serve" aria-hidden="true"><img class="occluder-background" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /><img class="worktop-occlusion-patch" src="../images/ui/sakura-cat-sushi/background/serve-worktop-edge.png" alt="" draggable="false" /></div>
+            <img class="cook-worktop-front" src="../images/ui/sakura-cat-sushi/background/cook-worktop-front.png" alt="" aria-hidden="true" draggable="false" />
+            <img id="cook-wok-foreground" class="cook-wok-foreground" src="../images/ui/sakura-cat-sushi/cats/cat04-wok-foreground.png" alt="" aria-hidden="true" draggable="false" />
             <div class="illustrated-console" aria-label="三组独立插画点餐台预览；交互仅显示 mock 反馈">
               <section class="illustrated-cart illustrated-cart--left" aria-label="左购物盘">
                 <img src="../images/ui/sakura-cat-sushi/cart/cart-left-matte.png" alt="" draggable="false" />
@@ -163,7 +165,7 @@
             </div>
             <div id="cat-placement-guides" class="cat-placement-guides debug-only" aria-hidden="true"></div>
             <div class="scene-check-guide scene-check-guide--top" aria-hidden="true">顶部信息安全区</div>
-            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 前方台口接触线 y≈620</div>
+            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 摆盘后沿 y≈565／端菜后沿 y≈575</div>
             <div class="scene-check-guide scene-check-guide--bottom" aria-hidden="true">底部点餐台预留与点击区</div>
             <div class="scene-contact-line scene-contact-line--cut" aria-hidden="true"></div>
             <div class="scene-contact-line scene-contact-line--plate" aria-hidden="true"></div>
@@ -182,7 +184,7 @@
         </article>
         <article>
           <h2>猫咪工位</h2>
-          <p>依据四张标注图校准：切菜板顺着桌面长边；摆盘猫在收窄的后厨台面后；端菜猫靠台面右缘；炒菜猫和低位灶台贴近传送带。局部桌面只增加少量料理器皿。</p>
+          <p>猫咪与对应工位一起校准：切菜猫保持直立、砧板顺桌边；摆盘和端菜猫由台面后沿遮住下身；炒菜猫站在低位木台后，锅与火在台前的嵌入灶眼上。</p>
         </article>
         <article>
           <h2>底部插画点餐台</h2>
