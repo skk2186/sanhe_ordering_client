@@ -10,14 +10,15 @@
   <body>
     <header class="prototype-header">
       <div class="heading">
-        <p class="eyebrow">THEME V3 · PHASE 03B-3</p>
-        <h1>樱花猫咪寿司屋 · 已审批素材合成检查</h1>
-        <p class="lede">使用本批审批的背景、猫咪和三组点餐台；正式 /display 页面未改动。</p>
+        <p class="eyebrow">THEME V3 · PHASE 03B-3W</p>
+        <h1>樱花猫咪寿司屋 · 设计稿工位重建预览</h1>
+        <p class="lede">以确认设计稿重建四组静态工位，保留旧版对照；新局部素材仍待视觉验收。</p>
       </div>
 
       <div class="controls" aria-label="原型控制">
         <div class="control-group scene-mode-switch" role="group" aria-label="场景模式">
           <button type="button" class="control-button" data-scene-mode="confirmed" aria-pressed="false">已确认构图</button>
+          <button type="button" class="control-button" data-scene-mode="before" aria-pressed="false">上轮工位对照</button>
           <button type="button" class="control-button" data-scene-mode="background" aria-pressed="false">新版背景</button>
           <button type="button" class="control-button" data-scene-mode="cats" aria-pressed="false">新版猫咪工位</button>
           <button type="button" class="control-button" data-scene-mode="console" aria-pressed="false">插画点餐台</button>
@@ -86,6 +87,7 @@
             <img class="worktop-refinement worktop-refinement--plate" src="../images/ui/sakura-cat-sushi/background/plate-worktop-narrow.png" alt="" aria-hidden="true" draggable="false" />
             <img class="worktop-refinement worktop-refinement--serve" src="../images/ui/sakura-cat-sushi/background/serve-worktop-edge.png" alt="" aria-hidden="true" draggable="false" />
             <img class="worktop-refinement worktop-refinement--cook" src="../images/ui/sakura-cat-sushi/background/cook-worktop-linked.png" alt="" aria-hidden="true" draggable="false" />
+            <img class="cook-shelf-repair" src="../images/ui/sakura-cat-sushi/background/cook-shelf-repair-design-w.png" alt="" aria-hidden="true" draggable="false" />
             <img class="confirmed-composition" src="./confirmed-composition.png" alt="用户确认的樱花猫咪寿司屋构图参考，原始 2048×768 图片，保持比例展示，不是正式母背景。" draggable="false" />
             <div class="source-outline debug-only" aria-hidden="true"><span>用户确认原图 2048×768 · 等比放置 2880×1080 · 非正式运行素材</span></div>
 
@@ -138,7 +140,7 @@
             <div class="cat-station cat-station--cook debug-only"><b>炒菜猫</b><span>源图约 x=1610–1880 / y=130–360</span><small>锅铲转轴、锅沿与火/蒸汽分层</small></div>
 
             <div id="moving-plates" class="moving-plates" role="group" aria-label="mock 餐盘与菜品牌匾同步运动调试单元"></div>
-            <div id="static-cats" class="static-cats" role="group" aria-label="四只已验收静态猫咪角色"></div>
+            <div id="static-cats" class="static-cats" role="group" aria-label="四组设计稿衍生静态猫咪工位"></div>
             <div class="workstation-occluder workstation-occluder--plate" aria-hidden="true"><img class="occluder-background" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /><img class="worktop-occlusion-patch" src="../images/ui/sakura-cat-sushi/background/plate-worktop-narrow.png" alt="" draggable="false" /></div>
             <div class="workstation-occluder workstation-occluder--serve" aria-hidden="true"><img class="occluder-background" src="../images/ui/sakura-cat-sushi/background/sakura-shop-clean-3840x1080-INTERIM-upscaled.png" alt="" draggable="false" /><img class="worktop-occlusion-patch" src="../images/ui/sakura-cat-sushi/background/serve-worktop-edge.png" alt="" draggable="false" /></div>
             <img class="cook-worktop-front" src="../images/ui/sakura-cat-sushi/background/cook-worktop-front.png" alt="" aria-hidden="true" draggable="false" />
@@ -165,7 +167,7 @@
             </div>
             <div id="cat-placement-guides" class="cat-placement-guides debug-only" aria-hidden="true"></div>
             <div class="scene-check-guide scene-check-guide--top" aria-hidden="true">顶部信息安全区</div>
-            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 摆盘后沿 y≈565／端菜后沿 y≈575</div>
+            <div class="scene-check-guide scene-check-guide--work" aria-hidden="true">后厨工位 · 角色与台面接触线</div>
             <div class="scene-check-guide scene-check-guide--bottom" aria-hidden="true">底部点餐台预留与点击区</div>
             <div class="scene-contact-line scene-contact-line--cut" aria-hidden="true"></div>
             <div class="scene-contact-line scene-contact-line--plate" aria-hidden="true"></div>
@@ -184,7 +186,7 @@
         </article>
         <article>
           <h2>猫咪工位</h2>
-          <p>猫咪与对应工位一起校准：切菜猫保持直立、砧板顺桌边；摆盘和端菜猫由台面后沿遮住下身；炒菜猫站在低位木台后，锅与火在台前的嵌入灶眼上。</p>
+          <p>切菜猫直立切鱼，三块食材分别落在木台上；摆盘和端菜猫站在窄台后、餐具完整可见；炒菜猫与低位木台、锅火、嵌入灶位绘成同一局部素材。可切换上轮工位逐项对照。</p>
         </article>
         <article>
           <h2>底部插画点餐台</h2>

@@ -380,11 +380,26 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .cook-worktop-front, .cook-wok-foreground { display: none; position: absolute; pointer-events: none; height: auto; max-width: none; }
 .cook-worktop-front { z-index: 19; left: 2770px; top: 280px; width: 730px; }
 .cook-wok-foreground { z-index: 21; }
-.scene-mode-cats .cook-worktop-front,
-.scene-mode-composite .cook-worktop-front,
-.scene-mode-cats .cook-wok-foreground,
-.scene-mode-composite .cook-wok-foreground { display: block; }
 .cook-wok-foreground[hidden] { display: none !important; }
+
+/* The previous station composite remains available for direct visual comparison. */
+.scene-mode-before .clean-scene-reference,
+.scene-mode-before .worktop-refinement,
+.scene-mode-before .static-cats,
+.scene-mode-before .workstation-occluder,
+.scene-mode-before .cook-worktop-front,
+.scene-mode-before .cook-wok-foreground,
+.scene-mode-before .illustrated-console { display: block; }
+.scene-mode-before .confirmed-composition,
+.scene-mode-before .side-extension,
+.scene-mode-before .moving-plates,
+.scene-mode-before .debug-only { display: none !important; }
+.scene-mode-before::after { display: none; }
+.scene-mode-cats .worktop-refinement--cook,
+.scene-mode-composite .worktop-refinement--cook { display: none; }
+.cook-shelf-repair { display: none; position: absolute; z-index: 5; left: 2770px; top: 280px; width: 730px; height: 410px; pointer-events: none; mask-image: radial-gradient(ellipse 170px 120px at 47% 44%, #000 66%, transparent 100%); }
+.scene-mode-cats .cook-shelf-repair,
+.scene-mode-composite .cook-shelf-repair { display: block; }
 
 .illustrated-cart, .illustrated-center { top: 740px; width: 1020px; height: 340px; }
 .illustrated-cart--left { left: 360px; }
@@ -414,10 +429,10 @@ main { padding: 12px clamp(8px, 1.2vw, 18px) 28px; }
 .scene-check-guide--work { top: 250px; height: 420px; }
 .scene-check-guide--bottom { top: 740px; height: 340px; }
 .scene-contact-line { height: 0; border-top: 4px dashed #ffed70; }
-.scene-contact-line--cut { left: 385px; top: 551px; width: 470px; }
+.scene-contact-line--cut { left: 350px; top: 535px; width: 490px; }
 .scene-contact-line--plate { left: 990px; top: 565px; width: 460px; }
 .scene-contact-line--serve { left: 2350px; top: 575px; width: 470px; }
-.scene-contact-line--cook { left: 2890px; top: 550px; width: 525px; }
+.scene-contact-line--cook { left: 2940px; top: 570px; width: 525px; }
 .scene-mode-cats:not(.guides-hidden) .scene-check-guide,
 .scene-mode-composite:not(.guides-hidden) .scene-check-guide,
 .scene-mode-cats:not(.guides-hidden) .scene-contact-line,

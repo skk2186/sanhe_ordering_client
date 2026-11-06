@@ -31,24 +31,28 @@
   const SAMPLES_PER_SEGMENT = 48
   const CAT_STATIONS = [
     {
-      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-upright-board.png',
-      x: 600, y: 585, scale: 0.30, z: 22,
-      note: '猫身保持正立；只重绘砧板、鱼肉与刀手接触区，使砧板顺着左桌面的长边。'
+      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-design-w.png',
+      nativeWidth: 1774, nativeHeight: 887, x: 600, y: 540, scale: 0.345, z: 22,
+      previous: { image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-upright-board.png', nativeWidth: 1122, nativeHeight: 1402, x: 600, y: 585, scale: 0.30 },
+      note: '按设计稿重绘正立切菜姿态；刀、双爪、鱼肉和水平砧板同组，砧板落在左侧木台上。'
     },
     {
-      id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png',
-      x: 1230, y: 645, scale: 0.28, z: 23,
-      note: '猫与窄台面一起前靠；台面后沿从 y=565 遮住下半身，双手与寿司盘在台面上方。'
+      id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-design-w.png',
+      nativeWidth: 1415, nativeHeight: 1112, x: 1230, y: 600, scale: 0.29, z: 23,
+      previous: { image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png', nativeWidth: 1122, nativeHeight: 1402, x: 1230, y: 645, scale: 0.28 },
+      note: '按设计稿重绘持单贯寿司的双手和完整腰身；后厨窄台前缘遮住下身，台面小食材留在左侧。'
     },
     {
-      id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-approved.png',
-      x: 2670, y: 655, scale: 0.27, z: 23,
-      note: '靠近右侧窄台面前缘；台面后沿从 y=575 遮住下半身，向中央端碗。'
+      id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-design-w.png',
+      nativeWidth: 1428, nativeHeight: 1101, x: 2620, y: 610, scale: 0.29, z: 23,
+      previous: { image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-approved.png', nativeWidth: 1122, nativeHeight: 1402, x: 2670, y: 655, scale: 0.27, mirror: true },
+      note: '按设计稿重绘向左前方递出大木碗的双手和腰身；猫站在右侧窄台后方。'
     },
     {
-      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-grounded.png',
-      x: 3090, y: 650, scale: 0.29, z: 24,
-      note: '猫身延入低位木台后方；独立锅火前景层压在嵌入灶眼上，左侧让出尾巴空间。'
+      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-workstation-design-w.png',
+      nativeWidth: 1752, nativeHeight: 897, x: 3200, y: 624, scale: 0.40, z: 24,
+      previous: { image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-grounded.png', nativeWidth: 1122, nativeHeight: 1402, x: 3090, y: 650, scale: 0.29 },
+      note: '依据设计稿把猫、低位木台、嵌入灶眼、锅火与蒸汽绘为同一工位；台面前缘自然遮住腰身。'
     }
   ]
 
@@ -279,7 +283,7 @@
       image.className = `static-cat static-cat--${cat.id}`
       image.dataset.catId = cat.id
       image.src = cat.image
-      image.alt = `${cat.name}静态角色素材，1122×1402透明 PNG；当前手臂与道具未拆分。`
+      image.alt = `${cat.name}静态工位角色素材，透明 PNG；当前手臂与道具未拆分。`
       image.draggable = false
       image.title = cat.note
       catsRoot.append(image)
@@ -305,7 +309,7 @@
       card.append(note)
       addCatRange(card, cat, 'x', 'X 脚底锚点', 300, 3540, 10)
       addCatRange(card, cat, 'y', 'Y 脚底锚点', 120, 820, 5)
-      addCatRange(card, cat, 'scale', '缩放', 0.15, 0.38, 0.01, 2)
+      addCatRange(card, cat, 'scale', '缩放', 0.15, 0.50, 0.01, 2)
       addCatRange(card, cat, 'z', '层级', 18, 40, 1)
       const visibleLabel = document.createElement('label')
       visibleLabel.className = 'cat-visible-control'
@@ -325,27 +329,28 @@
   }
 
   const renderCats = () => {
+    const before = sceneMode === 'before'
     CAT_STATIONS.forEach((station) => {
       const cat = catState.get(station.id)
-      const { x, y, scale } = cat
+      const pose = before ? cat.previous : cat
+      const { x, y, scale } = pose
       const image = catsRoot.querySelector(`[data-cat-id="${cat.id}"]`)
       const guide = catGuidesRoot.querySelector(`[data-cat-id="${cat.id}"]`)
-      const width = 1122 * scale
-      const height = 1402 * scale
+      const width = pose.nativeWidth * scale
+      const height = pose.nativeHeight * scale
+      if (image.getAttribute('src') !== pose.image) image.src = pose.image
       image.style.left = `${x}px`
       image.style.top = `${y}px`
       image.style.width = `${width}px`
       image.style.zIndex = String(cat.z)
-      image.style.transform = cat.id === 'cat03'
-          ? 'translate(-50%, -100%) scaleX(-1)'
-          : 'translate(-50%, -100%)'
+      image.style.transform = pose.mirror ? 'translate(-50%, -100%) scaleX(-1)' : 'translate(-50%, -100%)'
       image.hidden = !cat.visible
       if (cat.id === 'cat04') {
         cookWokForeground.style.left = `${x}px`
         cookWokForeground.style.top = `${y}px`
         cookWokForeground.style.width = `${width}px`
         cookWokForeground.style.transform = 'translate(-50%, -100%)'
-        cookWokForeground.hidden = !cat.visible
+        cookWokForeground.hidden = !before || !cat.visible
       }
       guide.style.left = `${x}px`
       guide.style.top = `${y}px`
@@ -438,8 +443,9 @@
     canvas.classList.toggle('scene-mode-cats', sceneMode === 'cats')
     canvas.classList.toggle('scene-mode-console', sceneMode === 'console')
     canvas.classList.toggle('scene-mode-composite', sceneMode === 'composite')
-    document.body.classList.toggle('cat-mode-active', sceneMode === 'cats' || sceneMode === 'composite')
+    document.body.classList.toggle('cat-mode-active', sceneMode === 'cats' || sceneMode === 'composite' || sceneMode === 'before')
     catAdjustmentPanel.hidden = sceneMode !== 'cats' && sceneMode !== 'composite'
+    renderCats()
     sceneModeButtons.forEach((button) => {
       const active = button.dataset.sceneMode === sceneMode
       button.classList.toggle('is-active', active)
@@ -449,7 +455,8 @@
     zoomValue.textContent = `${Math.round(scale * 100)}%`
     const sceneLabel = sceneMode === 'confirmed'
       ? '已确认构图参考'
-      : sceneMode === 'background' ? '本批审批干净背景'
+      : sceneMode === 'before' ? '上轮工位对照'
+        : sceneMode === 'background' ? '本批审批干净背景'
         : sceneMode === 'cats' ? '新版猫咪工位 + 审批背景'
           : sceneMode === 'console' ? '三组审批点餐台插画'
             : sceneMode === 'composite' ? '审批素材完整静态合成' : '中性画布 · 餐盘—牌匾运动单元调试'
@@ -481,9 +488,11 @@
     signGapValue.value = String(signGap)
     signGapValue.textContent = String(signGap)
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
-    if (sceneMode === 'cats' || sceneMode === 'composite') {
-      status.textContent = '静态工位合成：四只审批角色按新版工作台接触线摆位；手臂与道具仍是静态图。'
-      unitMetrics.textContent = `4 张 1122×1402 透明角色 · 背景：${interimBackground.checked ? '3840×1080 临时插值增强' : '2365×665 原图等比显示'} · 三组审批点餐台仅供预览`
+    if (sceneMode === 'cats' || sceneMode === 'composite' || sceneMode === 'before') {
+      status.textContent = sceneMode === 'before'
+        ? '上轮工位对照：用于逐只猫查看修复前的身体、台面与锅灶关系。'
+        : '设计稿工位合成：四只角色、道具和对应台面按接触线摆位；动作仍是静态图。'
+      unitMetrics.textContent = `4 组透明角色与工位插画 · 背景：${interimBackground.checked ? '3840×1080 临时插值增强' : '2365×665 原图等比显示'} · 三组点餐台仅供预览`
       return
     }
     if (sceneMode === 'console') {
@@ -582,8 +591,8 @@
       curve: { x: 1920, y: 570 },
       cut: { x: 600, y: 440 },
       plating: { x: 1230, y: 450 },
-      serving: { x: 2670, y: 450 },
-      cooking: { x: 3090, y: 450 },
+      serving: { x: 2620, y: 450 },
+      cooking: { x: 3200, y: 450 },
       console: { x: 1920, y: 970 }
     }
     const target = targets[button.dataset.focus]
