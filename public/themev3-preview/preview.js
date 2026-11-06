@@ -31,16 +31,16 @@
   const SAMPLES_PER_SEGMENT = 48
   const CAT_STATIONS = [
     {
-      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-design-w.png',
-      nativeWidth: 1774, nativeHeight: 887, x: 600, y: 540, scale: 0.345, z: 22,
+      id: 'cat01', name: '切菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-parallel-x.png',
+      nativeWidth: 1630, nativeHeight: 965, x: 600, y: 550, scale: 0.345, z: 22,
       previous: { image: '../images/ui/sakura-cat-sushi/cats/cat01-cut-upright-board.png', nativeWidth: 1122, nativeHeight: 1402, x: 600, y: 585, scale: 0.30 },
-      note: '按设计稿重绘正立切菜姿态；刀、双爪、鱼肉和水平砧板同组，砧板落在左侧木台上。'
+      note: '猫身保持直立，双爪和刀贴合砧板；鱼肉与右侧菜品顺下方木台向右下收束，移除原先脱离台面的左侧鱼料板。'
     },
     {
       id: 'cat02', name: '摆盘猫', image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-design-w.png',
-      nativeWidth: 1415, nativeHeight: 1112, x: 1230, y: 600, scale: 0.29, z: 23,
+      nativeWidth: 1415, nativeHeight: 1112, x: 1230, y: 615, scale: 0.29, z: 23,
       previous: { image: '../images/ui/sakura-cat-sushi/cats/cat02-plate-approved.png', nativeWidth: 1122, nativeHeight: 1402, x: 1230, y: 645, scale: 0.28 },
-      note: '按设计稿重绘持单贯寿司的双手和完整腰身；后厨窄台前缘遮住下身，台面小食材留在左侧。'
+      note: '向前贴合窄台后缘，腰身下移到台口背后，由真实木台前缘遮挡；双手与寿司盘仍完整可见。'
     },
     {
       id: 'cat03', name: '端菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat03-serve-design-w.png',
@@ -49,10 +49,10 @@
       note: '按设计稿重绘向左前方递出大木碗的双手和腰身；猫站在右侧窄台后方。'
     },
     {
-      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-workstation-design-w.png',
-      nativeWidth: 1752, nativeHeight: 897, x: 3200, y: 624, scale: 0.40, z: 24,
+      id: 'cat04', name: '炒菜猫', image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-inset-x.png',
+      nativeWidth: 1536, nativeHeight: 1024, x: 3200, y: 550, scale: 0.32, z: 24,
       previous: { image: '../images/ui/sakura-cat-sushi/cats/cat04-cook-grounded.png', nativeWidth: 1122, nativeHeight: 1402, x: 3090, y: 650, scale: 0.29 },
-      note: '依据设计稿把猫、低位木台、嵌入灶眼、锅火与蒸汽绘为同一工位；台面前缘自然遮住腰身。'
+      note: '移除重复桌台，锅与嵌入灶眼落在背景已有的后厨木台上；猫、双手与蒸汽保持同一工位，台面不伸入传送带。'
     }
   ]
 
@@ -455,7 +455,7 @@
     zoomValue.textContent = `${Math.round(scale * 100)}%`
     const sceneLabel = sceneMode === 'confirmed'
       ? '已确认构图参考'
-      : sceneMode === 'before' ? '上轮工位对照'
+      : sceneMode === 'before' ? '历史工位对照'
         : sceneMode === 'background' ? '本批审批干净背景'
         : sceneMode === 'cats' ? '新版猫咪工位 + 审批背景'
           : sceneMode === 'console' ? '三组审批点餐台插画'
@@ -490,7 +490,7 @@
     canvas.classList.toggle('is-reduced-motion', effectiveReducedMotion())
     if (sceneMode === 'cats' || sceneMode === 'composite' || sceneMode === 'before') {
       status.textContent = sceneMode === 'before'
-        ? '上轮工位对照：用于逐只猫查看修复前的身体、台面与锅灶关系。'
+        ? '历史工位对照：保留较早版本的角色、台面与锅灶关系。'
         : '设计稿工位合成：四只角色、道具和对应台面按接触线摆位；动作仍是静态图。'
       unitMetrics.textContent = `4 组透明角色与工位插画 · 背景：${interimBackground.checked ? '3840×1080 临时插值增强' : '2365×665 原图等比显示'} · 三组点餐台仅供预览`
       return
