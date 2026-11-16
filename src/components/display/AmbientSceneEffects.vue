@@ -28,8 +28,6 @@ const EVENT_LIBRARY = {
     { type: 'warmth', duration: 3800, left: 51, top: 47 }
   ],
   zhenxian: [
-    { type: 'foam-sweep', duration: 4200, left: 0, top: 38 },
-    { type: 'surface-shimmer', duration: 3300, left: 24, top: 53 },
     { type: 'fish-shadow', duration: 3600, left: 8, top: 66 }
   ],
   xiaoxin: [
@@ -186,38 +184,6 @@ onUnmounted(() => {
   animation-name: warmth-pulse;
 }
 
-.ambient-event--foam-sweep {
-  left: 0;
-  width: 140vw;
-  height: 32px;
-  transform: translate(-30%, -50%);
-  border-top: 6px solid currentColor;
-  border-radius: 50%;
-  opacity: 0;
-  animation-name: foam-sweep;
-}
-
-.ambient-event--foam-sweep::after {
-  content: '';
-  position: absolute;
-  top: -18px;
-  left: 0;
-  width: 100%;
-  height: 24px;
-  background: radial-gradient(ellipse at center, currentColor 0 17%, transparent 19%) 0 0 / 88px 24px repeat-x;
-  opacity: 0.82;
-}
-
-.ambient-event--surface-shimmer {
-  width: 420px;
-  height: 110px;
-  transform: translate(-50%, -50%) rotate(-4deg);
-  background: linear-gradient(105deg, transparent 16%, rgba(255, 255, 255, 0.9) 46%, transparent 74%);
-  filter: blur(1px) drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
-  opacity: 0;
-  animation-name: shimmer-drift;
-}
-
 .ambient-event--fish-shadow {
   width: 128px;
   height: 46px;
@@ -270,19 +236,6 @@ onUnmounted(() => {
   0%, 100% { opacity: 0; transform: translate(-50%, -50%) scaleX(0.6); }
   42% { opacity: 1; }
   68% { opacity: 0.22; }
-}
-
-@keyframes foam-sweep {
-  0% { opacity: 0; transform: translate(-45%, -50%); }
-  22% { opacity: 0.82; }
-  78% { opacity: 0.68; }
-  100% { opacity: 0; transform: translate(12%, -50%); }
-}
-
-@keyframes shimmer-drift {
-  0% { opacity: 0; transform: translate(-120%, -50%) rotate(-4deg); }
-  35% { opacity: 0.82; }
-  100% { opacity: 0; transform: translate(120%, -50%) rotate(-4deg); }
 }
 
 @keyframes fish-drift {

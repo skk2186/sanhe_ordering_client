@@ -50,10 +50,6 @@
     </header>
 
     <div ref="tideStageRef" class="tide-stage">
-      <div class="tide-current tide-current--back" aria-hidden="true"></div>
-      <div class="tide-current tide-current--middle" aria-hidden="true"></div>
-      <div class="tide-current tide-current--front" aria-hidden="true"></div>
-
       <div
         v-if="streamCycleItems.length"
         ref="streamRef"
@@ -850,11 +846,6 @@ onUnmounted(() => {
   --ink: #073b5d;
 }
 
-.scenic-dish-stage.is-underwater-theme .tide-current::after {
-  opacity: 0.72;
-  filter: hue-rotate(14deg) saturate(0.8);
-}
-
 @keyframes scenic-stage-enter {
   0% {
     opacity: 0;
@@ -959,68 +950,6 @@ onUnmounted(() => {
   inset: 0 0 62px;
   z-index: 2;
   overflow: hidden;
-}
-
-.tide-current {
-  position: absolute;
-  left: -8%;
-  width: 116%;
-  pointer-events: none;
-  border-top: solid rgba(255, 255, 255, 0.82);
-  border-radius: 50%;
-  filter: drop-shadow(0 6px 0 rgba(21, 155, 200, 0.18));
-}
-
-.tide-current::after {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: 0;
-  width: 100%;
-  height: 28px;
-  background: radial-gradient(
-    circle at 50% 100%,
-    transparent 15px,
-    rgba(255, 255, 255, 0.78) 16px 20px,
-    transparent 21px
-  ) 0 0 / 82px 28px repeat-x;
-  animation: foam-drift 12s linear infinite;
-}
-
-.tide-current--back {
-  top: 22%;
-  height: 25%;
-  border-top-width: 7px;
-  opacity: 0.64;
-  transform: rotate(1.4deg);
-}
-
-.tide-current--middle {
-  top: 49%;
-  height: 27%;
-  border-top-width: 10px;
-  opacity: 0.82;
-  transform: rotate(-1.2deg);
-}
-
-.tide-current--middle::after {
-  animation-direction: reverse;
-  animation-duration: 15s;
-}
-
-.tide-current--front {
-  top: 76%;
-  height: 20%;
-  border-top-width: 13px;
-  transform: rotate(1deg);
-}
-
-.is-reversed .tide-current::after {
-  animation-direction: reverse;
-}
-
-.is-reversed .tide-current--middle::after {
-  animation-direction: normal;
 }
 
 .tide-stream {
@@ -1328,14 +1257,8 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
 }
 
-.scenic-dish-stage.is-paused .tide-dish,
-.scenic-dish-stage.is-paused .tide-current::after {
+.scenic-dish-stage.is-paused .tide-dish {
   animation-play-state: paused;
-}
-
-@keyframes foam-drift {
-  from { background-position-x: 0; }
-  to { background-position-x: 164px; }
 }
 
 @keyframes dish-bob {
@@ -1417,10 +1340,6 @@ onUnmounted(() => {
   --chef-tray-dark: #512817;
   --chef-ink: #3b2115;
   --chef-cream: #fff4df;
-}
-
-.scenic-dish-stage.is-chef-theme .tide-current {
-  display: none;
 }
 
 .scenic-dish-stage.is-chef-theme .tide-stage {
@@ -1700,7 +1619,6 @@ onUnmounted(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .tide-dish { animation-duration: 9000ms; }
-  .tide-current::after { animation-duration: 24s; }
 }
 
 /* Ordinary dishes travel on one horizontal lane. Event slots keep their
