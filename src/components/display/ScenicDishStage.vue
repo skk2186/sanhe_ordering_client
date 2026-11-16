@@ -1063,9 +1063,9 @@ onUnmounted(() => {
   .scene-promo-trigger img, .scene-promo-trigger__pulse { animation: none; }
 }
 
-/* The forest stump and bamboo trays share one lower serving lane. */
+/* The stump asset has more transparent space below its visible base than the trays. */
 .scenic-dish-stage.is-forest-theme .tide-slot.is-queue-event {
-  padding-top: clamp(100px, 12vh, 160px);
+  padding-top: clamp(100px, 25vh, 270px);
 }
 
 /* The turtle also travels in the lower underwater lane so its enlarged
@@ -1690,7 +1690,7 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-forest-theme .tide-slot:not(.is-queue-event) {
-  padding-top: clamp(120px, 14vh, 170px);
+  padding-top: clamp(110px, 24vh, 260px);
 }
 
 .scenic-dish-stage .tide-slot:not(.is-queue-event) .tide-dish {

@@ -15,7 +15,7 @@
           <span class="brand-table">TABLE {{ deskNumber }} · {{ deskPeople }} SEATS</span>
         </div>
 
-        <div class="top-progress">
+        <div class="top-progress" :class="{ 'is-forest': activeSceneKey === 'zhenxian' }">
           <TopPlateProgress
             :progress="plateProgress"
             :formatted="formattedProgress"
@@ -1533,6 +1533,10 @@ onUnmounted(() => {
   padding: 0;
   transform: translateX(-50%);
   pointer-events: none;
+}
+
+.top-progress.is-forest {
+  width: min(1080px, calc(100vw - 40px));
 }
 
 .top-progress :deep(.plate-progress) {
