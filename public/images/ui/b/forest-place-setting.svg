@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112">
+ <defs><radialGradient id="ceramic"><stop stop-color="#fffdf4"/><stop offset=".72" stop-color="#fff7e5"/><stop offset="1" stop-color="#e8d9bb"/></radialGradient></defs>
+ <circle cx="56" cy="57" r="53" fill="#c6935e" stroke="#87603f" stroke-width="2"/>
+ <circle cx="56" cy="55" r="48" fill="#eac99d" stroke="#fff0cf" stroke-width="2"/>
+ <g fill="none" stroke="#a77d54" stroke-width="1.3" opacity=".44"><circle cx="56" cy="55" r="44"/><circle cx="56" cy="55" r="41"/></g>
+ <circle cx="56" cy="53" r="39" fill="url(#ceramic)" stroke="#d7bd95" stroke-width="2"/>
+ <circle cx="56" cy="53" r="33" fill="none" stroke="#e5d3ae" stroke-width="1.5"/>
+</svg>

@@ -222,6 +222,17 @@ onMounted(async () => {
   // position, top, left, z-index等由父组件控制
 }
 
+@media (min-width: 769px) and (max-width: 1920px) {
+  [data-theme="zhenxian"] .menu-view-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(1100px, calc(100vw - 32px));
+    height: min(600px, calc(100vh - 32px));
+    transform: translate(-50%, -50%);
+  }
+}
+
 .left-panel {
   width: 200px;
   flex-shrink: 0;

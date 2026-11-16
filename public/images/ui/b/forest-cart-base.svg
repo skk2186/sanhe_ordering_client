@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 827 217">
+ <defs>
+  <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#e9be83"/><stop offset=".5" stop-color="#cf9760"/><stop offset="1" stop-color="#b57949"/></linearGradient>
+  <linearGradient id="top" x2="0" y2="1"><stop stop-color="#fff0d2"/><stop offset="1" stop-color="#eed7aa"/></linearGradient>
+ </defs>
+ <path d="M28 8H799q18 0 18 18v191H10V26Q10 8 28 8Z" fill="url(#wood)" stroke="#855c3b" stroke-width="5"/>
+ <path d="M29 17H798q10 0 10 10v175H19V27q0-10 10-10Z" fill="url(#top)" stroke="#f8dba9" stroke-width="3"/>
+ <path d="M23 195h782M23 28h782" stroke="#b88758" stroke-width="3" opacity=".5"/>
+ <g fill="none" stroke="#a9794e" opacity=".28" stroke-width="2">
+  <path d="M35 12q128 8 244 0t246 0 260 0"/>
+  <path d="M27 207q151-9 305 0t315 0 153 0"/>
+  <path d="M54 41q90 4 185 0m95 0q92-3 161 1m133-1q67 4 135 0"/>
+ </g>
+ <g fill="#9c6d43"><circle cx="32" cy="29" r="3"/><circle cx="795" cy="29" r="3"/><circle cx="32" cy="197" r="3"/><circle cx="795" cy="197" r="3"/></g>
+</svg>

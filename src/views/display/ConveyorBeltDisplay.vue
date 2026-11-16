@@ -1539,6 +1539,10 @@ onUnmounted(() => {
   width: min(1080px, calc(100vw - 40px));
 }
 
+@media (min-width: 769px) and (max-width: 1920px) {
+  .top-progress.is-forest { width: min(540px, calc(100vw - 260px)); }
+}
+
 .top-progress :deep(.plate-progress) {
   width: 100%;
 }

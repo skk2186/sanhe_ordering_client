@@ -10,10 +10,11 @@
     </div>
 
     <div class="item-group" v-if="!tipsType">
-      <div :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting }]" type="button"
+      <div :class="['order-btn', `order-btn-${side}`, { 'is-submitting': submitting, 'is-ready': count > 0, 'is-full': count >= 4 }]" type="button"
           :style="'order: ' + (side ==='left' ? '1' : '0') "
           :aria-label="`${$t('common.placeOrder')}-${side}`" :aria-disabled="submitting"
           :title="$t('common.placeOrder')" @click="!submitting && $emit('place-order', side)">
+        <span class="forest-order-label" aria-hidden="true">下单</span>
         <el-icon v-if="submitting" class="submitting-icon"><Loading /></el-icon>
         <div v-else class="order-progress">{{ count }}/4</div>
       </div>
@@ -191,23 +192,93 @@ const handleTipsClick = () => {
 
 }
 [data-theme="zhenxian"] .cart-section {
-  background: url('/images/ui/b/cart_bg.png') ;
+  background: url('/images/ui/b/forest-cart-base.svg') center / 100% 100% no-repeat;
   .cart-item-left {
-    background: url('/images/ui/b/diezi1.png') ;
+    background: none;
   }
   .cart-item-right {
-    background: url('/images/ui/b/diezi2.png') ;
+    background: none;
   }
   .item-name-area {
-    color: #fff;
+    color: #4e392a;
   }
   .tips-overlay.order_meal {
-    background-image: url('/images/ui/b/order_meal.png');
+    background-image: url('/images/ui/b/forest-tip-order.svg');
   }
   .tips-overlay.out_meal {
-    background-image: url('/images/ui/b/out_meal.png');
+    background-image: url('/images/ui/b/forest-tip-limit.svg');
   }
 
+}
+
+.forest-order-label { display: none; }
+
+[data-theme="zhenxian"] .cart-section {
+  .item-circle {
+    background: url('/images/ui/b/forest-place-setting.svg') center / contain no-repeat;
+    box-shadow: none;
+  }
+  .item-circle.empty-item::after { color: #80674d; opacity: .85; }
+  .item-circle .item-image img { width: 76%; height: 76%; }
+  .item-info {
+    background: #fff3d9;
+    border: 2px solid #ba9569;
+    box-shadow: 0 2px 5px rgba(75, 49, 28, .17);
+  }
+  .item-name-area {
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .item-controls {
+    color: #4e392a;
+    background: #e6d2ae;
+  }
+  .quantity-display { color: #4e392a; font-size: 15px; }
+  .item-controls .minus-btn,
+  .item-controls .plus-btn {
+    width: 22px;
+    height: 22px;
+    color: #4e392a;
+    background: #f9edcf;
+    border: 1px solid #ae8256;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .item-controls .minus-btn:hover:not(:disabled),
+  .item-controls .plus-btn:hover:not(:disabled) { background: #fff8e8; }
+  .item-controls button:disabled { opacity: .43; cursor: not-allowed; }
+  .item-controls .max-quantity { background: #d8c9af; }
+  .circle-close-btn {
+    background: #c8785c;
+    border: 2px solid #fff3d9;
+  }
+  .circle-close-btn:hover { background: #ab604a; }
+  .order-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: url('/images/ui/b/forest-order-sign.svg') center / 100% 100% no-repeat;
+    box-shadow: none;
+  }
+  .order-btn:hover { box-shadow: none; filter: brightness(1.04); }
+  .forest-order-label {
+    display: block;
+    margin-top: 58px;
+    color: #61422f;
+    font-size: 27px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .order-btn.is-ready .forest-order-label { color: #bc684e; }
+  .order-btn.is-full .forest-order-label { color: #6f8c4d; }
+  .order-progress {
+    top: 122px;
+    color: #6d804b;
+    font-size: 24px;
+  }
+  .submitting-icon { margin-top: 21px; color: #6f8c4d; }
 }
 [data-theme="xiaoxin"] .cart-section {
   background: url('/images/ui/c/cart_bg.png') ;
@@ -460,6 +531,15 @@ const handleTipsClick = () => {
       bottom: 18px;
       font-size: 22px;
     }
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1920px) {
+  [data-theme="zhenxian"] .cart-section {
+    .forest-order-label { margin-top: 43px; font-size: 23px; }
+    .order-progress { top: 104px; bottom: auto; font-size: 18px; }
+    .item-controls .minus-btn,
+    .item-controls .plus-btn { width: 19px; height: 19px; font-size: 14px; }
   }
 }
 </style>
