@@ -60,6 +60,7 @@ const assetUrls = computed(() => {
 }
 
 .plate-progress.is-forest {
+  aspect-ratio: 941 / 144;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -119,19 +120,20 @@ const assetUrls = computed(() => {
 
 .forest-progress-art {
   position: absolute;
-  inset: 0;
+  top: -61%;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: auto;
   pointer-events: none;
   user-select: none;
 }
 
 .forest-progress-track {
   position: absolute;
-  top: 51.2%;
+  top: 49%;
   left: 24.6%;
   width: 61.2%;
-  height: 13.2%;
+  height: 29%;
   overflow: hidden;
   border-radius: 999px;
   background: #5c3524;
@@ -149,7 +151,7 @@ const assetUrls = computed(() => {
 }
 
 .plate-progress.is-forest .progress-count {
-  top: 60%;
+  top: 64%;
   left: 87%;
   color: #fff4d4;
   text-shadow: 0 2px 3px #3b2218;

@@ -1063,12 +1063,8 @@ onUnmounted(() => {
   .scene-promo-trigger img, .scene-promo-trigger__pulse { animation: none; }
 }
 
-/* Shin-chan's lotus boat belongs to the lower shallow-water lane. It should
-   not inherit the ordinary dish wave offsets, which made the event jump
-   between water bands and look detached from the beach scene. */
+/* The forest stump and bamboo trays share one lower serving lane. */
 .scenic-dish-stage.is-forest-theme .tide-slot.is-queue-event {
-  /* Lift the enlarged boat by roughly one ordinary dish position while it
-   remains in the lower shallow-water lane. */
   padding-top: clamp(100px, 12vh, 160px);
 }
 
@@ -1694,7 +1690,7 @@ onUnmounted(() => {
 }
 
 .scenic-dish-stage.is-forest-theme .tide-slot:not(.is-queue-event) {
-  padding-top: clamp(28px, 5vh, 65px);
+  padding-top: clamp(120px, 14vh, 170px);
 }
 
 .scenic-dish-stage .tide-slot:not(.is-queue-event) .tide-dish {
