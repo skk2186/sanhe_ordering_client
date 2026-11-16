@@ -6,7 +6,7 @@
       'is-reversed': direction === 'right',
       'is-dragging': isStreamDragging,
       'is-chef-theme': themeKey === 'ailaotou',
-      'is-beach-theme': themeKey === 'zhenxian',
+      'is-forest-theme': themeKey === 'zhenxian',
       'is-underwater-theme': themeKey === 'xiaoxin',
       'is-scene-entering': sceneEntryActive
     }"
@@ -74,10 +74,10 @@
               }"
               :style="entry.style"
             >
-              <BeachBoatPass
+              <ForestStumpPass
                 v-if="entry.kind === 'event' && themeKey === 'zhenxian'"
                 :direction="direction"
-                :promo-item="promoTriggerItem"
+                :promo-item="forestFeaturedItem"
                 :promo-content="promoTrigger"
                 @dish-click="emitDishClick"
                 @featured-promo="emitFeaturedPromo"
@@ -101,6 +101,14 @@
                 <span v-if="recommendationIds.has(String(entry.item.id))" class="tide-dish__ai">AI</span>
                 <span v-if="!isAvailable(entry.item)" class="tide-dish__soldout">{{ t('common.soldOut') }}</span>
                 <img
+                  v-if="themeKey === 'zhenxian'"
+                  class="tide-dish__forest-tray"
+                  src="/images/ui/b/forest-bamboo-tray.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  v-else
                   class="tide-dish__shell"
                   src="/images/ui/b/shell-dish-tray.png"
                   alt=""
@@ -123,7 +131,7 @@
 
       <div v-else class="tide-empty">{{ t('menu.noDishes') }}</div>
 
-      <!-- 特殊事件水花层：小新船尾浪花、海龟气泡与涟漪都画在这层 canvas 上 -->
+      <!-- 云端主题海龟特殊事件的水花层 -->
       <StageSplashLayer
         v-if="splashLayerEnabled"
         ref="splashLayerRef"
@@ -141,8 +149,8 @@ import {
 } from '@element-plus/icons-vue'
 import { useI18n } from '@/i18n'
 import AmbientSceneEffects from '@/components/display/AmbientSceneEffects.vue'
-import BeachBoatPass from '@/components/display/BeachBoatPass.vue'
 import SeaTurtlePass from '@/components/display/SeaTurtlePass.vue'
+import ForestStumpPass from '@/components/display/ForestStumpPass.vue'
 import StageSplashLayer from '@/components/display/StageSplashLayer.vue'
 import { findPromoForItem } from '@/config/promoContent'
 
@@ -182,9 +190,10 @@ const availablePromoItems = computed(() => props.items
   .sort((left, right) => getPopularity(right) - getPopularity(left)))
 const promoTriggerItem = computed(() => availablePromoItems.value.find(item => findPromoForItem(item)) || null)
 const promoTrigger = computed(() => findPromoForItem(promoTriggerItem.value))
+const forestFeaturedItem = computed(() => promoTriggerItem.value || availablePromoItems.value[0] || null)
 
 // 水花层只在带特殊事件的场景启用（沙滩=小新船，海底=海龟）
-const splashLayerEnabled = computed(() => themeKey.value === 'zhenxian' || themeKey.value === 'xiaoxin')
+const splashLayerEnabled = computed(() => themeKey.value === 'xiaoxin')
 
 // 事件元素缓存：非响应式普通数组，避免每帧遍历响应式代理的开销
 let eventArtCache = []
@@ -1057,7 +1066,7 @@ onUnmounted(() => {
 /* Shin-chan's lotus boat belongs to the lower shallow-water lane. It should
    not inherit the ordinary dish wave offsets, which made the event jump
    between water bands and look detached from the beach scene. */
-.scenic-dish-stage.is-beach-theme .tide-slot.is-queue-event {
+.scenic-dish-stage.is-forest-theme .tide-slot.is-queue-event {
   /* Lift the enlarged boat by roughly one ordinary dish position while it
    remains in the lower shallow-water lane. */
   padding-top: clamp(100px, 12vh, 160px);
@@ -1124,6 +1133,58 @@ onUnmounted(() => {
   pointer-events: none;
   filter: drop-shadow(0 12px 14px rgba(8, 94, 132, 0.24));
   transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__forest-tray {
+  position: absolute;
+  left: -7%;
+  bottom: -6%;
+  z-index: 1;
+  width: 114%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 10px 10px rgba(73, 52, 24, .26));
+  transition: filter .2s ease, transform .2s ease;
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish:hover .tide-dish__forest-tray,
+.scenic-dish-stage.is-forest-theme .tide-dish:focus-visible .tide-dish__forest-tray {
+  filter: drop-shadow(0 15px 14px rgba(73, 52, 24, .32)) brightness(1.04);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__image,
+.scenic-dish-stage.is-forest-theme .tide-dish__copy {
+  transform: none;
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__image {
+  width: clamp(105px, 6vw, 160px);
+  margin-top: 54px;
+  box-shadow: 0 4px 10px rgba(73, 52, 24, .22);
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__copy {
+  width: 88%;
+  margin-bottom: 14px;
+  color: #4b321f;
+  background: rgba(255, 249, 224, .91);
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__copy h3 { color: #4b321f; }
+.scenic-dish-stage.is-forest-theme .tide-dish__copy strong { color: #a45a35; }
+
+.scenic-dish-stage.is-forest-theme .tide-dish::after {
+  background: radial-gradient(ellipse, rgba(73, 52, 24, .23), transparent 68%);
+}
+
+.scenic-dish-stage.is-forest-theme .tide-dish__soldout {
+  top: 39%;
+}
+
+.scenic-dish-stage.is-forest-theme .tide-slot.is-recommended .tide-dish__forest-tray {
+  filter: drop-shadow(0 12px 13px rgba(183, 117, 34, .33));
 }
 
 .tide-dish__chef-tray {
@@ -1479,6 +1540,11 @@ onUnmounted(() => {
     height: calc(100% + 62px);
   }
 
+  .scenic-dish-stage.is-forest-theme .tide-dish__image {
+    width: 205px;
+    margin-top: 24px;
+  }
+
   .scenic-dish-stage.is-beach-theme .tide-dish__beach-board {
     inset: 0 -42px -10px;
   }
@@ -1516,7 +1582,7 @@ onUnmounted(() => {
     flex-basis: calc((158px * 2) + var(--stream-gap));
   }
 
-  .scenic-dish-stage.is-beach-theme .tide-slot.is-queue-event {
+  .scenic-dish-stage.is-forest-theme .tide-slot.is-queue-event {
     padding-top: 96px;
   }
   .scenic-dish-stage.is-underwater-theme .tide-slot.is-queue-event {
@@ -1565,7 +1631,7 @@ onUnmounted(() => {
     flex-basis: calc((142px * 2) + var(--stream-gap));
   }
 
-  .scenic-dish-stage.is-beach-theme .tide-slot.is-queue-event {
+  .scenic-dish-stage.is-forest-theme .tide-slot.is-queue-event {
     padding-top: 76px;
   }
   .scenic-dish-stage.is-underwater-theme .tide-slot.is-queue-event {
@@ -1625,6 +1691,10 @@ onUnmounted(() => {
    independent wave offsets and component animations. */
 .scenic-dish-stage .tide-slot:not(.is-queue-event) {
   padding-top: calc(var(--stream-drop) + 180px);
+}
+
+.scenic-dish-stage.is-forest-theme .tide-slot:not(.is-queue-event) {
+  padding-top: clamp(28px, 5vh, 65px);
 }
 
 .scenic-dish-stage .tide-slot:not(.is-queue-event) .tide-dish {

@@ -6,11 +6,20 @@
     aria-valuemin="0"
     aria-valuemax="100"
     :aria-valuenow="numericProgress"
+    :class="{ 'is-forest': themeKey === 'zhenxian' }"
     :style="{ '--progress': `${numericProgress}%` }"
   >
-    <img class="progress-background" :src="assetUrls.background" alt="" aria-hidden="true">
-    <img class="progress-fill-art" :src="assetUrls.fill" alt="" aria-hidden="true">
-    <img class="progress-frame" :src="assetUrls.frame" alt="" aria-hidden="true">
+    <template v-if="themeKey === 'zhenxian'">
+      <img class="forest-progress-art" src="/images/ui/b/forest-progress.png" alt="" aria-hidden="true">
+      <span class="forest-progress-track" aria-hidden="true">
+        <span class="forest-progress-fill"></span>
+      </span>
+    </template>
+    <template v-else>
+      <img class="progress-background" :src="assetUrls.background" alt="" aria-hidden="true">
+      <img class="progress-fill-art" :src="assetUrls.fill" alt="" aria-hidden="true">
+      <img class="progress-frame" :src="assetUrls.frame" alt="" aria-hidden="true">
+    </template>
     <span class="progress-count">{{ formatted }}</span>
   </div>
 </template>
@@ -31,8 +40,7 @@ const numericProgress = computed(() => {
 })
 
 const assetUrls = computed(() => {
-  const themeFolder = props.themeKey === 'xiaoxin' ? 'c' : 'b'
-  const base = `/images/ui/${themeFolder}`
+  const base = `/images/ui/${props.themeKey === 'xiaoxin' ? 'c' : 'b'}`
 
   return {
     background: `${base}/bar.png`,
@@ -49,6 +57,15 @@ const assetUrls = computed(() => {
   aspect-ratio: 941 / 93;
   overflow: hidden;
   isolation: isolate;
+}
+
+.plate-progress.is-forest {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .progress-background,
@@ -98,6 +115,44 @@ const assetUrls = computed(() => {
   line-height: 1;
   text-align: left;
   text-shadow: 0 2px 3px rgba(43, 19, 9, 0.72);
+}
+
+.forest-progress-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.forest-progress-track {
+  position: absolute;
+  top: 51.2%;
+  left: 24.6%;
+  width: 61.2%;
+  height: 13.2%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #5c3524;
+  box-shadow: inset 0 2px 4px rgba(38, 20, 13, .56);
+}
+
+.forest-progress-fill {
+  display: block;
+  width: var(--progress);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #83ab2f 0%, #c9cc39 55%, #ffd85a 100%);
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, .35);
+  transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.plate-progress.is-forest .progress-count {
+  top: 60%;
+  left: 87%;
+  color: #fff4d4;
+  text-shadow: 0 2px 3px #3b2218;
 }
 
 @media (max-width: 600px) {

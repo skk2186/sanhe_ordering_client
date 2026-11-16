@@ -28,7 +28,7 @@ const EVENT_LIBRARY = {
     { type: 'warmth', duration: 3800, left: 51, top: 47 }
   ],
   zhenxian: [
-    { type: 'fish-shadow', duration: 3600, left: 8, top: 66 }
+    { type: 'forest-leaf', duration: 3800, left: 68, top: 26 }
   ],
   xiaoxin: [
     { type: 'bubble-cluster', duration: 4800, left: 16, top: 63 },
@@ -196,6 +196,15 @@ onUnmounted(() => {
   animation-name: fish-drift;
 }
 
+.ambient-event--forest-leaf {
+  width: 13px;
+  height: 22px;
+  border-radius: 100% 0 100% 0;
+  background: #a6bf58;
+  opacity: 0;
+  animation-name: forest-leaf-drift;
+}
+
 .ambient-event--bubble-cluster {
   width: 150px;
   height: 220px;
@@ -243,6 +252,12 @@ onUnmounted(() => {
   24% { opacity: 0.5; }
   74% { opacity: 0.4; }
   100% { opacity: 0; transform: translate(150%, -50%) scale(1.08); }
+}
+
+@keyframes forest-leaf-drift {
+  0% { opacity: 0; transform: translate(-30px, -20px) rotate(-20deg); }
+  28% { opacity: .7; }
+  100% { opacity: 0; transform: translate(65px, 90px) rotate(105deg); }
 }
 
 @keyframes bubble-rise {
